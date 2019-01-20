@@ -9,9 +9,13 @@ import css from "../css/app.css"
 //
 // Import dependencies
 //
-import "phoenix_html"
+// // TODO: see if there's anything from this to crib
+// import "phoenix_html"
 
 // Import local files
 //
 // Local files can be imported directly using relative paths, for example:
 // import socket from "./socket"
+
+// Test hello
+console.log("Uh, hi?");
