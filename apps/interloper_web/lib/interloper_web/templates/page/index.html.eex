@@ -1,35 +1,43 @@
-<section class="phx-hero">
-  <h1><%= gettext "Welcome to %{name}!", name: "Phoenix" %></h1>
-  <p>A productive web framework that<br/>does not compromise speed and maintainability.</p>
-</section>
-
-<section class="row">
-  <article class="column">
-    <h2>Resources</h2>
-    <ul>
-      <li>
-        <a href="https://hexdocs.pm/phoenix/overview.html">Guides &amp; Docs</a>
-      </li>
-      <li>
-        <a href="https://github.com/phoenixframework/phoenix">Source</a>
-      </li>
-      <li>
-        <a href="https://github.com/phoenixframework/phoenix/blob/v1.4/CHANGELOG.md">v1.4 Changelog</a>
-      </li>
-    </ul>
-  </article>
-  <article class="column">
-    <h2>Help</h2>
-    <ul>
-      <li>
-        <a href="https://elixirforum.com/c/phoenix-forum">Forum</a>
-      </li>
-      <li>
-        <a href="https://webchat.freenode.net/?channels=elixir-lang">#elixir-lang on Freenode IRC</a>
-      </li>
-      <li>
-        <a href="https://twitter.com/elixirphoenix">Twitter @elixirphoenix</a>
-      </li>
-    </ul>
-  </article>
-</section>
+<div class="textbox">
+  <span class="green" id="motd">
+    Welcome to InterloperOS!<br>
+    Version: <span class="orange">0.2.0 (alpha)</span><br>
+    Mode: <span class="orange">Elixir</span>
+  </span>
+</div>
+<div class="textbox"><br></div>
+<div class="textbox">
+  This is a test of the InterloperOS system.<br>
+  <br>
+  * Up/down arrow keys to select<br>
+  * Escape key to deselect<br>
+  * Enter key to accept
+</div>
+<div class="textbox"><br></div>
+<div class="textbox">
+  User: <span class="yellow">Raymond Neilson</span>
+</div>
+<div class="textbox"><br></div>
+<div class="textbox">
+  <span class="bold underline">Software</span>
+</div>
+<div class="textbox"><br></div>
+<div class="textbox">
+  <a class="blue selector" href="/games" data-id="games">Game projects</a>
+</div>
+<div class="textbox"><br></div>
+<div class="textbox">
+  <a class="blue selector" href="/github" data-id="github">Github repositories</a>
+</div>
+<div class="textbox"><br></div>
+<div class="textbox">
+  <span class="bold underline">About</span>
+</div>
+<div class="textbox"><br></div>
+<div class="textbox">
+  <a class="blue selector" href="/twitter" data-id="twitter">Twitter</a>
+</div>
+<div class="textbox"><br></div>
+<div class="textbox">
+  <a class="blue selector" href="mailto:rneilson@interloper.ca" target="_blank" data-id="email">Email</a>
+</div>
