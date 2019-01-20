@@ -3,9 +3,14 @@ defmodule InterloperWeb.Router do
 
   pipeline :browser do
     plug :accepts, ["html"]
-    plug :fetch_session
-    plug :fetch_flash
-    plug :protect_from_forgery
+
+    # TODO: reenable if/when we find some use for sessions
+    # plug :fetch_session
+    # plug :fetch_flash
+
+    # TODO: reenable if/when any forms are set up
+    # plug :protect_from_forgery
+
     plug :put_secure_browser_headers
   end
 

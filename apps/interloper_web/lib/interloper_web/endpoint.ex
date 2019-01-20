@@ -34,13 +34,15 @@ defmodule InterloperWeb.Endpoint do
   plug Plug.MethodOverride
   plug Plug.Head
 
-  # The session will be stored in the cookie and signed,
-  # this means its contents can be read but not tampered with.
-  # Set :encryption_salt if you would also like to encrypt it.
-  plug Plug.Session,
-    store: :cookie,
-    key: "_interloper_web_key",
-    signing_salt: "VpTe81l8"
+  # TODO: reenable if/when we ever use sessions
+  # (probably via Redis instead of cookies, too)
+  # # The session will be stored in the cookie and signed,
+  # # this means its contents can be read but not tampered with.
+  # # Set :encryption_salt if you would also like to encrypt it.
+  # plug Plug.Session,
+  #   store: :cookie,
+  #   key: "_interloper_web_key",
+  #   signing_salt: "VpTe81l8"
 
   plug InterloperWeb.Router
 end
