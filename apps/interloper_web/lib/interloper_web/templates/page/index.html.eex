@@ -1,7 +1,7 @@
 <div class="textbox">
   <span class="green" id="motd">
     Welcome to InterloperOS!<br>
-    Version: <span class="orange">0.2.0 (alpha)</span><br>
+    Version: <span class="orange"><%= get_version() %> (alpha)</span><br>
     Mode: <span class="orange">Elixir</span>
   </span>
 </div>
@@ -23,7 +23,7 @@
 </div>
 <div class="textbox"><br></div>
 <div class="textbox">
-  <a class="blue selector" href="/games" data-id="games">Game projects</a>
+  <a class="blue selector" href="<%= Routes.page_path(@conn, :games) %>" data-id="games">Game projects</a>
 </div>
 <div class="textbox"><br></div>
 <div class="textbox">

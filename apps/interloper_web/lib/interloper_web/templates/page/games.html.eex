@@ -1,0 +1,34 @@
+<div class="textbox"><br></div>
+<div class="textbox">
+    <span class="bold underline">Game projects</span>
+</div>
+<div class="textbox"><br></div>
+<div class="textbox">
+    <div class="imgbox">
+        <a class="blue selector" href="https://www.interloper.ca/rampant" target="_blank" data-id="rampant">
+            <img src="<%= Routes.static_url(@conn, "/images/rampant-banner.jpg") %>" title="_rampant">
+        </a>
+    </div>
+</div>
+<div class="textbox"><br></div>
+<div class="textbox">
+    A twin-stick arena shooter, featuring dynamic physics, a distinct aesthetic, multiple game modes, and intelligent enemy AI.
+</div>
+<div class="textbox"><br></div>
+<div class="textbox">
+    <%# TODO: update base URL if/when _rampant subsite brought in %>
+    <a class="blue selector" href="https://www.interloper.ca/rampant" target="_blank" data-id="site">Visit the official site</a>
+</div>
+<div class="textbox">
+    <a class="blue selector" href="https://rneilson.itch.io/rampant" target="_blank" data-id="buy">Buy it on itch.io</a>
+</div>
+<div class="textbox">
+    <a class="blue selector" href="https://www.youtube.com/watch?v=L9RNKRnfUKE" target="_blank" data-id="trailer">Watch the trailer on Youtube</a>
+</div>
+<div class="textbox">
+    <a class="blue selector" href="https://github.com/rneilson/rampant-src" target="_blank" data-id="source">Read the source on Github</a>
+</div>
+<div class="textbox"><br></div>
+<div class="textbox">
+    <a class="green selector" href="<%= Routes.page_path(@conn, :index) %>" data-id=":index" data-preview="/">[Up]</a>
+</div>
