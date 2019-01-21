@@ -38,17 +38,17 @@
 /* @import must be at top of file, otherwise CSS will not work */
 /*@import url("//hello.myfonts.net/count/321e0c");*/
 
-/*@font-face {font-family: 'Native';font-weight: normal;font-style: normal;src: url('webfonts/321E40_3_0.eot');src: url('webfonts/321E40_3_0.eot?#iefix') format('embedded-opentype'),url('webfonts/321E40_3_0.woff2') format('woff2'),url('webfonts/321E40_3_0.woff') format('woff'),url('webfonts/321E40_3_0.ttf') format('truetype');}*/
+@font-face {font-family: 'Native';font-weight: normal;font-style: normal;src: url('/fonts/321E40_3_0.eot');src: url('/fonts/321E40_3_0.eot?#iefix') format('embedded-opentype'),url('/fonts/321E40_3_0.woff2') format('woff2'),url('/fonts/321E40_3_0.woff') format('woff'),url('/fonts/321E40_3_0.ttf') format('truetype');}
 
-/*@font-face {font-family: 'Native';font-weight: normal;font-style: italic;src: url('webfonts/321E40_0_0.eot');src: url('webfonts/321E40_0_0.eot?#iefix') format('embedded-opentype'),url('webfonts/321E40_0_0.woff2') format('woff2'),url('webfonts/321E40_0_0.woff') format('woff'),url('webfonts/321E40_0_0.ttf') format('truetype');}*/
+@font-face {font-family: 'Native';font-weight: normal;font-style: italic;src: url('/fonts/321E40_0_0.eot');src: url('/fonts/321E40_0_0.eot?#iefix') format('embedded-opentype'),url('/fonts/321E40_0_0.woff2') format('woff2'),url('/fonts/321E40_0_0.woff') format('woff'),url('/fonts/321E40_0_0.ttf') format('truetype');}
 
-/*@font-face {font-family: 'Native';font-weight: bold;font-style: normal;src: url('webfonts/321E40_2_0.eot');src: url('webfonts/321E40_2_0.eot?#iefix') format('embedded-opentype'),url('webfonts/321E40_2_0.woff2') format('woff2'),url('webfonts/321E40_2_0.woff') format('woff'),url('webfonts/321E40_2_0.ttf') format('truetype');}*/
+@font-face {font-family: 'Native';font-weight: bold;font-style: normal;src: url('/fonts/321E40_2_0.eot');src: url('/fonts/321E40_2_0.eot?#iefix') format('embedded-opentype'),url('/fonts/321E40_2_0.woff2') format('woff2'),url('/fonts/321E40_2_0.woff') format('woff'),url('/fonts/321E40_2_0.ttf') format('truetype');}
 
-/*@font-face {font-family: 'Native';font-weight: bold;font-style: italic;src: url('webfonts/321E40_5_0.eot');src: url('webfonts/321E40_5_0.eot?#iefix') format('embedded-opentype'),url('webfonts/321E40_5_0.woff2') format('woff2'),url('webfonts/321E40_5_0.woff') format('woff'),url('webfonts/321E40_5_0.ttf') format('truetype');}*/
+@font-face {font-family: 'Native';font-weight: bold;font-style: italic;src: url('/fonts/321E40_5_0.eot');src: url('/fonts/321E40_5_0.eot?#iefix') format('embedded-opentype'),url('/fonts/321E40_5_0.woff2') format('woff2'),url('/fonts/321E40_5_0.woff') format('woff'),url('/fonts/321E40_5_0.ttf') format('truetype');}
 
-/*@font-face {font-family: 'Native-Light';src: url('webfonts/321E40_4_0.eot');src: url('webfonts/321E40_4_0.eot?#iefix') format('embedded-opentype'),url('webfonts/321E40_4_0.woff2') format('woff2'),url('webfonts/321E40_4_0.woff') format('woff'),url('webfonts/321E40_4_0.ttf') format('truetype');}*/
+/*@font-face {font-family: 'Native-Light';src: url('/fonts/321E40_4_0.eot');src: url('/fonts/321E40_4_0.eot?#iefix') format('embedded-opentype'),url('/fonts/321E40_4_0.woff2') format('woff2'),url('/fonts/321E40_4_0.woff') format('woff'),url('/fonts/321E40_4_0.ttf') format('truetype');}*/
 
-/*@font-face {font-family: 'Native-LightItalic';src: url('webfonts/321E40_1_0.eot');src: url('webfonts/321E40_1_0.eot?#iefix') format('embedded-opentype'),url('webfonts/321E40_1_0.woff2') format('woff2'),url('webfonts/321E40_1_0.woff') format('woff'),url('webfonts/321E40_1_0.ttf') format('truetype');}*/
+/*@font-face {font-family: 'Native-LightItalic';src: url('/fonts/321E40_1_0.eot');src: url('/fonts/321E40_1_0.eot?#iefix') format('embedded-opentype'),url('/fonts/321E40_1_0.woff2') format('woff2'),url('/fonts/321E40_1_0.woff') format('woff'),url('/fonts/321E40_1_0.ttf') format('truetype');}*/
 
 html {
     box-sizing:border-box;
