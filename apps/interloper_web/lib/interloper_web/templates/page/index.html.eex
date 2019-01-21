@@ -23,11 +23,11 @@
 </div>
 <div class="textbox"><br></div>
 <div class="textbox">
-  <a class="blue selector" href="<%= Routes.page_path(@conn, :games) %>" data-id="games">Game projects</a>
+  <a class="blue selector" href="/github" data-id="github">Github repositories</a>
 </div>
 <div class="textbox"><br></div>
 <div class="textbox">
-  <a class="blue selector" href="/github" data-id="github">Github repositories</a>
+  <a class="blue selector" href="<%= Routes.page_path(@conn, :games) %>" data-id=":games">Game projects</a>
 </div>
 <div class="textbox"><br></div>
 <div class="textbox">

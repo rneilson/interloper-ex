@@ -34,10 +34,6 @@
  * © 2016 MyFonts Inc
 */
 
-
-/* @import must be at top of file, otherwise CSS will not work */
-/*@import url("//hello.myfonts.net/count/321e0c");*/
-
 @font-face {font-family: 'Native';font-weight: normal;font-style: normal;src: url('/fonts/321E40_3_0.eot');src: url('/fonts/321E40_3_0.eot?#iefix') format('embedded-opentype'),url('/fonts/321E40_3_0.woff2') format('woff2'),url('/fonts/321E40_3_0.woff') format('woff'),url('/fonts/321E40_3_0.ttf') format('truetype');}
 
 @font-face {font-family: 'Native';font-weight: normal;font-style: italic;src: url('/fonts/321E40_0_0.eot');src: url('/fonts/321E40_0_0.eot?#iefix') format('embedded-opentype'),url('/fonts/321E40_0_0.woff2') format('woff2'),url('/fonts/321E40_0_0.woff') format('woff'),url('/fonts/321E40_0_0.ttf') format('truetype');}
@@ -45,10 +41,6 @@
 @font-face {font-family: 'Native';font-weight: bold;font-style: normal;src: url('/fonts/321E40_2_0.eot');src: url('/fonts/321E40_2_0.eot?#iefix') format('embedded-opentype'),url('/fonts/321E40_2_0.woff2') format('woff2'),url('/fonts/321E40_2_0.woff') format('woff'),url('/fonts/321E40_2_0.ttf') format('truetype');}
 
 @font-face {font-family: 'Native';font-weight: bold;font-style: italic;src: url('/fonts/321E40_5_0.eot');src: url('/fonts/321E40_5_0.eot?#iefix') format('embedded-opentype'),url('/fonts/321E40_5_0.woff2') format('woff2'),url('/fonts/321E40_5_0.woff') format('woff'),url('/fonts/321E40_5_0.ttf') format('truetype');}
-
-/*@font-face {font-family: 'Native-Light';src: url('/fonts/321E40_4_0.eot');src: url('/fonts/321E40_4_0.eot?#iefix') format('embedded-opentype'),url('/fonts/321E40_4_0.woff2') format('woff2'),url('/fonts/321E40_4_0.woff') format('woff'),url('/fonts/321E40_4_0.ttf') format('truetype');}*/
-
-/*@font-face {font-family: 'Native-LightItalic';src: url('/fonts/321E40_1_0.eot');src: url('/fonts/321E40_1_0.eot?#iefix') format('embedded-opentype'),url('/fonts/321E40_1_0.woff2') format('woff2'),url('/fonts/321E40_1_0.woff') format('woff'),url('/fonts/321E40_1_0.ttf') format('truetype');}*/
 
 html {
     box-sizing:border-box;
@@ -62,18 +54,12 @@ body {
     height: 100vh;
     /*background-color: #2D2D2D;*/
     background-color: black;
-    /*color: #D4D2CF;*/
     color: #d2cfcd;
-    /*font-family: "Droid Sans Mono", "Lucida Console", "Liberation Mono", Monaco, monospace;*/
     font-family: "Native", "Lucida Console", "Liberation Mono", Monaco, monospace;
-    /*font-family: "Native";*/
-    /*font-family: "Native-Light";*/
     font-style: normal;
     font-variant: normal;
     font-weight: normal;
-    /*font-size: 14px;*/
     font-size: 15px;
-    /*line-height: 1.2858;*/
     line-height: 1.2;
     margin: 0px;
 }
@@ -89,7 +75,6 @@ a {
 }
 a:focus {
     outline: none;
-    /*line-height: normal;*/
 }
 div {
     border: none;
@@ -122,7 +107,6 @@ div.overlay {
     padding: 0px;
     z-index: 1;
     position: absolute;
-    /*text-align: center;*/
     top: -1px;
     bottom: -1px;
     left: 0px;
@@ -130,7 +114,6 @@ div.overlay {
 }
 div.popup {
     position: absolute;
-    /*top: 0px;*/
     left: 0px;
     right: 0px;
     -webkit-transition-property: left, right, top, bottom, opacity;
@@ -151,8 +134,6 @@ div.popup.inactive-x {
 div.popup.inactive-y {
     top: 50%;
     bottom: 50%;
-    /*top: calc(50% - 1px);*/
-    /*bottom: calc(50% - 1px);*/
     overflow: hidden;
 }
 div.status {
@@ -184,8 +165,6 @@ div.bannerbox img{
 div.textbox {
     border: none;
     padding: 0px 4px;
-    /*margin-right: 15px;*/
-    /*position: relative;*/
 }
 div.textbox p {
     padding: 0px;
@@ -261,8 +240,6 @@ div.tweetbox a:focus > img, div.tweetbox a:hover > img {
     padding: 0px;
 }
 div.tweettext {
-    /*margin-left: 48px;*/
-    /*padding: 0px 0px 4px;*/
     padding: 0px;
 }
 div.tweetquote {
@@ -298,13 +275,11 @@ div.tweetspacer {
     }
     .small {
         font-size: 12px;
-        /*font-size: 11px;*/
     }
 }
 @media all and (max-width: 727px) and (min-width: 549px) {
     body {
         font-size: 2.06044vw;
-        /*font-size: 1.92308vw;*/
     }
     .popup {
         top: 2.47253vw;
@@ -312,17 +287,14 @@ div.tweetspacer {
     }
     .small {
         font-size: 1.64835vw;
-        /*font-size: 1.51099vw;*/
     }
     .indent {
         margin-left: 2.06044vw;
-        /*margin-left: 1.92308vw;*/
     }
 }
 @media all and (max-width: 548px) {
     body {
         font-size: 11px;
-        /*font-size: 10.5px;*/
     }
     .popup {
         top: 14px;
@@ -333,7 +305,6 @@ div.tweetspacer {
     }
     .indent {
         margin-left: 11px;
-        /*margin-left: 10.5px;*/
     }
 }
 @media all and (min-height: 756px) {
@@ -342,8 +313,6 @@ div.tweetspacer {
         padding-bottom: 18px;
     }
     #main {
-        /*top: 1px;*/
-        // height: 720px;
         height: calc(100% - 18px);
     }
 }
@@ -353,8 +322,6 @@ div.tweetspacer {
         padding-bottom: 2.38095vh;
     }
     #main {
-        /*top: 1px;*/
-        /*bottom: 1px;*/
         height: 100%;
     }
 }
@@ -362,8 +329,6 @@ p {
     padding-top: 4px;
     padding-bottom: 4px;
     margin: 0px;
-    /*margin-top: 4px;*/
-    /*margin-bottom: 4px;*/
 }
 p.ralignlink {
     padding-right: 2em;
@@ -381,10 +346,7 @@ sup {
     padding-right: 4px;
 }
 #main {
-    /*background-color: #171616;*/
     background-color: black;
-    /*width: 100%;*/
-    /*height: 100%;*/
     position: relative;
     left: 0;
     right: 0;
@@ -442,17 +404,8 @@ sup {
     text-decoration: underline;
 }
 .italic {
-    /*font-family: "Native-LightItalic";*/
     font-style: italic;
 }
-/*
-.small {
-    font-family: "Native-Light";
-}
-.small.italic {
-    font-family: "Native-LightItalic";
-}
-*/
 .indent {
     margin-left: 14px;
 }

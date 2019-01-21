@@ -4,10 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width">
     <title>Interloper</title>
-    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Droid+Sans+Mono" />
     <link rel="stylesheet" type="text/css" href="<%= Routes.static_path(@conn, "/css/app.css") %>"/>
-    <link rel="shortcut icon" href="<%= Routes.static_path(@conn, "/favicon.ico") %>" />
-    <link rel="icon" href="<%= Routes.static_path(@conn, "/favicon.ico") %>" />
+    <link rel="shortcut icon" href="<%= Routes.static_path(@conn, "/_favicon.ico") %>" />
+    <link rel="icon" href="<%= Routes.static_path(@conn, "/_favicon.ico") %>" />
     <meta name="og:title" content="Interloper">
     <meta name="og:description" content="Personal site of Raymond Neilson">
     <meta name="og:image" content="<%= Routes.static_url(@conn, "/images/rodeo.png") %>">
