@@ -17,7 +17,7 @@ defmodule InterloperWeb.GithubClient do
 
   # TODO: guard for path?
   def start_link(path) do
-    GenServer.start_link(__MODULE__, path, name: {:via, InterloperWeb.Registry, get_name(path)})
+    GenServer.start_link(__MODULE__, path, name: get_via_tuple(path))
   end
 
   @doc """
@@ -33,7 +33,7 @@ defmodule InterloperWeb.GithubClient do
   def fetch(path) when binary_part(path, 0, 1) == "/" do
     # Ensure server started or get existing
     case get_or_create_server(path) do
-      {:ok, pid} -> GenServer.call(pid, {:fetch, path})
+      {:ok, pid} -> GenServer.call(pid, :fetch)
       {:error, reason} -> {:error, reason}
     end
   end
@@ -58,8 +58,21 @@ defmodule InterloperWeb.GithubClient do
 
   # TODO: handle_continue to send first timeout message?
 
+  # Cache valid, return existing
+  def handle_call(:fetch, %{body: body, cache_valid: true} = state) do
+    {:reply, {:ok, body}, state}
+  end
+
+  # Cache not valid and no task dispatched, refetch
   # TODO: handle_call/3
 
+  # Cache not valid and task already dispatched, add caller
+  # TODO: handle_call/3
+
+  # Task complete, reply to callers and update cache
+  # TODO: handle_info/2
+
+  # Task failed, reply to callers and keep cache
   # TODO: handle_info/2
 
 
@@ -69,6 +82,11 @@ defmodule InterloperWeb.GithubClient do
   @spec get_name(binary) :: {atom, binary}
   defp get_name(path) when is_binary(path) do
     {:github, path}
+  end
+
+  # Get via tuple for use with registries
+  defp get_via_tuple(path) when is_binary(path) do
+    {:via, Registry, {InterloperWeb.Registry, get_name(path)}}
   end
 
   # Get the path portion of a given Github API URL.
