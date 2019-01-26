@@ -1,4 +1,4 @@
-defmodule InterloperWeb.Github do
+defmodule InterloperWeb.GithubClient do
   @moduledoc """
   Interface to the Github API, with persistent caching
   to reduce external calls and avoid rate limits.
@@ -13,7 +13,10 @@ defmodule InterloperWeb.Github do
 
   ## Client
 
-  # TODO: start_link/3
+  # TODO: guard for path?
+  def start_link(path) do
+    GenServer.start_link(__MODULE__, path, name: {:via, InterloperWeb.Registry, get_name(path)})
+  end
 
   # TODO: fetch/1
 
@@ -27,6 +30,13 @@ defmodule InterloperWeb.Github do
   end
 
   ## Internal (utils)
+
+  @doc """
+  Get name tuple for use with registry.
+  """
+  def get_name(path) do
+    {:github, path}
+  end
 
   # TODO: get_or_create_server/1
 
