@@ -8,8 +8,12 @@ defmodule InterloperWeb.Application do
   def start(_type, _args) do
     # List all child processes to be supervised
     children = [
+      # Start a registry
+      {Registry, keys: :unique, name: InterloperWeb.Registry},
+      # Dynamic supervisor for fetcher processes (etc)
+      {DynamicSupervisor, strategy: :one_for_one, name: InterloperWeb.DynamicSupervisor},
       # Start the endpoint when the application starts
-      InterloperWeb.Endpoint
+      InterloperWeb.Endpoint,
       # Starts a worker by calling: InterloperWeb.Worker.start_link(arg)
       # {InterloperWeb.Worker, arg},
     ]
