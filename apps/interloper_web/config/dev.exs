@@ -56,6 +56,9 @@ config :interloper_web, InterloperWeb.Endpoint,
       ~r{priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$},
       ~r{priv/gettext/.*(po)$},
       ~r{lib/interloper_web/views/.*(ex)$},
-      ~r{lib/interloper_web/templates/.*(eex)$}
+      ~r{lib/interloper_web/templates/.*(eex)$},
+      # Also watch controllers and clients
+      ~r{lib/interloper_web/controllers/.*(ex)$},
+      ~r{lib/interloper_web/clients/.*(ex)$},
     ]
   ]
