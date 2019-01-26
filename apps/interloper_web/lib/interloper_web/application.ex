@@ -12,6 +12,8 @@ defmodule InterloperWeb.Application do
       {Registry, keys: :unique, name: InterloperWeb.Registry},
       # Dynamic supervisor for fetcher processes (etc)
       {DynamicSupervisor, strategy: :one_for_one, name: InterloperWeb.DynamicSupervisor},
+      # Task supervisor for fetch tasks (etc)
+      {Task.Supervisor, name: InterloperWeb.TaskSupervisor},
       # Start the endpoint when the application starts
       InterloperWeb.Endpoint,
       # Starts a worker by calling: InterloperWeb.Worker.start_link(arg)
