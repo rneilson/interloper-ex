@@ -13,6 +13,8 @@ defmodule InterloperWeb.GithubClient do
 
   @base_url "https://api.github.com"
 
+  @cache_timeout 60 * 1000  # 60s by default
+
   ## Client
 
   # TODO: guard for path?
@@ -114,9 +116,46 @@ defmodule InterloperWeb.GithubClient do
   end
 
   # Task complete, reply to callers and update cache
-  # TODO: handle_info/2
+  def handle_info({ref, response}, %{ref: ref, callers: callers} = state) do
+    # Demonitor task
+    Process.demonitor(ref, [:flush])
+    # TODO: parse response and determine success/error
+    body = Jason.decode!(response.body)
+    # TODO: any parsing of the header value?
+    cache_tag =
+      case List.keyfind(response.headers, "etag", 0) do
+        {_, etag} -> etag
+        nil -> nil
+      end
+    # Reply to previous callers
+    new_callers = reply_to_callers({:ok, body}, callers)
+    # Send cache timeout message
+    # TODO: decide whether to invalidate cache based on response
+    Process.send_after(self(), :invalidate_cache, @cache_timeout)
+    # Update state
+    new_state = %{
+        path: state.path,
+        body: body,
+        ref: nil,
+        callers: new_callers,
+        cache_tag: cache_tag,
+        cache_valid: true,
+      }
+    {:noreply, new_state}
+  end
 
   # Task failed, reply to callers and keep cache
+  # TODO: handle_info/2
+
+  # Cache timed out, update state
+  def handle_info(:invalidate_cache, %{ref: ref} = state) do
+    case ref do
+      nil ->
+        {:noreply, %{state | cache_valid: false}}
+      _ ->
+        {:noreply, state}
+    end
+  end
   # TODO: handle_info/2
 
 
@@ -183,6 +222,13 @@ defmodule InterloperWeb.GithubClient do
   end
   defp add_etag_header(headers, etag) when byte_size(etag) > 0 do
     headers ++ [{"If-None-Match", etag}]
+  end
+
+  # Reply to all stored callers
+  defp reply_to_callers(response, callers) do
+    # TODO: some error handling?
+    Enum.map(callers, fn from -> GenServer.reply(from, response) end)
+    []
   end
 
 end
