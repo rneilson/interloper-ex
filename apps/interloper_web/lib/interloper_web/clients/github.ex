@@ -93,8 +93,7 @@ defmodule InterloperWeb.GithubClient do
 
   def init(path) do
     # Initial state
-    # TODO: make this into a struct?
-    state = %{ path: path, body: nil, ref: nil, callers: [], cache_tag: nil, cache_valid: false }
+    state = create_new_state(path)
     # TODO: continue?
     {:ok, state}
   end
@@ -125,7 +124,7 @@ defmodule InterloperWeb.GithubClient do
   end
 
   # Task complete, reply to callers and update cache
-  def handle_info({ref, response}, %{ref: ref, callers: callers} = state) do
+  def handle_info({ref, response}, %{ref: ref, callers: callers, path: path}) do
     # Demonitor task
     Process.demonitor(ref, [:flush])
     # Get headers
@@ -138,8 +137,12 @@ defmodule InterloperWeb.GithubClient do
         :ok -> decoded
         :error -> response.body
       end
-    # TODO: check status code for success/error
-    status = decode_success
+    # Check status code, plus decode success, for success/error
+    status =
+      case {response.status_code, decode_success} do
+        {status_code, :ok} when status_code >= 200 and status_code < 400 -> :ok
+        _ -> :error
+      end
     # Reply to previous callers
     reply_to_callers({status, body}, callers)
     # Only cache if request successful
@@ -155,16 +158,8 @@ defmodule InterloperWeb.GithubClient do
       Process.send_after(self(), :invalidate_cache, @cache_timeout)
     end
     # Update state
-    new_state =
-      %{
-        path: state.path,
-        body: new_body,
-        ref: nil,
-        callers: [],
-        cache_tag: new_cache_tag,
-        cache_valid: success,
-      }
-    {:noreply, new_state}
+    new_state = create_new_state(path)
+    {:noreply, %{new_state | body: new_body, cache_tag: new_cache_tag, cache_valid: success}}
   end
 
   # Task failed, reply to callers and clear cache
@@ -173,16 +168,7 @@ defmodule InterloperWeb.GithubClient do
     # Reply to previous callers (obscure real error, though)
     reply_to_callers({:error, "Request failed for #{path}"}, callers)
     # Update state
-    new_state =
-      %{
-        path: path,
-        body: nil,
-        ref: nil,
-        callers: [],
-        cache_tag: nil,
-        cache_valid: false,
-      }
-    {:noreply, new_state}
+    {:noreply, create_new_state(path)}
   end
 
   # Cache timed out, update state
@@ -198,6 +184,19 @@ defmodule InterloperWeb.GithubClient do
 
 
   ## Internal (utilities)
+
+  # Fresh state
+  # TODO: move to its own struct type?
+  defp create_new_state(path) do
+    %{
+      path: path,
+      body: nil,
+      ref: nil,
+      callers: [],
+      cache_tag: nil,
+      cache_valid: false,
+    }
+  end
 
   # Get currently-configured base URL
   @spec get_base_url() :: binary
