@@ -91,15 +91,27 @@ defmodule InterloperWeb.GithubClient do
   # TODO: handle_continue to send first timeout message?
 
   # Cache valid, return existing
-  def handle_call(:fetch, %{body: body, cache_valid: true} = state) do
+  def handle_call(:fetch, _from, %{body: body, cache_valid: true} = state) do
     {:reply, {:ok, body}, state}
   end
 
   # Cache not valid and no task dispatched, refetch
-  # TODO: handle_call/3
+  def handle_call(:fetch, from, %{ref: nil, cache_valid: false} = state) do
+    # Get path, callers list (should be empty), and cache tag from state
+    # (Separate just to keep it clean)
+    %{path: path, callers: callers, cache_tag: cache_tag} = state
+    # Dispatch new task
+    task = Task.Supervisor.async_nolink(
+      InterloperWeb.TaskSupervisor, __MODULE__, :fetch_raw, [path, cache_tag])
+    # Add caller to list, keep task ref, wait for response
+    {:noreply, %{state | ref: task.ref, callers: [from | callers]}}
+  end
 
   # Cache not valid and task already dispatched, add caller
-  # TODO: handle_call/3
+  def handle_call(:fetch, from, %{ref: _ref, callers: callers, cache_valid: false} = state) do
+    # Save new caller for when task returns
+    {:noreply, %{state | callers: [from | callers]}}
+  end
 
   # Task complete, reply to callers and update cache
   # TODO: handle_info/2
