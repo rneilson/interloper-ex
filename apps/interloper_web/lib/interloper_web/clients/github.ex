@@ -69,20 +69,20 @@ defmodule InterloperWeb.GithubClient do
 
   Returns raw HTTPoison response struct.
   """
-  @spec fetch_raw(path :: binary, etag :: binary | nil) :: any
-  def fetch_raw(path, etag \\ nil) do
+  @spec fetch_raw(path :: binary, auth :: binary | nil, etag :: binary | nil) :: any
+  def fetch_raw(path, auth \\ nil, etag \\ nil) do
     # Actual request URL
     url = get_base_url() <> path
     # Headers
     headers = List.flatten([
       [{"Accept", "application/json"}],
-      add_authorization_header(),
+      add_authorization_header(auth),
       add_etag_header(etag),
       # TODO: if-modified-since?
     ])
     # Options, if any even make sense?
     # TODO: SSL options, possibly?
-    options = []
+    options = [follow_redirect: true]
     # Make request
     # TODO: actually use HTTPoison...
     request = %{ method: :get, url: url, headers: headers, options: options }
@@ -107,7 +107,6 @@ defmodule InterloperWeb.GithubClient do
           {200, [], "{\"data\": \"Fresh data\"}"}
       end
     # TEMP: return faked response struct
-    Logger.debug("Response headers: #{inspect(headers)}")
     %{ body: body, headers: headers, request: request, request_url: url, status_code: status_code }
   end
 
@@ -130,15 +129,15 @@ defmodule InterloperWeb.GithubClient do
   end
 
   # Cache not valid and no task dispatched, refetch
-  def handle_call(:fetch, from, %{body: old_body, ref: nil, cache_valid: false} = state) do
-    # Get path, callers list (should be empty), and cache tag from state
+  def handle_call(:fetch, from, %{ref: nil, cache_valid: false} = state) do
+    # Get auth, body, path, callers list (should be empty), and cache tag from state
     # (Separate just to keep it clean)
-    %{path: path, callers: callers, cache_tag: cache_tag} = state
+    %{auth: auth, body: old_body, path: path, callers: callers, cache_tag: cache_tag} = state
     # Only set etag header if body present
     etag = if is_nil(old_body), do: nil, else: cache_tag
     # Dispatch new task
     task = Task.Supervisor.async_nolink(
-      InterloperWeb.TaskSupervisor, __MODULE__, :fetch_raw, [path, etag])
+      InterloperWeb.TaskSupervisor, __MODULE__, :fetch_raw, [path, auth, etag])
     # Add caller to list, keep task ref, wait for response
     {:noreply, %{state | ref: task.ref, callers: [from | callers]}}
   end
@@ -153,6 +152,10 @@ defmodule InterloperWeb.GithubClient do
   def handle_info({ref, response}, %{path: path, body: old_body, ref: ref, callers: callers}) do
     # Demonitor task
     Process.demonitor(ref, [:flush])
+    # TEMP: remove this later?
+    Logger.debug("Response url: #{inspect(response.request_url)}")
+    Logger.debug("Response code: #{inspect(response.status_code)}")
+    Logger.debug("Response headers: #{inspect(response.headers)}")
     # Get headers
     headers = Enum.into(response.headers, %{})
     # Attempt decoding response body
@@ -216,7 +219,19 @@ defmodule InterloperWeb.GithubClient do
   # Fresh state
   # TODO: move to its own struct type?
   defp create_new_state(path) do
+    # Get username/password, construct header
+    auth =
+      with config when is_list(config) <- Application.get_env(:interloper_web, __MODULE__),
+           user when is_binary(user) <- Keyword.get(config, :username),
+           pass when is_binary(pass) <- Keyword.get(config, :password)
+      do
+        "Basic " <> Base.encode64(user <> ":" <> pass)
+      else
+        _ ->
+          nil
+      end
     %{
+      auth: auth,
       path: path,
       body: nil,
       ref: nil,
@@ -292,17 +307,11 @@ defmodule InterloperWeb.GithubClient do
 
   # Conditionally returns `Authorization` header if
   # credentials configured
-  defp add_authorization_header() do
-    # Get username/password, construct header
-    with config when is_list(config) <- Application.get_env(:interloper_web, __MODULE__),
-         user when is_binary(user) <- Keyword.get(config, :username),
-         pass when is_binary(pass) <- Keyword.get(config, :password)
-    do
-      [{"Authorization", "Basic " <> Base.encode64(user <> ":" <> pass)}]
-    else
-      _ ->
-        []
-    end
+  defp add_authorization_header(auth) when byte_size(auth) > 0 do
+    [{"Authorization", auth}]
+  end
+  defp add_authorization_header(_auth) do
+    []
   end
 
   # Reply to all stored callers
