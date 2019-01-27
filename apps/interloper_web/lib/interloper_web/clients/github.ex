@@ -59,24 +59,33 @@ defmodule InterloperWeb.GithubClient do
   def fetch_raw(path, etag \\ nil) do
     # Actual request URL
     url = get_base_url() <> path
-
     # Headers
     headers = [{"Accept", "application/json"}]
-    # Add if-none-match if etag given
-    headers = add_etag_header(headers, etag)
     # TODO: authorization
     # TODO: if-modified-since?
-
+    # Add if-none-match if etag given
+    headers = add_etag_header(headers, etag)
     # Options, if any even make sense?
     # TODO: SSL options, possibly?
     options = []
-
+    # Make request
     # TODO: actually use HTTPoison...
     request = %{ method: :get, url: url, headers: headers, options: options }
     # TEMP: fake delay with sleep
     Process.sleep(1000)
+    # TEMP: fake exception for testing
+    if path == "/_exit" do
+      raise "Fake failure"
+    end
+    # TEMP: fake values for testing
+    {status_code, body} =
+      case path do
+        "/_error" -> {502, "{\"error\": \"Fake error message\"}"}
+        "/_notfound" -> {404, "Fake not found"}
+        _ -> {200, "{}"}
+      end
     # TEMP: return faked response struct
-    %{ body: "{}", headers: [], request: request, request_url: url, status_code: 200 }
+    %{ body: body, headers: [], request: request, request_url: url, status_code: status_code }
   end
 
 
@@ -123,35 +132,58 @@ defmodule InterloperWeb.GithubClient do
     headers = Enum.into(response.headers, %{})
     # Attempt decoding response body
     {decode_success, decoded} = Jason.decode(response.body, strings: :copy)
+    # Return raw response body if not decoded
+    body =
+      case decode_success do
+        :ok -> decoded
+        :error -> response.body
+      end
     # TODO: check status code for success/error
     status = decode_success
-    # TODO: set overall success including status code
-    success = status == :ok
     # Reply to previous callers
-    reply_to_callers({status, decoded}, callers)
+    reply_to_callers({status, body}, callers)
+    # Only cache if request successful
+    # TODO: set overall success including status code
+    # TODO: any parsing of the ETag header value?
+    {success, new_body, new_cache_tag} =
+      case status do
+        :ok -> {true, body, Map.get(headers, "etag")}
+        _ -> {false, nil, nil}
+      end
     # Send cache timeout message
     if success do
       Process.send_after(self(), :invalidate_cache, @cache_timeout)
     end
-    # Only cache if request successful
-    body = if success, do: decoded, else: nil
-    # TODO: any parsing of the ETag header value?
-    cache_tag = if success, do: Map.get(headers, "etag"), else: nil
     # Update state
     new_state =
       %{
         path: state.path,
-        body: body,
+        body: new_body,
         ref: nil,
         callers: [],
-        cache_tag: cache_tag,
+        cache_tag: new_cache_tag,
         cache_valid: success,
       }
     {:noreply, new_state}
   end
 
-  # Task failed, reply to callers and keep cache
-  # TODO: handle_info/2
+  # Task failed, reply to callers and clear cache
+  def handle_info({:DOWN, ref, :process, _pid, _reason}, %{ref: ref} = state) do
+    %{path: path, callers: callers} = state
+    # Reply to previous callers (obscure real error, though)
+    reply_to_callers({:error, "Request failed for #{path}"}, callers)
+    # Update state
+    new_state =
+      %{
+        path: path,
+        body: nil,
+        ref: nil,
+        callers: [],
+        cache_tag: nil,
+        cache_valid: false,
+      }
+    {:noreply, new_state}
+  end
 
   # Cache timed out, update state
   def handle_info(:invalidate_cache, %{ref: ref} = state) do
