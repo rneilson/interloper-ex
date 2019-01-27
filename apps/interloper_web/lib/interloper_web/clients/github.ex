@@ -74,13 +74,12 @@ defmodule InterloperWeb.GithubClient do
     # Actual request URL
     url = get_base_url() <> path
     # Headers
-    headers = List.flatten([
-      [{"Accept", "application/json"}],
-      add_authorization_header(auth),
-      add_etag_header(etag),
-      # TODO: if-modified-since?
-    ])
-    # Options, if any even make sense?
+    # TODO: if-modified-since?
+    headers =
+      [{"Accept", "application/json"}]
+      |> add_header("Authorization", auth)
+      |> add_header("If-None-Match", etag)
+    # Options
     # TODO: SSL options, possibly?
     options = [follow_redirect: true]
     # Make request
@@ -296,22 +295,12 @@ defmodule InterloperWeb.GithubClient do
     end
   end
 
-  # Conditionally returns `If-None-Match` header if
-  # `etag` value given
-  defp add_etag_header(etag) when byte_size(etag) > 0 do
-    [{"If-None-Match", etag}]
+  # Conditionally returns header if `value` given
+  defp add_header(headers, name, value) when byte_size(value) > 0 do
+    headers ++ [{name, value}]
   end
-  defp add_etag_header(_etag) do
-    []
-  end
-
-  # Conditionally returns `Authorization` header if
-  # credentials configured
-  defp add_authorization_header(auth) when byte_size(auth) > 0 do
-    [{"Authorization", auth}]
-  end
-  defp add_authorization_header(_auth) do
-    []
+  defp add_header(headers, _name, _value) do
+    headers
   end
 
   # Reply to all stored callers
