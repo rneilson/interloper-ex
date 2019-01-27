@@ -15,7 +15,7 @@ defmodule InterloperWeb.GithubClient do
   @base_url "https://api.github.com"
 
   @cache_timeout 60 * 1000        # 60s by default
-  @expire_timeout 5 * 60 * 1000   # 5m by default
+  @expire_timeout 2 * 60 * 1000   # 5m by default
 
   ## Client
 
@@ -263,17 +263,20 @@ defmodule InterloperWeb.GithubClient do
   end
 
   # Cancels existing expiry timeout, if any, and starts new one
-  defp reset_expiry_timer(state) when is_map(state) do
-    %{state | expire_ref: reset_expiry_timer(Map.get(state, :expire_ref))}
+  @spec reset_expiry_timer(current :: map | reference | nil, timeout :: integer) :: reference
+  defp reset_expiry_timer(current, timeout \\ @expire_timeout)
+
+  defp reset_expiry_timer(state, timeout) when is_map(state) do
+    %{state | expire_ref: reset_expiry_timer(Map.get(state, :expire_ref), timeout)}
   end
 
-  defp reset_expiry_timer(expire_ref) when is_reference(expire_ref) do
+  defp reset_expiry_timer(expire_ref, timeout) when is_reference(expire_ref) do
     Process.cancel_timer(expire_ref)
-    reset_expiry_timer(nil)
+    reset_expiry_timer(nil, timeout)
   end
 
-  defp reset_expiry_timer(expire_ref) when is_nil(expire_ref) do
-    Process.send_after(self(), :timeout, @expire_timeout)
+  defp reset_expiry_timer(expire_ref, timeout) when is_nil(expire_ref) do
+    Process.send_after(self(), :timeout, timeout)
   end
 
   # Get currently-configured base URL
