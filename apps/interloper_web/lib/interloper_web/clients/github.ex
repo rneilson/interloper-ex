@@ -119,10 +119,13 @@ defmodule InterloperWeb.GithubClient do
 
   def init(path) do
     # Initial state
-    state = create_new_state(path)
+    state =
+      path
+      |> create_new_state
+      |> reset_expiry_timer
     Logger.debug("Started new cache process for #{path}")
     # TODO: continue?
-    {:ok, state, @expire_timeout}
+    {:ok, state}
   end
 
   # TODO: handle_continue to send first timeout message?
@@ -130,7 +133,7 @@ defmodule InterloperWeb.GithubClient do
   # Cache valid, return existing
   def handle_call(:fetch, _from, %{path: path, body: body, cache_valid: true} = state) do
     Logger.debug("Returning cached data for #{path}")
-    {:reply, {:ok, body}, state, @expire_timeout}
+    {:reply, {:ok, body}, state}
   end
 
   # Cache not valid and no task dispatched, refetch
@@ -144,17 +147,18 @@ defmodule InterloperWeb.GithubClient do
     task = Task.Supervisor.async_nolink(
       InterloperWeb.TaskSupervisor, __MODULE__, :fetch_raw, [path, [auth: auth, etag: etag]])
     # Add caller to list, keep task ref, wait for response
-    {:noreply, %{state | ref: task.ref, callers: [from | callers]}, @expire_timeout}
+    {:noreply, reset_expiry_timer(%{state | ref: task.ref, callers: [from | callers]})}
   end
 
   # Cache not valid and task already dispatched, add caller
   def handle_call(:fetch, from, %{ref: _ref, callers: callers, cache_valid: false} = state) do
     # Save new caller for when task returns
-    {:noreply, %{state | callers: [from | callers]}, @expire_timeout}
+    {:noreply, %{state | callers: [from | callers]}}
   end
 
   # Task complete, reply to callers and update cache
-  def handle_info({ref, response}, %{path: path, body: old_body, ref: ref, callers: callers}) do
+  def handle_info({ref, response}, %{ref: ref} = state) do
+    %{path: path, body: old_body, callers: callers} = state
     # Demonitor task
     Process.demonitor(ref, [:flush])
     # TEMP: remove this later?
@@ -195,16 +199,19 @@ defmodule InterloperWeb.GithubClient do
       Process.send_after(self(), :invalidate_cache, @cache_timeout)
     end
     # Update state
-    new_state = create_new_state(path, body: new_body, cache_tag: new_cache_tag, cache_valid: success)
-    {:noreply, new_state, @expire_timeout}
+    new_state = %{
+      state | body: new_body, ref: nil, callers: [], cache_tag: new_cache_tag, cache_valid: success
+    }
+    {:noreply, new_state}
   end
 
   # Task failed, reply to callers and clear cache
-  def handle_info({:DOWN, ref, :process, _pid, _reason}, %{path: path, ref: ref, callers: callers}) do
+  def handle_info({:DOWN, ref, :process, _pid, _reason}, %{ref: ref} = state) do
+    %{path: path, callers: callers, expire_ref: expire_ref} = state
     # Reply to previous callers (obscure real error, though)
     reply_to_callers({:error, "Request failed for #{path}"}, callers)
-    # Reset state
-    {:noreply, create_new_state(path), @expire_timeout}
+    # Reset state, but leave existing expiry intact
+    {:noreply, create_new_state(path, expire_ref: expire_ref)}
   end
 
   # Cache timed out, update state
@@ -212,9 +219,9 @@ defmodule InterloperWeb.GithubClient do
     case ref do
       nil ->
         Logger.debug("Invalidating cache for #{path}")
-        {:noreply, %{state | cache_valid: false}, @expire_timeout}
+        {:noreply, %{state | cache_valid: false}}
       _ ->
-        {:noreply, state, @expire_timeout}
+        {:noreply, state}
     end
   end
 
@@ -249,9 +256,24 @@ defmodule InterloperWeb.GithubClient do
       callers: [],
       cache_tag: nil,
       cache_valid: false,
+      expire_ref: nil,
     }
     # Merge additional items, if any
     Enum.into(items, state)
+  end
+
+  # Cancels existing expiry timeout, if any, and starts new one
+  defp reset_expiry_timer(state) when is_map(state) do
+    %{state | expire_ref: reset_expiry_timer(Map.get(state, :expire_ref))}
+  end
+
+  defp reset_expiry_timer(expire_ref) when is_reference(expire_ref) do
+    Process.cancel_timer(expire_ref)
+    reset_expiry_timer(nil)
+  end
+
+  defp reset_expiry_timer(expire_ref) when is_nil(expire_ref) do
+    Process.send_after(self(), :timeout, @expire_timeout)
   end
 
   # Get currently-configured base URL
@@ -278,17 +300,18 @@ defmodule InterloperWeb.GithubClient do
   @spec get_path(binary) :: {:ok, binary} | {:error, term}
   defp get_path(url)
 
-  # TODO: less-simplistic check?
   defp get_path(path) when binary_part(path, 0, 1) == "/" do
+    # TODO: less-simplistic check?
     {:ok, path}
   end
 
-  # TODO: less-simplistic extraction?
   defp get_path(@base_url <> path) when byte_size(path) > 0 do
+    # TODO: less-simplistic extraction?
     {:ok, path}
   end
 
   defp get_path(url) do
+    # Catch-other clause
     {:error, "Invalid Github API URL: #{url}"}
   end
 
