@@ -24,6 +24,19 @@ defmodule InterloperWeb.GithubClient do
   end
 
   @doc """
+  Finds PID of existing cache process for `path`, if
+  one exists.
+  """
+  @spec find_pid(path :: binary) :: pid | nil
+  def find_pid(path) when is_binary(path) do
+    # Try looking up existing process for this path
+    case Registry.lookup(InterloperWeb.Registry, get_name(path)) do
+      [{pid, _} | _] -> pid
+      [] -> nil
+    end
+  end
+
+  @doc """
   Retrives (possibly-cached) response from Github API
   at given `url`, creating new process and updating
   cached response as required.
@@ -223,7 +236,7 @@ defmodule InterloperWeb.GithubClient do
   # Get name tuple for use with registries.
   @spec get_name(binary) :: {atom, binary}
   defp get_name(path) when is_binary(path) do
-    {:github, path}
+    {__MODULE__, path}
   end
 
   # Get via tuple for use with registries
@@ -257,12 +270,12 @@ defmodule InterloperWeb.GithubClient do
   @spec get_or_create_server(path :: binary) :: {:ok, pid} | {:error, any}
   defp get_or_create_server(path) do
     # Try looking up existing process for this path
-    case Registry.lookup(InterloperWeb.Registry, get_name(path)) do
-      [] ->
+    case find_pid(path) do
+      nil ->
         # Spawn a new process for this path
         Logger.debug("Spawning new cache process for #{path}")
         DynamicSupervisor.start_child(InterloperWeb.DynamicSupervisor, {__MODULE__, path})
-      [{pid, _} | _] ->
+      pid ->
         # Return first found -- shouldn't be an issue with unique keys
         {:ok, pid}
     end
