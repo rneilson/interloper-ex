@@ -9,7 +9,7 @@ defmodule InterloperWeb.GithubClient do
   calls, and otherwise deduplicate requests.
   """
 
-  use GenServer
+  use GenServer, restart: :temporary
   require Logger
 
   @base_url "https://api.github.com"
@@ -61,17 +61,19 @@ defmodule InterloperWeb.GithubClient do
     # Actual request URL
     url = get_base_url() <> path
     # Headers
-    headers = [{"Accept", "application/json"}]
-    # TODO: authorization
-    # TODO: if-modified-since?
-    # Add if-none-match if etag given
-    headers = add_etag_header(headers, etag)
+    headers = List.flatten([
+      [{"Accept", "application/json"}],
+      add_authorization_header(),
+      add_etag_header(etag),
+      # TODO: if-modified-since?
+    ])
     # Options, if any even make sense?
     # TODO: SSL options, possibly?
     options = []
     # Make request
     # TODO: actually use HTTPoison...
     request = %{ method: :get, url: url, headers: headers, options: options }
+    Logger.debug("Request headers: #{inspect(headers)}")
     # TEMP: fake delay with sleep
     Process.sleep(1000)
     # TEMP: fake values for testing
@@ -92,6 +94,7 @@ defmodule InterloperWeb.GithubClient do
           {200, [], "{\"data\": \"Fresh data\"}"}
       end
     # TEMP: return faked response struct
+    Logger.debug("Response headers: #{inspect(headers)}")
     %{ body: body, headers: headers, request: request, request_url: url, status_code: status_code }
   end
 
@@ -265,13 +268,28 @@ defmodule InterloperWeb.GithubClient do
     end
   end
 
-  # Conditionally adds `If-None-Match` header if
+  # Conditionally returns `If-None-Match` header if
   # `etag` value given
-  defp add_etag_header(headers, etag) when byte_size(etag) > 0 do
-    headers ++ [{"If-None-Match", etag}]
+  defp add_etag_header(etag) when byte_size(etag) > 0 do
+    [{"If-None-Match", etag}]
   end
-  defp add_etag_header(headers, _etag) do
-    headers
+  defp add_etag_header(_etag) do
+    []
+  end
+
+  # Conditionally returns `Authorization` header if
+  # credentials configured
+  defp add_authorization_header() do
+    # Get username/password, construct header
+    with config when is_list(config) <- Application.get_env(:interloper_web, __MODULE__),
+         user when is_binary(user) <- Keyword.get(config, :username),
+         pass when is_binary(pass) <- Keyword.get(config, :password)
+    do
+      [{"Authorization", "Basic " <> Base.encode64(user <> ":" <> pass)}]
+    else
+      _ ->
+        []
+    end
   end
 
   # Reply to all stored callers
