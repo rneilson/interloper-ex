@@ -10,6 +10,7 @@ defmodule InterloperWeb.GithubClient do
   """
 
   use GenServer
+  require Logger
 
   @base_url "https://api.github.com"
 
@@ -73,19 +74,25 @@ defmodule InterloperWeb.GithubClient do
     request = %{ method: :get, url: url, headers: headers, options: options }
     # TEMP: fake delay with sleep
     Process.sleep(1000)
-    # TEMP: fake exception for testing
-    if path == "/_exit" do
-      raise "Fake failure"
-    end
     # TEMP: fake values for testing
-    {status_code, body} =
-      case path do
-        "/_error" -> {502, "{\"error\": \"Fake error message\"}"}
-        "/_notfound" -> {404, "Fake not found"}
-        _ -> {200, "{}"}
+    {status_code, headers, body} =
+      case {path, etag} do
+        {"/_exit", _} ->
+          raise "Fake failure"
+        {"/_error", _} ->
+          {502, [], "{\"error\": \"Fake error message\"}"}
+        {"/_notfound", _} ->
+          {404, [], "Fake not found"}
+        {"/_cached", "0123456789"} ->
+          Logger.debug("Pretending to respond with cached data")
+          {304, [{"etag", "0123456789"}], ""}
+        {"/_cached", _} ->
+          {200, [{"etag", "0123456789"}], "{\"data\": \"Cached data\"}"}
+        _ ->
+          {200, [], "{\"data\": \"Fresh data\"}"}
       end
     # TEMP: return faked response struct
-    %{ body: body, headers: [], request: request, request_url: url, status_code: status_code }
+    %{ body: body, headers: headers, request: request, request_url: url, status_code: status_code }
   end
 
 
@@ -101,18 +108,21 @@ defmodule InterloperWeb.GithubClient do
   # TODO: handle_continue to send first timeout message?
 
   # Cache valid, return existing
-  def handle_call(:fetch, _from, %{body: body, cache_valid: true} = state) do
+  def handle_call(:fetch, _from, %{path: path, body: body, cache_valid: true} = state) do
+    Logger.debug("Returning cached data for #{path}")
     {:reply, {:ok, body}, state}
   end
 
   # Cache not valid and no task dispatched, refetch
-  def handle_call(:fetch, from, %{ref: nil, cache_valid: false} = state) do
+  def handle_call(:fetch, from, %{body: old_body, ref: nil, cache_valid: false} = state) do
     # Get path, callers list (should be empty), and cache tag from state
     # (Separate just to keep it clean)
     %{path: path, callers: callers, cache_tag: cache_tag} = state
+    # Only set etag header if body present
+    etag = if is_nil(old_body), do: nil, else: cache_tag
     # Dispatch new task
     task = Task.Supervisor.async_nolink(
-      InterloperWeb.TaskSupervisor, __MODULE__, :fetch_raw, [path, cache_tag])
+      InterloperWeb.TaskSupervisor, __MODULE__, :fetch_raw, [path, etag])
     # Add caller to list, keep task ref, wait for response
     {:noreply, %{state | ref: task.ref, callers: [from | callers]}}
   end
@@ -124,24 +134,27 @@ defmodule InterloperWeb.GithubClient do
   end
 
   # Task complete, reply to callers and update cache
-  def handle_info({ref, response}, %{ref: ref, callers: callers, path: path}) do
+  def handle_info({ref, response}, %{path: path, body: old_body, ref: ref, callers: callers}) do
     # Demonitor task
     Process.demonitor(ref, [:flush])
     # Get headers
     headers = Enum.into(response.headers, %{})
     # Attempt decoding response body
     {decode_success, decoded} = Jason.decode(response.body, strings: :copy)
-    # Return raw response body if not decoded
-    body =
-      case decode_success do
-        :ok -> decoded
-        :error -> response.body
-      end
     # Check status code, plus decode success, for success/error
-    status =
+    # Return raw response body if not decoded
+    # Return cached response body if not modified
+    {status, body} =
       case {response.status_code, decode_success} do
-        {status_code, :ok} when status_code >= 200 and status_code < 400 -> :ok
-        _ -> :error
+        {304, _} when not is_nil(old_body) ->
+          Logger.debug("Using cached response body for #{path}")
+          {:ok, old_body}
+        {status_code, :ok} when status_code >= 200 and status_code < 400 ->
+          {:ok, decoded}
+        {_status_code, :ok} ->
+          {:error, decoded}
+        _ ->
+          {:error, response.body}
       end
     # Reply to previous callers
     reply_to_callers({status, body}, callers)
@@ -163,24 +176,23 @@ defmodule InterloperWeb.GithubClient do
   end
 
   # Task failed, reply to callers and clear cache
-  def handle_info({:DOWN, ref, :process, _pid, _reason}, %{ref: ref} = state) do
-    %{path: path, callers: callers} = state
+  def handle_info({:DOWN, ref, :process, _pid, _reason}, %{path: path, ref: ref, callers: callers}) do
     # Reply to previous callers (obscure real error, though)
     reply_to_callers({:error, "Request failed for #{path}"}, callers)
-    # Update state
+    # Reset state
     {:noreply, create_new_state(path)}
   end
 
   # Cache timed out, update state
-  def handle_info(:invalidate_cache, %{ref: ref} = state) do
+  def handle_info(:invalidate_cache, %{path: path, ref: ref} = state) do
     case ref do
       nil ->
+        Logger.debug("Invalidating cache for #{path}")
         {:noreply, %{state | cache_valid: false}}
       _ ->
         {:noreply, state}
     end
   end
-  # TODO: handle_info/2
 
 
   ## Internal (utilities)
@@ -245,6 +257,7 @@ defmodule InterloperWeb.GithubClient do
     case Registry.lookup(InterloperWeb.Registry, get_name(path)) do
       [] ->
         # Spawn a new process for this path
+        Logger.debug("Spawning new cache process for #{path}")
         DynamicSupervisor.start_child(InterloperWeb.DynamicSupervisor, {__MODULE__, path})
       [{pid, _} | _] ->
         # Return first found -- shouldn't be an issue with unique keys
@@ -254,11 +267,11 @@ defmodule InterloperWeb.GithubClient do
 
   # Conditionally adds `If-None-Match` header if
   # `etag` value given
-  defp add_etag_header(headers, nil) do
-    headers
-  end
   defp add_etag_header(headers, etag) when byte_size(etag) > 0 do
     headers ++ [{"If-None-Match", etag}]
+  end
+  defp add_etag_header(headers, _etag) do
+    headers
   end
 
   # Reply to all stored callers
