@@ -207,11 +207,11 @@ defmodule InterloperWeb.GithubClient do
 
   # Task failed, reply to callers and clear cache
   def handle_info({:DOWN, ref, :process, _pid, _reason}, %{ref: ref} = state) do
-    %{path: path, callers: callers, expire_ref: expire_ref} = state
+    %{path: path, callers: callers} = state
     # Reply to previous callers (obscure real error, though)
     reply_to_callers({:error, "Request failed for #{path}"}, callers)
-    # Reset state, but leave existing expiry intact
-    {:noreply, create_new_state(path, expire_ref: expire_ref)}
+    # Shut down, request failed
+    {:stop, :request_failed, state}
   end
 
   # Cache timed out, update state
