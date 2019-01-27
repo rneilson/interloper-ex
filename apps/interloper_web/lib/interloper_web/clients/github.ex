@@ -64,33 +64,37 @@ defmodule InterloperWeb.GithubClient do
   @doc """
   Makes HTTP request to specified Github API path.
   Primarily for use by async task spawned by caching
-  process. Will pass `If-None-Match` header with
-  `etag` value if given.
+  process.
+
+  Options:
+  * `:auth` - value of `Authorization` header
+  * `:etag` - value of `If-None-Match` header
 
   Returns raw HTTPoison response struct.
   """
-  @spec fetch_raw(path :: binary, auth :: binary | nil, etag :: binary | nil) :: any
-  def fetch_raw(path, auth \\ nil, etag \\ nil) do
+  @spec fetch_raw(path :: binary, opts :: keyword) :: any
+  def fetch_raw(path, opts \\ []) do
     # Actual request URL
     url = get_base_url() <> path
     # Headers
     # TODO: if-modified-since?
     headers =
       [{"Accept", "application/json"}]
-      |> add_header("Authorization", auth)
-      |> add_header("If-None-Match", etag)
+      |> add_header("Authorization", Keyword.get(opts, :auth))
+      |> add_header("If-None-Match", Keyword.get(opts, :etag))
     # Options
     # TODO: SSL options, possibly?
     options = [follow_redirect: true]
+    Logger.debug("Request headers: #{inspect(headers)}")
+
     # Make request
     # TODO: actually use HTTPoison...
     request = %{ method: :get, url: url, headers: headers, options: options }
-    Logger.debug("Request headers: #{inspect(headers)}")
     # TEMP: fake delay with sleep
     Process.sleep(1000)
     # TEMP: fake values for testing
     {status_code, headers, body} =
-      case {path, etag} do
+      case {path, Keyword.get(opts, :etag)} do
         {"/_exit", _} ->
           raise "Fake failure"
         {"/_error", _} ->
@@ -136,7 +140,7 @@ defmodule InterloperWeb.GithubClient do
     etag = if is_nil(old_body), do: nil, else: cache_tag
     # Dispatch new task
     task = Task.Supervisor.async_nolink(
-      InterloperWeb.TaskSupervisor, __MODULE__, :fetch_raw, [path, auth, etag])
+      InterloperWeb.TaskSupervisor, __MODULE__, :fetch_raw, [path, [auth: auth, etag: etag]])
     # Add caller to list, keep task ref, wait for response
     {:noreply, %{state | ref: task.ref, callers: [from | callers]}}
   end
