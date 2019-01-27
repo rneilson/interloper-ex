@@ -45,12 +45,44 @@ defmodule InterloperWeb.GithubClient do
     end
   end
 
+  @doc """
+  Makes HTTP request to specified Github API path.
+  Primarily for use by async task spawned by caching
+  process. Will pass `If-None-Match` header with
+  `etag` value if given.
+
+  Returns raw HTTPoison response struct.
+  """
+  @spec fetch_raw(path :: binary, etag :: binary | nil) :: any
+  def fetch_raw(path, etag \\ nil) do
+    # Actual request URL
+    url = get_base_url() <> path
+
+    # Headers
+    headers = [{"Accept", "application/json"}]
+    # Add if-none-match if etag given
+    headers = add_etag_header(headers, etag)
+    # TODO: authorization
+    # TODO: if-modified-since?
+
+    # Options, if any even make sense?
+    # TODO: SSL options, possibly?
+    options = []
+
+    # TODO: actually use HTTPoison...
+    request = %{ method: :get, url: url, headers: headers, options: options }
+    # TEMP: Fake delay with sleep
+    Process.sleep(1000)
+    # Return faked response struct
+    %{ body: "{}", headers: [], request: request, request_url: url, status_code: 200 }
+  end
+
 
   ## Server (callbacks)
 
   def init(path) do
     # Initial state
-    # TODO: make this into a struct
+    # TODO: make this into a struct?
     state = %{ path: path, body: nil, ref: nil, callers: [], cache_tag: nil, cache_valid: false }
     # TODO: continue?
     {:ok, state}
@@ -78,6 +110,13 @@ defmodule InterloperWeb.GithubClient do
 
   ## Internal (utilities)
 
+  # Get currently-configured base URL
+  @spec get_base_url() :: binary
+  defp get_base_url() do
+    # TODO: get from env for overriding during testing
+    @base_url
+  end
+
   # Get name tuple for use with registries.
   @spec get_name(binary) :: {atom, binary}
   defp get_name(path) when is_binary(path) do
@@ -85,6 +124,7 @@ defmodule InterloperWeb.GithubClient do
   end
 
   # Get via tuple for use with registries
+  @spec get_via_tuple(binary) :: {:via, atom, term}
   defp get_via_tuple(path) when is_binary(path) do
     {:via, Registry, {InterloperWeb.Registry, get_name(path)}}
   end
@@ -122,6 +162,15 @@ defmodule InterloperWeb.GithubClient do
         # Return first found -- shouldn't be an issue with unique keys
         {:ok, pid}
     end
+  end
+
+  # Conditionally adds `If-None-Match` header if
+  # `etag` value given
+  defp add_etag_header(headers, nil) do
+    headers
+  end
+  defp add_etag_header(headers, etag) when byte_size(etag) > 0 do
+    headers ++ [{"If-None-Match", etag}]
   end
 
 end
