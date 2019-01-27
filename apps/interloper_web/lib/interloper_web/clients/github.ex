@@ -73,9 +73,9 @@ defmodule InterloperWeb.GithubClient do
 
     # TODO: actually use HTTPoison...
     request = %{ method: :get, url: url, headers: headers, options: options }
-    # TEMP: Fake delay with sleep
+    # TEMP: fake delay with sleep
     Process.sleep(1000)
-    # Return faked response struct
+    # TEMP: return faked response struct
     %{ body: "{}", headers: [], request: request, request_url: url, status_code: 200 }
   end
 
@@ -119,27 +119,37 @@ defmodule InterloperWeb.GithubClient do
   def handle_info({ref, response}, %{ref: ref, callers: callers} = state) do
     # Demonitor task
     Process.demonitor(ref, [:flush])
-    # TODO: parse response and determine success/error
-    body = Jason.decode!(response.body)
-    # TODO: any parsing of the header value?
-    cache_tag =
-      case List.keyfind(response.headers, "etag", 0) do
-        {_, etag} -> etag
-        nil -> nil
-      end
+    # Get headers
+    headers = Enum.into(response.headers, %{})
+    # TODO: check status code for success/error
+    # Attempt decoding response body
+    {decode_success, decoded} = Jason.decode(response.body, strings: :copy)
+    # TODO: set overall success including status code
+    status = decode_success
+    # TODO: any parsing of the ETag header value?
+    new_cache_tag = Map.get(headers, "etag")
     # Reply to previous callers
-    new_callers = reply_to_callers({:ok, body}, callers)
+    reply_to_callers({status, decoded}, callers)
     # Send cache timeout message
-    # TODO: decide whether to invalidate cache based on response
-    Process.send_after(self(), :invalidate_cache, @cache_timeout)
+    new_cache_valid = status == :ok
+    if new_cache_valid do
+      Process.send_after(self(), :invalidate_cache, @cache_timeout)
+    end
+    # Only cache if request successful
+    new_body =
+      case status do
+        :ok -> decoded
+        _ -> nil
+      end
     # Update state
-    new_state = %{
+    new_state =
+      %{
         path: state.path,
-        body: body,
+        body: new_body,
         ref: nil,
-        callers: new_callers,
-        cache_tag: cache_tag,
-        cache_valid: true,
+        callers: [],
+        cache_tag: new_cache_tag,
+        cache_valid: new_cache_valid,
       }
     {:noreply, new_state}
   end
@@ -228,7 +238,6 @@ defmodule InterloperWeb.GithubClient do
   defp reply_to_callers(response, callers) do
     # TODO: some error handling?
     Enum.map(callers, fn from -> GenServer.reply(from, response) end)
-    []
   end
 
 end
