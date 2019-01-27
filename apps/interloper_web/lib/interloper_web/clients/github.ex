@@ -147,7 +147,7 @@ defmodule InterloperWeb.GithubClient do
     task = Task.Supervisor.async_nolink(
       InterloperWeb.TaskSupervisor, __MODULE__, :fetch_raw, [path, [auth: auth, etag: etag]])
     # Add caller to list, keep task ref, wait for response
-    {:noreply, reset_expiry_timer(%{state | ref: task.ref, callers: [from | callers]})}
+    {:noreply, %{state | ref: task.ref, callers: [from | callers]}}
   end
 
   # Cache not valid and task already dispatched, add caller
@@ -158,23 +158,25 @@ defmodule InterloperWeb.GithubClient do
 
   # Task complete, reply to callers and update cache
   def handle_info({ref, response}, %{ref: ref} = state) do
-    %{path: path, body: old_body, callers: callers} = state
+    %{path: path, body: old_body, callers: callers, expire_ref: expire_ref} = state
     # Demonitor task
     Process.demonitor(ref, [:flush])
     # TEMP: remove this later?
     Logger.debug("Response url: #{inspect(response.request_url)}")
     Logger.debug("Response code: #{inspect(response.status_code)}")
     Logger.debug("Response headers: #{inspect(response.headers)}")
-    # Get headers
+    # Get headers, attempt decoding response body
     headers = Enum.into(response.headers, %{})
-    # Attempt decoding response body
     {decode_success, decoded} = Jason.decode(response.body, strings: :copy)
-    # Check status code, plus decode success, for success/error
-    # Return raw response body if not decoded
-    # Return cached response body if not modified
+    # Check status code, plus decode success, for overall success/error
     {status, body} =
       case {response.status_code, decode_success} do
+        {429, _} when not is_nil(old_body) ->
+          # Return cached response body if rate-limited
+          Logger.warn("Rate limit hit for #{path}, using cached response body")
+          {:ok, old_body}
         {304, _} when not is_nil(old_body) ->
+          # Return cached response body if not modified
           Logger.debug("Using cached response body for #{path}")
           {:ok, old_body}
         {status_code, :ok} when status_code >= 200 and status_code < 400 ->
@@ -182,27 +184,27 @@ defmodule InterloperWeb.GithubClient do
         {_status_code, :ok} ->
           {:error, decoded}
         _ ->
+          # Return raw response body if not decoded
           {:error, response.body}
       end
     # Reply to previous callers
     reply_to_callers({status, body}, callers)
-    # Only cache if request successful
-    # TODO: set overall success including status code
-    # TODO: any parsing of the ETag header value?
-    {success, new_body, new_cache_tag} =
-      case status do
-        :ok -> {true, body, Map.get(headers, "etag")}
-        _ -> {false, nil, nil}
-      end
-    # Send cache timeout message
-    if success do
-      Process.send_after(self(), :invalidate_cache, @cache_timeout)
-    end
     # Update state
-    new_state = %{
-      state | body: new_body, ref: nil, callers: [], cache_tag: new_cache_tag, cache_valid: success
-    }
-    {:noreply, new_state}
+    new_state =
+      case status do
+        :ok ->
+          # Send cache timeout message
+          Process.send_after(self(), :invalidate_cache, @cache_timeout)
+          # Update cached values and extend expiry
+          new_tag = Map.get(headers, "etag")
+          new_ref = reset_expiry_timer(expire_ref)
+          %{state | body: body, cache_tag: new_tag, cache_valid: true, expire_ref: new_ref}
+        _ ->
+          # Clear cached values on any error, keep expiry
+          %{state | body: nil, cache_tag: nil, cache_valid: false}
+      end
+    # Clear task ref and callers list regardless
+    {:noreply, %{new_state | ref: nil, callers: []}}
   end
 
   # Task failed, reply to callers and clear cache
@@ -223,6 +225,13 @@ defmodule InterloperWeb.GithubClient do
       _ ->
         {:noreply, state}
     end
+  end
+
+  # Request in progress, don't terminate
+  def handle_info(:timeout, %{path: path, ref: ref} = state) when is_reference(ref) do
+    Logger.debug("Extending expiry timeout for #{path}")
+    # TODO: pick a better extension time limit?
+    {:noreply, reset_expiry_timer(state, @cache_timeout)}
   end
 
   # Cache process expired, terminate
@@ -276,6 +285,7 @@ defmodule InterloperWeb.GithubClient do
   end
 
   defp reset_expiry_timer(expire_ref, timeout) when is_nil(expire_ref) do
+    Logger.debug("Expiry in #{timeout} ms")
     Process.send_after(self(), :timeout, timeout)
   end
 
