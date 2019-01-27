@@ -107,8 +107,13 @@ defmodule InterloperWeb.GithubClient do
           {304, [{"etag", "0123456789"}], ""}
         {"/_cached", _} ->
           {200, [{"etag", "0123456789"}], "{\"data\": \"Cached data\"}"}
+        {"/_limit", "9876543210"} ->
+          Logger.debug("Pretending to respond with rate-limit error")
+          {429, [], ""}
+        {"/_limit", _} ->
+          {200, [{"etag", "9876543210"}], "{\"data\": \"Rate-limited data\"}"}
         _ ->
-          {200, [], "{\"data\": \"Fresh data\"}"}
+          {200, [], "{\"path\": \"#{path}\", \"data\": \"Fresh data\"}"}
       end
     # TEMP: return faked response struct
     %{ body: body, headers: headers, request: request, request_url: url, status_code: status_code }
@@ -158,40 +163,20 @@ defmodule InterloperWeb.GithubClient do
 
   # Task complete, reply to callers and update cache
   def handle_info({ref, response}, %{ref: ref} = state) do
-    %{path: path, body: old_body, callers: callers, expire_ref: expire_ref} = state
+    %{body: old_body, callers: callers, expire_ref: expire_ref} = state
     # Demonitor task
     Process.demonitor(ref, [:flush])
     # TEMP: remove this later?
     Logger.debug("Response url: #{inspect(response.request_url)}")
     Logger.debug("Response code: #{inspect(response.status_code)}")
     Logger.debug("Response headers: #{inspect(response.headers)}")
-    # Get headers, attempt decoding response body
-    headers = Enum.into(response.headers, %{})
-    {decode_success, decoded} = Jason.decode(response.body, strings: :copy)
-    # Check status code, plus decode success, for overall success/error
-    {status, body} =
-      case {response.status_code, decode_success} do
-        {429, _} when not is_nil(old_body) ->
-          # Return cached response body if rate-limited
-          Logger.warn("Rate limit hit for #{path}, using cached response body")
-          {:ok, old_body}
-        {304, _} when not is_nil(old_body) ->
-          # Return cached response body if not modified
-          Logger.debug("Using cached response body for #{path}")
-          {:ok, old_body}
-        {status_code, :ok} when status_code >= 200 and status_code < 400 ->
-          {:ok, decoded}
-        {_status_code, :ok} ->
-          {:error, decoded}
-        _ ->
-          # Return raw response body if not decoded
-          {:error, response.body}
-      end
+    # Parse response
+    {success, headers, body} = parse_response(response, old_body)
     # Reply to previous callers
-    reply_to_callers({status, body}, callers)
+    reply_to_callers({success, body}, callers)
     # Update state
     new_state =
-      case status do
+      case success do
         :ok ->
           # Send cache timeout message
           Process.send_after(self(), :invalidate_cache, @cache_timeout)
@@ -351,6 +336,38 @@ defmodule InterloperWeb.GithubClient do
   end
   defp add_header(headers, _name, _value) do
     headers
+  end
+
+  # Parse HTTP response
+  # Returns {success, headers, body}, where `success` is
+  # one of :ok or :error, and `body` may be the given
+  # `old_body` on status code 304 or 429
+  @spec parse_response(response :: term, old_body :: term) :: {atom, map, term}
+  defp parse_response(response, old_body) do
+    url = response.request_url
+    # Get headers, attempt decoding response body
+    headers = Enum.into(response.headers, %{})
+    {decode_success, decoded} = Jason.decode(response.body, strings: :copy)
+    # Check status code, plus decode success, for overall success/error
+    case {response.status_code, decode_success} do
+      # Return cached response body if rate-limited
+      {429, _} when not is_nil(old_body) ->
+        Logger.warn("Rate limit hit for #{url}, using cached response body")
+        {:ok, headers, old_body}
+      # Return cached response body if not modified
+      {304, _} when not is_nil(old_body) ->
+        Logger.debug("Using cached response body for #{url}")
+        {:ok, headers, old_body}
+      # Normal successful response
+      {status_code, :ok} when status_code >= 200 and status_code < 400 ->
+        {:ok, headers, decoded}
+      # Unsuccessful response
+      {_status_code, :ok} ->
+        {:error, headers, decoded}
+      # Return raw response body if not decoded
+      _ ->
+        {:error, headers, response.body}
+    end
   end
 
   # Reply to all stored callers
