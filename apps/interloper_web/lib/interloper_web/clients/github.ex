@@ -121,35 +121,31 @@ defmodule InterloperWeb.GithubClient do
     Process.demonitor(ref, [:flush])
     # Get headers
     headers = Enum.into(response.headers, %{})
-    # TODO: check status code for success/error
     # Attempt decoding response body
     {decode_success, decoded} = Jason.decode(response.body, strings: :copy)
-    # TODO: set overall success including status code
+    # TODO: check status code for success/error
     status = decode_success
-    # TODO: any parsing of the ETag header value?
-    new_cache_tag = Map.get(headers, "etag")
+    # TODO: set overall success including status code
+    success = status == :ok
     # Reply to previous callers
     reply_to_callers({status, decoded}, callers)
     # Send cache timeout message
-    new_cache_valid = status == :ok
-    if new_cache_valid do
+    if success do
       Process.send_after(self(), :invalidate_cache, @cache_timeout)
     end
     # Only cache if request successful
-    new_body =
-      case status do
-        :ok -> decoded
-        _ -> nil
-      end
+    body = if success, do: decoded, else: nil
+    # TODO: any parsing of the ETag header value?
+    cache_tag = if success, do: Map.get(headers, "etag"), else: nil
     # Update state
     new_state =
       %{
         path: state.path,
-        body: new_body,
+        body: body,
         ref: nil,
         callers: [],
-        cache_tag: new_cache_tag,
-        cache_valid: new_cache_valid,
+        cache_tag: cache_tag,
+        cache_valid: success,
       }
     {:noreply, new_state}
   end
