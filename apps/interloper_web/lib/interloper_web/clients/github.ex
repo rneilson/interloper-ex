@@ -15,7 +15,7 @@ defmodule InterloperWeb.GithubClient do
   @base_url "https://api.github.com"
 
   @cache_timeout 60 * 1000        # 60s by default
-  @expire_timeout 2 * 60 * 1000   # 5m by default
+  @expire_timeout 5 * 60 * 1000   # 5m by default
 
   ## Client
 
@@ -87,36 +87,11 @@ defmodule InterloperWeb.GithubClient do
     # TODO: SSL options, possibly?
     options = [follow_redirect: true]
     Logger.debug("Request headers: #{inspect(headers)}")
-
     # Make request
     # TODO: actually use HTTPoison...
     request = %{ method: :get, url: url, headers: headers, options: options }
-    # TEMP: fake delay with sleep
-    Process.sleep(1000)
-    # TEMP: fake values for testing
-    {status_code, headers, body} =
-      case {path, Keyword.get(opts, :etag)} do
-        {"/_exit", _} ->
-          raise "Fake failure"
-        {"/_error", _} ->
-          {502, [], "{\"error\": \"Fake error message\"}"}
-        {"/_notfound", _} ->
-          {404, [], "Fake not found"}
-        {"/_cached", "0123456789"} ->
-          Logger.debug("Pretending to respond with cached data")
-          {304, [{"etag", "0123456789"}], ""}
-        {"/_cached", _} ->
-          {200, [{"etag", "0123456789"}], "{\"data\": \"Cached data\"}"}
-        {"/_limit", "9876543210"} ->
-          Logger.debug("Pretending to respond with rate-limit error")
-          {429, [], ""}
-        {"/_limit", _} ->
-          {200, [{"etag", "9876543210"}], "{\"data\": \"Rate-limited data\"}"}
-        _ ->
-          {200, [], "{\"path\": \"#{path}\", \"data\": \"Fresh data\"}"}
-      end
-    # TEMP: return faked response struct
-    %{ body: body, headers: headers, request: request, request_url: url, status_code: status_code }
+    # TEMP: get fake response
+    mock_response(request)
   end
 
 
@@ -202,14 +177,14 @@ defmodule InterloperWeb.GithubClient do
   end
 
   # Cache timed out, update state
-  def handle_info(:invalidate_cache, %{path: path, ref: ref} = state) do
-    case ref do
-      nil ->
-        Logger.debug("Invalidating cache for #{path}")
-        {:noreply, %{state | cache_valid: false}}
-      _ ->
-        {:noreply, state}
-    end
+  def handle_info(:invalidate_cache, %{path: path, ref: nil, cache_valid: true} = state) do
+    Logger.debug("Invalidating cache for #{path}")
+    {:noreply, %{state | cache_valid: false}}
+  end
+
+  # Request in progress or cache already invalid, keep state
+  def handle_info(:invalidate_cache, state) do
+    {:noreply, state}
   end
 
   # Request in progress, don't terminate
@@ -338,6 +313,12 @@ defmodule InterloperWeb.GithubClient do
     headers
   end
 
+  # Reply to all stored callers
+  defp reply_to_callers(response, callers) do
+    # TODO: some error handling?
+    Enum.map(callers, fn from -> GenServer.reply(from, response) end)
+  end
+
   # Parse HTTP response
   # Returns {success, headers, body}, where `success` is
   # one of :ok or :error, and `body` may be the given
@@ -370,10 +351,40 @@ defmodule InterloperWeb.GithubClient do
     end
   end
 
-  # Reply to all stored callers
-  defp reply_to_callers(response, callers) do
-    # TODO: some error handling?
-    Enum.map(callers, fn from -> GenServer.reply(from, response) end)
+
+  ## Testing (mocks)
+
+  # Fake testing responses, full request
+  defp mock_response(%{ url: url, headers: header_list } = request) do
+    {:ok, path} = get_path(url)
+    etag = with {_, etag} <- List.keyfind(header_list, "If-None-Match", 0), do: etag
+    # TEMP: fake delay with sleep
+    Process.sleep(1000)
+    # TEMP: fake values for testing
+    {status_code, headers, body} =
+      case {path, etag} do
+        {"/_exit", _} ->
+          raise "Fake failure"
+        {"/_error", _} ->
+          {502, [], "{\"error\": \"Fake error message\"}"}
+        {"/_notfound", _} ->
+          {404, [], "Fake not found"}
+        {"/_cached", "0123456789"} ->
+          Logger.debug("Pretending to respond with cached data")
+          {304, [{"etag", "0123456789"}], ""}
+        {"/_cached", _} ->
+          {200, [{"etag", "0123456789"}], "{\"data\": \"Cached data\"}"}
+        {"/_limit", "9876543210"} ->
+          Logger.debug("Pretending to respond with rate-limit error")
+          {429, [], ""}
+        {"/_limit", _} ->
+          {200, [{"etag", "9876543210"}], "{\"data\": \"Rate-limited data\"}"}
+        _ ->
+          {200, [], "{\"path\": \"#{path}\", \"data\": \"Fresh data\"}"}
+      end
+    # TEMP: return fake HTTPoison response
+    # TODO: return faked response struct
+    %{ body: body, headers: headers, request: request, request_url: url, status_code: status_code }
   end
 
 end
