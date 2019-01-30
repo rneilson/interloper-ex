@@ -15,7 +15,7 @@ defmodule InterloperWeb.GithubClient do
   @base_url "https://api.github.com"
 
   @cache_timeout 60 * 1000        # 60s by default
-  @expire_timeout 5 * 60 * 1000   # 5m by default
+  @expire_timeout 60 * 60 * 1000  # 60m by default
 
   ## Client
 
@@ -88,10 +88,13 @@ defmodule InterloperWeb.GithubClient do
     options = [follow_redirect: true]
     Logger.debug("Request headers: #{inspect(headers)}")
     # Make request
-    # TODO: actually use HTTPoison...
-    request = %{ method: :get, url: url, headers: headers, options: options }
-    # TEMP: get fake response
-    mock_response(request)
+    # TODO: better way to indicate test/mock path?
+    if binary_part(path, 0, 2) == "/_" do
+      # Get fake response
+      mock_response(%{ method: :get, url: url, headers: headers, options: options })
+    else
+      HTTPoison.request!(:get, url, "", headers, options)
+    end
   end
 
 
@@ -214,9 +217,9 @@ defmodule InterloperWeb.GithubClient do
       do
         "Basic " <> Base.encode64(user <> ":" <> pass)
       else
-        _ ->
-          nil
+        _ -> nil
       end
+    # New state map
     state = %{
       auth: auth,
       path: path,
@@ -327,7 +330,11 @@ defmodule InterloperWeb.GithubClient do
   defp parse_response(response, old_body) do
     url = response.request_url
     # Get headers, attempt decoding response body
-    headers = Enum.into(response.headers, %{})
+    # Lowercase header names for easier future use
+    headers =
+      response.headers
+      |> Enum.map(fn {name, value} -> {String.downcase(name), value} end)
+      |> Enum.into(%{})
     {decode_success, decoded} = Jason.decode(response.body, strings: :copy)
     # Check status code, plus decode success, for overall success/error
     case {response.status_code, decode_success} do
@@ -371,14 +378,14 @@ defmodule InterloperWeb.GithubClient do
           {404, [], "Fake not found"}
         {"/_cached", "0123456789"} ->
           Logger.debug("Pretending to respond with cached data")
-          {304, [{"etag", "0123456789"}], ""}
+          {304, [{"ETag", "0123456789"}], ""}
         {"/_cached", _} ->
-          {200, [{"etag", "0123456789"}], "{\"data\": \"Cached data\"}"}
+          {200, [{"ETag", "0123456789"}], "{\"data\": \"Cached data\"}"}
         {"/_limit", "9876543210"} ->
           Logger.debug("Pretending to respond with rate-limit error")
           {429, [], ""}
         {"/_limit", _} ->
-          {200, [{"etag", "9876543210"}], "{\"data\": \"Rate-limited data\"}"}
+          {200, [{"ETag", "9876543210"}], "{\"data\": \"Rate-limited data\"}"}
         _ ->
           {200, [], "{\"path\": \"#{path}\", \"data\": \"Fresh data\"}"}
       end
