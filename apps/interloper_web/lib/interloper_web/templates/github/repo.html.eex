@@ -6,7 +6,9 @@
     <% else %>
     <a class="blue selector" href="<%= @repo["html_url"] %>" target="_blank"><%= @repo["name"] %></a>
     <% end %>
+    <%= if @repo["language"] do %>
     <span class="italic">(<%= @repo["language"] %>)</span>
+    <% end %>
 </div>
 <div class="textbox indent">
     <span><%= @repo["description"] %></span>

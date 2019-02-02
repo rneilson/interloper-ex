@@ -16,6 +16,11 @@ defmodule InterloperWeb.GithubController do
     end
   end
 
+  # # If we ever decide to allow viewing other users...
+  # def index(conn, %{"username" => username}) do
+  #   index(conn, %{username: username})
+  # end
+
   def index(conn, _params) do
     index(conn, %{username: GithubClient.get_default_user()})
   end
