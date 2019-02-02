@@ -17,7 +17,7 @@
     <% not is_nil(assigns[:commit]) -> %>
         Last commit:
         <span class="yellow"><%= String.slice(@commit["sha"], 0..7) %></span>
-        <span class="green"><%= @commit["commit"]["author"]["date"] %></span><%# TODO: format %>
+        <%= SharedView.render_date_format(@commit["commit"]["author"]["date"]) %>
     <% not is_nil(assigns[:commit_err]) -> %>
         <span class="err">Error retrieving last commit: <%= @commit_err %></span>
     <% true -> %>
