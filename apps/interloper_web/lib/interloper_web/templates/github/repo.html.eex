@@ -19,7 +19,7 @@
         <span class="yellow"><%= String.slice(@commit["sha"], 0..7) %></span>
         <span class="green"><%= @commit["commit"]["author"]["date"] %></span><%# TODO: format %>
     <% not is_nil(assigns[:commit_err]) -> %>
-        <span class="red">Error retrieving last commit: <%= @commit_err %></span>
+        <span class="err">Error retrieving last commit: <%= @commit_err %></span>
     <% true -> %>
         <span class="italic">No commit details available</span>
     <% end %>

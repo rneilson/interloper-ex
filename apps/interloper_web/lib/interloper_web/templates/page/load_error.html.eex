@@ -1,7 +1,0 @@
-<div class="textbox"><br></div>
-<div class="textbox">
-    <span class="red">Error retrieving <%= @loading %>:</span>
-</div>
-<div class="textbox">
-    <span class="red"><%= @reason %></span>
-</div>

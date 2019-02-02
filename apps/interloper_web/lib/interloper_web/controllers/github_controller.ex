@@ -1,6 +1,7 @@
 defmodule InterloperWeb.GithubController do
   use InterloperWeb, :controller
 
+  alias InterloperWeb.SharedController
   alias InterloperWeb.GithubClient
 
   def index(conn, %{username: username}) do
@@ -9,15 +10,9 @@ defmodule InterloperWeb.GithubController do
       {:ok, repo_list} ->
         repos = get_repo_details(repo_list)
         render(conn, "repo_list.html", repos: repos)
-      {:error, reason_raw} ->
-        reason =
-          case Jason.encode(reason_raw) do
-            {:ok, reason_str} -> reason_str
-            {:error, _reason} -> "unknown"
-          end
-        conn
-        |> put_view(InterloperWeb.PageView)
-        |> render("load_error.html", loading: "Github repo list for #{username}", reason: reason)
+      {:error, reason} ->
+        loading = "Github repo list for #{username}"
+        SharedController.render_loading_error(conn, reason, loading: loading)
     end
   end
 
