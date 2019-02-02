@@ -15,6 +15,10 @@ config :interloper_web, InterloperWeb.Endpoint,
   render_errors: [view: InterloperWeb.ErrorView, accepts: ~w(html json)],
   pubsub: [name: InterloperWeb.PubSub, adapter: Phoenix.PubSub.PG2]
 
+# Github client defaults
+config :interloper_web, InterloperWeb.GithubClient,
+  username: "rneilson"
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{Mix.env()}.exs"
