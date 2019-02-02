@@ -494,7 +494,12 @@ sup {
     border-width: 1px;
 }
 .yellow {
-    color: #eede22;
+    color: #EEDE22;
+}
+.yellowneg, .yellow.selector:focus, .yellow.selector:hover {
+    color: black;
+    background-color: #EEDE22;
+    border-color: #EEDE22;
 }
 .pink {
     color: #F92672;
