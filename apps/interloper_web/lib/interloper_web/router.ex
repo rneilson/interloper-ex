@@ -23,6 +23,7 @@ defmodule InterloperWeb.Router do
 
     get "/", PageController, :index
     get "/games", PageController, :games
+    get "/github", PageController, :github
   end
 
   # Other scopes may use custom stacks.

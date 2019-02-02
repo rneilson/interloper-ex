@@ -25,6 +25,15 @@ defmodule InterloperWeb.GithubClient do
   end
 
   @doc """
+  Returns default Github username if configured, or
+  raises otherwise.
+  """
+  def get_default_user() do
+    Application.fetch_env!(:interloper_web, __MODULE__)
+    |> Keyword.fetch!(:username)
+  end
+
+  @doc """
   Finds PID of existing cache process for `path`, if
   one exists.
   """

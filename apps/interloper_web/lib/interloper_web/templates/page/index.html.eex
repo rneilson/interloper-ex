@@ -1,3 +1,4 @@
+<div class="textbox"><br></div>
 <div class="textbox">
   <span class="green" id="motd">
     Welcome to InterloperOS!<br>
@@ -23,7 +24,7 @@
 </div>
 <div class="textbox"><br></div>
 <div class="textbox">
-  <a class="blue selector" href="/github" data-page-id="github">Github repositories</a>
+  <a class="blue selector" href="/github" data-page-id=":github">Github repositories</a>
 </div>
 <div class="textbox"><br></div>
 <div class="textbox">
@@ -35,7 +36,7 @@
 </div>
 <div class="textbox"><br></div>
 <div class="textbox">
-  <a class="blue selector" href="/twitter" data-page-id="twitter">Twitter</a>
+  <a class="blue selector" href="/twitter" data-page-id=":twitter">Twitter</a>
 </div>
 <div class="textbox"><br></div>
 <div class="textbox">

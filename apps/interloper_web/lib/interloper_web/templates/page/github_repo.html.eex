@@ -1,0 +1,24 @@
+<div class="textbox"><br></div>
+<div class="textbox">
+    <a class="<%= if @repo["fork"] do %>purple<% else %>blue<% end %> selector"
+        href="<%= @repo["html_url"] %>" target="_blank"><%= @repo["name"] %></a>
+    <span class="italic">(<%= @repo["language"] %>)</span>
+</div>
+<div class="textbox">
+    <span class="indent"><%= @repo["description"] %></span>
+</div>
+<div class="textbox">
+    <span class="small indent">
+    <%= if assigns[:commit] do %>
+        Last commit:
+        <span class="yellow">@commit["sha"]</span><%# TODO: substring %>
+        <span class="green">@commit["committer"]["date"]</span><%# TODO: format %>
+    <% else %>
+        <%= if assigns[:commit_err] do %>
+            <span class="err">Error retrieving last commit: <%= @commit_err %></span>
+        <% else %>
+            <span class="err">No commit details available</span>
+        <% end %>
+    <% end %>
+    </span>
+</div>
