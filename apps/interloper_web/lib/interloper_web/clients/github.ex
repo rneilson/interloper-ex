@@ -14,7 +14,7 @@ defmodule InterloperWeb.GithubClient do
 
   @base_url "https://api.github.com"
 
-  @cache_timeout 60 * 1000        # 60s by default
+  @cache_timeout   2 * 60 * 1000  #  2m by default
   @expire_timeout 60 * 60 * 1000  # 60m by default
 
   ## Client
@@ -95,6 +95,8 @@ defmodule InterloperWeb.GithubClient do
     # Options
     # TODO: SSL options, possibly?
     options = [follow_redirect: true]
+    # TEMP: remove this later?
+    Logger.debug("Request url: #{url}")
     Logger.debug("Request headers: #{inspect(headers)}")
     # Make request
     # TODO: better way to indicate test/mock path?
@@ -154,7 +156,7 @@ defmodule InterloperWeb.GithubClient do
     # Demonitor task
     Process.demonitor(ref, [:flush])
     # TEMP: remove this later?
-    Logger.debug("Response url: #{inspect(response.request_url)}")
+    Logger.debug("Response url: #{response.request_url}")
     Logger.debug("Response code: #{inspect(response.status_code)}")
     Logger.debug("Response headers: #{inspect(response.headers)}")
     # Parse response
