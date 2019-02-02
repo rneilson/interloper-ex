@@ -4,21 +4,20 @@
         href="<%= @repo["html_url"] %>" target="_blank"><%= @repo["name"] %></a>
     <span class="italic">(<%= @repo["language"] %>)</span>
 </div>
-<div class="textbox">
-    <span class="indent"><%= @repo["description"] %></span>
+<div class="textbox indent">
+    <span><%= @repo["description"] %></span>
 </div>
-<div class="textbox">
-    <span class="small indent">
-    <%= if assigns[:commit] do %>
+<div class="textbox indent">
+    <span class="small">
+    <%= cond do %>
+    <% not is_nil(assigns[:commit]) -> %>
         Last commit:
-        <span class="yellow">@commit["sha"]</span><%# TODO: substring %>
-        <span class="green">@commit["committer"]["date"]</span><%# TODO: format %>
-    <% else %>
-        <%= if assigns[:commit_err] do %>
-            <span class="err">Error retrieving last commit: <%= @commit_err %></span>
-        <% else %>
-            <span class="err">No commit details available</span>
-        <% end %>
+        <span class="yellow"><%= String.slice(@commit["sha"], 0..7) %></span>
+        <span class="green"><%= @commit["commit"]["author"]["date"] %></span><%# TODO: format %>
+    <% not is_nil(assigns[:commit_err]) -> %>
+        <span class="red">Error retrieving last commit: <%= @commit_err %></span>
+    <% true -> %>
+        <span class="italic">No commit details available</span>
     <% end %>
     </span>
 </div>

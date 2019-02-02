@@ -2,8 +2,8 @@
 <div class="textbox">
     <span class="bold underline">Github repositories</span>
 </div>
-<%= for repo <- @repos do %>
-    <%= render("github_repo.html", repo: repo) %>
+<%= for repo_map <- @repos do %>
+    <%= render("github_repo.html", repo_map) %>
 <% end %>
 <div class="textbox"><br></div>
 <div class="textbox">
