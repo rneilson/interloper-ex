@@ -14,7 +14,6 @@
     <span><%= @repo["description"] %></span>
 </div>
 <div class="textbox indent">
-    <%# TODO: move a bunch of this into a client-side controller %>
     <span class="small">
     <%= cond do %>
     <% not is_nil(assigns[:commit]) -> %>
