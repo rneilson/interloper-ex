@@ -65,7 +65,7 @@ defmodule InterloperWeb.SharedView do
   end
 
   defp convert_datetime(%NaiveDateTime{} = dt) do
-    case DateTime.from_naive(dt) do
+    case DateTime.from_naive(dt, "Etc/UTC") do
       {:ok, datetime, _} -> datetime
       _ -> nil
     end
