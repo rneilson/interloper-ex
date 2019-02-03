@@ -56,6 +56,8 @@ body {
     background-color: black;
     color: #d2cfcd;
     font-family: "Native", "Lucida Console", "Liberation Mono", Monaco, monospace;
+    /*font-family: "Roboto Mono", "Lucida Console", "Liberation Mono", Monaco, monospace;*/
+    /*font-family: "Source Code Pro", "Lucida Console", "Liberation Mono", Monaco, monospace;*/
     font-style: normal;
     font-variant: normal;
     font-weight: normal;
@@ -397,7 +399,6 @@ sup {
     /*line-height: 22px;*/
 }
 .bold {
-    font-family: "Native";
     font-weight: bold;
 }
 .underline {
