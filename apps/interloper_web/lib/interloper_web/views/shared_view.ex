@@ -4,24 +4,7 @@ defmodule InterloperWeb.SharedView do
   ## Date formatting
   # TODO: move to own lib?
 
-  def render_date_format(dt, attrs \\ []) do
-    # Get raw datetime string for data attr
-    # Leave strings alone, assume ints are millisecond unix epoch
-    # TODO: test for being a %DateTime{} ?
-    {dt_str, data_dt_attrs} =
-      case convert_datetime(dt) do
-        nil -> {"", []}
-        datetime -> {date_format(datetime), [datetime: DateTime.to_iso8601(datetime)]}
-      end
-    # Pull out data attributes separately
-    {data_attrs, other_attrs} = Keyword.pop(attrs, :data, [])
-    # Set defaults
-    tag_attrs = [class: "green", data: Keyword.merge(data_dt_attrs, data_attrs)]
-    # Return span element
-    content_tag(:span, dt_str, Keyword.merge(tag_attrs, other_attrs))
-  end
-
-  # Process once converted
+  # Nicely(ish) format given datetime
   # TODO: fancy it up with proper day/month strings
   # TODO: spec & doc
   def date_format(%DateTime{calendar: Calendar.ISO} = dt) do
