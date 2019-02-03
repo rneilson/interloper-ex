@@ -339,32 +339,29 @@ defmodule InterloperWeb.GithubClient do
   # `old_body` on status code 304 or 429
   @spec parse_response(response :: term, old_body :: term) :: {atom, map, term}
   defp parse_response(response, old_body) do
-    url = response.request_url
     # Get headers, attempt decoding response body
     # Lowercase header names for easier future use
     headers =
       response.headers
       |> Enum.map(fn {name, value} -> {String.downcase(name), value} end)
       |> Enum.into(%{})
-    {decode_success, decoded} = Jason.decode(response.body, strings: :copy)
-    # Check status code, plus decode success, for overall success/error
-    case {response.status_code, decode_success} do
+    # {decode_success, decoded} = Jason.decode(response.body, strings: :copy)
+    # Check status code for overall success/error
+    case response.status_code do
       # Return cached response body if rate-limited
-      {429, _} when not is_nil(old_body) ->
-        Logger.warn("Rate limit hit for #{url}, using cached response body")
+      429 when not is_nil(old_body) ->
+        Logger.warn("Rate limit hit for #{response.request_url}, using cached response body")
         {:ok, headers, old_body}
       # Return cached response body if not modified
-      {304, _} when not is_nil(old_body) ->
-        Logger.debug("Using cached response body for #{url}")
+      304 when not is_nil(old_body) ->
+        Logger.debug("Using cached response body for #{response.request_url}")
         {:ok, headers, old_body}
       # Normal successful response
-      {status_code, :ok} when status_code >= 200 and status_code < 400 ->
-        {:ok, headers, decoded}
+      status_code when status_code >= 200 and status_code < 400 ->
+        {:ok, headers, response.body}
+      # TODO: 1xx codes?
       # Unsuccessful response
-      {_status_code, :ok} ->
-        {:error, headers, decoded}
-      # Return raw response body if not decoded
-      _ ->
+      _status_code ->
         {:error, headers, response.body}
     end
   end
