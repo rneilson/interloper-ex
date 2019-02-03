@@ -337,35 +337,45 @@ defmodule InterloperWeb.GithubClient do
   # Returns {success, headers, body}, where `success` is
   # one of :ok or :error, and `body` may be the given
   # `old_body` on status code 304 or 429
+  # Current options include:
+  # - {:raw, bool()}
   @spec parse_response(response :: term, old_body :: term) :: {atom, map, term}
-  defp parse_response(response, old_body) do
-    url = response.request_url
+  defp parse_response(response, old_body, opts \\ []) do
     # Get headers, attempt decoding response body
     # Lowercase header names for easier future use
     headers =
       response.headers
       |> Enum.map(fn {name, value} -> {String.downcase(name), value} end)
       |> Enum.into(%{})
-    {decode_success, decoded} = Jason.decode(response.body, strings: :copy)
+    {decode_success, new_body} =
+      case Keyword.get(opts, :raw) do
+        true -> {:ok, {:raw, response.body}}
+        _ -> Jason.decode(response.body, strings: :copy)
+      end
     # Check status code, plus decode success, for overall success/error
     case {response.status_code, decode_success} do
       # Return cached response body if rate-limited
       {429, _} when not is_nil(old_body) ->
-        Logger.warn("Rate limit hit for #{url}, using cached response body")
+        Logger.warn("Rate limit hit for #{response.request_url}, using cached response body")
         {:ok, headers, old_body}
       # Return cached response body if not modified
       {304, _} when not is_nil(old_body) ->
-        Logger.debug("Using cached response body for #{url}")
+        Logger.debug("Using cached response body for #{response.request_url}")
         {:ok, headers, old_body}
       # Normal successful response
       {status_code, :ok} when status_code >= 200 and status_code < 400 ->
-        {:ok, headers, decoded}
-      # Unsuccessful response
+        {:ok, headers, new_body}
+      # Unsuccessful response, body decoded
       {_status_code, :ok} ->
-        {:error, headers, decoded}
-      # Return raw response body if not decoded
+        {:error, headers, new_body}
+      # Couldn't parse otherwise-successful response
+      {status_code, :error} when status_code >= 200 and status_code < 400 ->
+        msg = "Couldn't parse response body"
+        Logger.debug(msg <> " for #{response.request_url}")
+        {:error, headers, {:raw, msg}}
+      # Any other scenario, return raw response body if not decoded
       _ ->
-        {:error, headers, response.body}
+        {:error, headers, {:raw, response.body}}
     end
   end
 
