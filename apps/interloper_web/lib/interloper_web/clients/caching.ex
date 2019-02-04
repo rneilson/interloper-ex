@@ -18,23 +18,16 @@ defmodule InterloperWeb.CachingClient do
 
   @base_url ""
   @base_name __MODULE__
-  @pretty_name "#{__MODULE__}"
   @cache_timeout 2 * 60 * 1000
   @expire_timeout 60 * 60 * 1000
-  @use_registry InterloperWeb.Registry
-  @task_supervisor InterloperWeb.TaskSupervisor
-  @cache_supervisor InterloperWeb.DynamicSupervisor
 
   @doc false
   defmacro __using__(opts \\ []) do
     config_attrs = [
       :base_url,
       :base_name,
-      :pretty_name,
       :cache_timeout,
       :expire_timeout,
-      :use_registry,
-      :cache_supervisor,
     ]
     config_overrides =
       opts
@@ -80,7 +73,7 @@ defmodule InterloperWeb.CachingClient do
   @spec find_pid(path :: binary) :: pid | nil
   def find_pid(path) when is_binary(path) do
     # Try looking up existing process for this path
-    case Registry.lookup(@use_registry, get_name(path)) do
+    case Registry.lookup(InterloperWeb.Registry, get_name(path)) do
       [{pid, _} | _] -> pid
       [] -> nil
     end
@@ -170,7 +163,7 @@ defmodule InterloperWeb.CachingClient do
     etag = if is_nil(old_body), do: nil, else: cache_tag
     # Dispatch new task
     task = Task.Supervisor.async_nolink(
-      @task_supervisor, __MODULE__, :fetch_raw, [path, [auth: auth, etag: etag]])
+      InterloperWeb.TaskSupervisor, __MODULE__, :fetch_raw, [path, [auth: auth, etag: etag]])
     # Add caller to list, keep task ref, wait for response
     {:noreply, %{state | ref: task.ref, callers: [from | callers]}}
   end
@@ -299,13 +292,13 @@ defmodule InterloperWeb.CachingClient do
 
   defp get_path(url) do
     # Catch-other clause
-    {:error, "Invalid #{@pretty_name} URL: #{url}"}
+    {:error, "Invalid URL: #{url}"}
   end
 
   # Get via tuple for use with registries
   @spec get_via_tuple(binary) :: {:via, atom, term}
   defp get_via_tuple(path) when is_binary(path) do
-    {:via, Registry, {@use_registry, get_name(path)}}
+    {:via, Registry, {InterloperWeb.Registry, get_name(path)}}
   end
 
   # Cancels existing expiry timeout, if any, and starts new one
@@ -338,7 +331,7 @@ defmodule InterloperWeb.CachingClient do
           nil ->
             # Spawn a new process for this path
             Logger.debug("Spawning new cache process for #{path}")
-            DynamicSupervisor.start_child(@cache_supervisor, {__MODULE__, path})
+            DynamicSupervisor.start_child(InterloperWeb.DynamicSupervisor, {__MODULE__, path})
           pid ->
             # Return first found -- shouldn't be an issue with unique keys
             {:ok, pid}
