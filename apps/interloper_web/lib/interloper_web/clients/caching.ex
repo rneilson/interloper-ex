@@ -42,10 +42,10 @@ defmodule InterloperWeb.CachingClient do
       |> Map.take(config_attrs)
 
     quote do
-      import InterloperWeb.CachingClient
+      import unquote(__MODULE__)
 
-      @config_overrides unquote(Macro.escape(config_overrides))
-      @before_compile InterloperWeb.CachingClient
+      @config_overrides unquote(config_overrides)
+      @before_compile unquote(__MODULE__)
     end
   end
 
