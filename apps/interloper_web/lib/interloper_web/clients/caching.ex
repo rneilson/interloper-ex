@@ -3,7 +3,7 @@ defmodule InterloperWeb.CachingClient do
   Interface to an external API, with persistent caching
   to reduce external calls and avoid rate limits.
 
-  Each request path gets its own persistent process to
+  Each request URL gets its own persistent process to
   cache the response (default 60s), send authorization
   and if-none-matches headers as appropriate in API
   calls, and otherwise deduplicate requests.
@@ -16,68 +16,50 @@ defmodule InterloperWeb.CachingClient do
   use GenServer, restart: :temporary
   require Logger
 
-  @base_url ""
-  @base_name __MODULE__
-  @cache_timeout 2 * 60 * 1000
-  @expire_timeout 60 * 60 * 1000
+  @config %{
+    raw: false,                     # Return decoded JSON
+    base_url: "",                   # Allow all URLs
+    base_name: __MODULE__,          # Use module name
+    cache_timeout: 2 * 60 * 1000,   # Cache valid for 2m
+    expire_timeout: 60 * 60 * 1000, # Expire after 60m
+    # TODO: auth header callback
+  }
 
   @doc false
   defmacro __using__(opts \\ []) do
-    config_attrs = [
-      :base_url,
-      :base_name,
-      :cache_timeout,
-      :expire_timeout,
-    ]
     config_overrides =
       opts
       |> Enum.into(%{})
-      |> Map.take(config_attrs)
+      |> Map.take(Map.keys(@config))
+    config = Map.merge(@config, config_overrides)
 
-    quote do
-      import InterloperWeb.CachingClient
+    quote location: :keep do
+      @config unquote(Macro.escape(config))
 
-      @config_overrides unquote(Macro.escape(config_overrides))
-      @before_compile InterloperWeb.CachingClient
+      @spec fetch(url :: binary) :: {:ok, term} | {:error, term}
+      def fetch(url) when is_binary(url) do
+        InterloperWeb.CachingClient.fetch(url, get_config())
+      end
+
+      @spec find_pid(url :: binary) :: pid | nil
+      def find_pid(url) when is_binary(url) do
+        InterloperWeb.CachingClient.find_pid(url, get_config())
+      end
+
+      # Merge any env-specified settings
+      # TODO: remove or refactor
+      defp get_config() do
+        env_config =
+          Application.get_env(:interloper_web, __MODULE__, [])
+          |> Enum.into(%{})
+          |> Map.take(Map.keys(@config))
+        Map.merge(@config, env_config)
+      end
     end
   end
 
-  @doc false
-  defmacro __before_compile__(env) do
-    config_overrides = Module.get_attribute(env.module, :config_overrides) || %{}
-    for {attr, val} <- config_overrides do
-      Module.put_attribute(env.module, attr, val)
-    end
-  end
 
   ## Client
-
-  # TODO: guard for path?
-  def start_link(path) do
-    GenServer.start_link(__MODULE__, path, name: get_via_tuple(path))
-  end
-
-  @doc """
-  Returns default client username if configured, or
-  raises otherwise.
-  """
-  def get_default_user() do
-    Application.fetch_env!(:interloper_web, __MODULE__)
-    |> Keyword.fetch!(:username)
-  end
-
-  @doc """
-  Finds PID of existing cache process for `path`, if
-  one exists.
-  """
-  @spec find_pid(path :: binary) :: pid | nil
-  def find_pid(path) when is_binary(path) do
-    # Try looking up existing process for this path
-    case Registry.lookup(InterloperWeb.Registry, get_name(path)) do
-      [{pid, _} | _] -> pid
-      [] -> nil
-    end
-  end
 
   @doc """
   Retrives (possibly-cached) response from API at
@@ -86,19 +68,19 @@ defmodule InterloperWeb.CachingClient do
 
   Returns {:ok, response} or {:error, reason}.
   """
-  @spec fetch(url :: binary) :: {:ok, term} | {:error, term}
-  def fetch(url) do
+  @spec fetch(url :: binary, config :: map) :: {:ok, term} | {:error, term}
+  def fetch(url, config \\ nil) when is_binary(url) do
     # Ensure server started or get existing
-    case get_or_create_server(url) do
+    case get_or_create_server(url, get_config(config)) do
       {:ok, pid} -> GenServer.call(pid, :fetch)
       {:error, reason} -> {:error, reason}
     end
   end
 
   @doc """
-  Makes HTTP request to specified API path.
-  Primarily for use by async task spawned by caching
-  process.
+  Makes HTTP request to specified URL.
+  Primarily for use by async tasks spawned by caching
+  processes.
 
   Options:
   * `:auth` - value of `Authorization` header
@@ -106,16 +88,14 @@ defmodule InterloperWeb.CachingClient do
 
   Returns raw HTTPoison response struct.
   """
-  @spec fetch_raw(path :: binary, opts :: keyword) :: any
-  def fetch_raw(path, opts \\ []) do
-    # Actual request URL
-    url = @base_url <> path
+  @spec fetch_raw(url :: binary, opts :: keyword) :: any
+  def fetch_raw(url, opts \\ []) when is_binary(url) do
     # Headers
     # TODO: if-modified-since?
     headers =
       [{"Accept", "application/json"}]
-      |> add_header("Authorization", Keyword.get(opts, :auth))
-      |> add_header("If-None-Match", Keyword.get(opts, :etag))
+      |> add_header("Authorization", opts[:auth])
+      |> add_header("If-None-Match", opts[:etag])
     # Options
     # TODO: SSL options, possibly?
     options = [follow_redirect: true]
@@ -123,8 +103,8 @@ defmodule InterloperWeb.CachingClient do
     Logger.debug("Request url: #{url}")
     Logger.debug("Request headers: #{inspect(headers)}")
     # Make request
-    # TODO: better way to indicate test/mock path?
-    if binary_part(path, 0, 2) == "/_" do
+    # TODO: better way to indicate test/mock url?
+    if binary_part(url, 0, 2) == "_/" do
       # Get fake response
       mock_response(%{ method: :get, url: url, headers: headers, options: options })
     else
@@ -132,16 +112,36 @@ defmodule InterloperWeb.CachingClient do
     end
   end
 
+  @doc """
+  Finds PID of existing cache process for `url`, if
+  one exists.
+  """
+  @spec find_pid(url :: binary, config :: map) :: pid | nil
+  def find_pid(url, config \\ nil) when is_binary(url) do
+    # May raise
+    name = get_name(url, get_config(config))
+    # Try looking up existing process for this url
+    case Registry.lookup(InterloperWeb.Registry, name) do
+      [{pid, _} | _] -> pid
+      [] -> nil
+    end
+  end
+
+  # TODO: guard for url?
+  def start_link({url, config}) do
+    use_config = get_config(config)
+    GenServer.start_link(__MODULE__, {url, use_config}, name: get_via_tuple(url, use_config))
+  end
+
 
   ## Server (callbacks)
 
-  def init(path) do
+  def init({url, config}) do
     # Initial state
     state =
-      path
-      |> create_new_state
-      |> reset_expiry_timer(@expire_timeout)
-    Logger.debug("Started new cache process for #{path}")
+      create_new_state(url, config)
+      |> reset_expiry_timer(config[:expire_timeout])
+    Logger.debug("Started new cache process for #{config[:base_name]} #{url}")
     # TODO: continue?
     {:ok, state}
   end
@@ -149,21 +149,21 @@ defmodule InterloperWeb.CachingClient do
   # TODO: handle_continue to send first timeout message?
 
   # Cache valid, return existing
-  def handle_call(:fetch, _from, %{path: path, body: body, cache_valid: true} = state) do
-    Logger.debug("Returning cached data for #{path}")
+  def handle_call(:fetch, _from, %{url: url, body: body, cache_valid: true} = state) do
+    Logger.debug("Returning cached data for #{url}")
     {:reply, {:ok, body}, state}
   end
 
   # Cache not valid and no task dispatched, refetch
-  def handle_call(:fetch, from, %{ref: nil, cache_valid: false} = state) do
-    # Get auth, body, path, callers list (should be empty), and cache tag from state
+  def handle_call(:fetch, from, %{ref: nil, callers: callers, cache_valid: false} = state) do
+    # Get auth, body, url, config, and cache tag from state
     # (Separate just to keep it clean)
-    %{auth: auth, body: old_body, path: path, callers: callers, cache_tag: cache_tag} = state
+    %{url: url, body: old_body, auth: auth, cache_tag: cache_tag} = state
     # Only set etag header if body present
     etag = if is_nil(old_body), do: nil, else: cache_tag
     # Dispatch new task
     task = Task.Supervisor.async_nolink(
-      InterloperWeb.TaskSupervisor, __MODULE__, :fetch_raw, [path, [auth: auth, etag: etag]])
+      InterloperWeb.TaskSupervisor, __MODULE__, :fetch_raw, [url, [auth: auth, etag: etag]])
     # Add caller to list, keep task ref, wait for response
     {:noreply, %{state | ref: task.ref, callers: [from | callers]}}
   end
@@ -176,7 +176,7 @@ defmodule InterloperWeb.CachingClient do
 
   # Task complete, reply to callers and update cache
   def handle_info({ref, response}, %{ref: ref} = state) do
-    %{body: old_body, callers: callers, expire_ref: expire_ref} = state
+    %{body: old_body, callers: callers, expire_ref: expire_ref, config: config} = state
     # Demonitor task
     Process.demonitor(ref, [:flush])
     # TEMP: remove this later?
@@ -184,7 +184,7 @@ defmodule InterloperWeb.CachingClient do
     Logger.debug("Response code: #{inspect(response.status_code)}")
     Logger.debug("Response headers: #{inspect(response.headers)}")
     # Parse response
-    {success, headers, body} = parse_response(response, old_body)
+    {success, headers, body} = parse_response(response, old_body, config)
     # Reply to previous callers
     reply_to_callers({success, body}, callers)
     # Update state
@@ -192,10 +192,12 @@ defmodule InterloperWeb.CachingClient do
       case success do
         :ok ->
           # Send cache timeout message
-          Process.send_after(self(), :invalidate_cache, @cache_timeout)
+          if config[:cache_timeout] do
+            Process.send_after(self(), :invalidate_cache, config[:cache_timeout])
+          end
           # Update cached values and extend expiry
           new_tag = Map.get(headers, "etag")
-          new_ref = reset_expiry_timer(expire_ref, @expire_timeout)
+          new_ref = reset_expiry_timer(expire_ref, config[:expire_timeout])
           %{state | body: body, cache_tag: new_tag, cache_valid: true, expire_ref: new_ref}
         _ ->
           # Clear cached values on any error, keep expiry
@@ -207,16 +209,16 @@ defmodule InterloperWeb.CachingClient do
 
   # Task failed, reply to callers and clear cache
   def handle_info({:DOWN, ref, :process, _pid, _reason}, %{ref: ref} = state) do
-    %{path: path, callers: callers} = state
+    %{url: url, callers: callers} = state
     # Reply to previous callers (obscure real error, though)
-    reply_to_callers({:error, "Request failed for #{path}"}, callers)
+    reply_to_callers({:error, "Request failed for #{url}"}, callers)
     # Shut down, request failed
     {:stop, :request_failed, state}
   end
 
   # Cache timed out, update state
-  def handle_info(:invalidate_cache, %{path: path, ref: nil, cache_valid: true} = state) do
-    Logger.debug("Invalidating cache for #{path}")
+  def handle_info(:invalidate_cache, %{url: url, ref: nil, cache_valid: true} = state) do
+    Logger.debug("Invalidating cache for #{url}")
     {:noreply, %{state | cache_valid: false}}
   end
 
@@ -226,29 +228,43 @@ defmodule InterloperWeb.CachingClient do
   end
 
   # Request in progress, don't terminate
-  def handle_info(:timeout, %{path: path, ref: ref} = state) when is_reference(ref) do
-    Logger.debug("Extending expiry timeout for #{path}")
+  def handle_info(:timeout, %{url: url, ref: ref, config: config} = state) when is_reference(ref) do
+    timeout = config[:cache_timeout] || 1000
+    Logger.debug("Extending expiry timeout for #{url} by #{timeout} ms")
     # TODO: pick a better extension time limit?
-    {:noreply, reset_expiry_timer(state, @cache_timeout)}
+    {:noreply, reset_expiry_timer(state, timeout)}
   end
 
   # Cache process expired, terminate
-  def handle_info(:timeout, %{path: path} = state) do
-    Logger.debug("Shutting down cache for #{path}")
+  def handle_info(:timeout, %{url: url} = state) do
+    Logger.debug("Shutting down cache for #{url}")
     {:stop, :normal, state}
   end
 
 
   ## Internal (utilities)
 
+  # Get (possibly-composite) configuration
+  # Maps will be used as-is
+  # Keyword lists will be merged with defaults
+  defp get_config(config) do
+    # TODO: allow functions and {module, function} tuples
+    cond do
+      !config -> @config
+      is_map(config) -> config
+      is_list(config) -> Map.merge(@config, Enum.into(config, %{}))
+      true -> raise ArgumentError, "Invalid config: #{inspect(config)}"
+    end
+  end
+
   # Fresh state
   # TODO: move to its own struct type?
-  defp create_new_state(path, items \\ []) do
+  defp create_new_state(url, config, items \\ []) do
     # Get username/password, construct header
+    # TODO: change to callback...
     auth =
-      with config when is_list(config) <- Application.get_env(:interloper_web, __MODULE__),
-           user when is_binary(user) <- Keyword.get(config, :username),
-           pass when is_binary(pass) <- Keyword.get(config, :password)
+      with user when is_binary(user) <- config[:username],
+           pass when is_binary(pass) <- config[:password]
       do
         "Basic " <> Base.encode64(user <> ":" <> pass)
       else
@@ -256,49 +272,56 @@ defmodule InterloperWeb.CachingClient do
       end
     # New state map
     state = %{
-      auth: auth,
-      path: path,
+      url: url,
       body: nil,
+      auth: auth,
       ref: nil,
       callers: [],
       cache_tag: nil,
       cache_valid: false,
       expire_ref: nil,
+      config: config,
     }
     # Merge additional items, if any
-    Enum.into(items, state)
+    Map.merge(state, Enum.into(items, %{}))
   end
 
   # Get name tuple for use with registries.
-  @spec get_name(binary) :: {atom, binary}
-  defp get_name(path) when is_binary(path) do
-    {@base_name, path}
+  @spec get_name(url :: binary, config :: map) :: {term, binary}
+  defp get_name(url, config) when is_binary(url) do
+    if !config[:base_name] do
+      raise ArgumentError, "Invalid base name: #{inspect(config[:base_name])}"
+    end
+    case get_full_url(url, config) do
+      {:ok, full_url} -> {config[:base_name], full_url}
+      {:error, reason} -> raise ArgumentError, "#{reason}"
+    end
   end
 
-  # Get the path portion of a given Github API URL.
-  # Returns {:ok, path} or {:error, reason}.
-  @spec get_path(binary) :: {:ok, binary} | {:error, term}
-  defp get_path(url)
-
-  defp get_path(path) when binary_part(path, 0, 1) == "/" do
-    # TODO: less-simplistic check?
-    {:ok, path}
-  end
-
-  defp get_path(@base_url <> path) when byte_size(path) > 0 do
-    # TODO: less-simplistic extraction?
-    {:ok, path}
-  end
-
-  defp get_path(url) do
-    # Catch-other clause
-    {:error, "Invalid URL: #{url}"}
+  # Get the full URL for given URL or path, validating against base URL
+  # Returns {:ok, url} or {:error, reason}
+  @spec get_full_url(url :: binary, config :: map) :: {:ok, binary} | {:error, term}
+  defp get_full_url(url, config) do
+    cond do
+      binary_part(url, 0, 1) == "/" ->
+        # TODO: less-simplistic check?
+        {:ok, config[:base_url] <> url}
+      String.starts_with?(url, config[:base_url]) ->
+        # TODO: less-simplistic check?
+        {:ok, url}
+      !config[:base_url] ->
+        # Misconfigured
+        {:error, "Invalid base URL: #{config[:base_url]}"}
+      true ->
+        # Catch-else clause
+        {:error, "Invalid URL: #{url}"}
+    end
   end
 
   # Get via tuple for use with registries
-  @spec get_via_tuple(binary) :: {:via, atom, term}
-  defp get_via_tuple(path) when is_binary(path) do
-    {:via, Registry, {InterloperWeb.Registry, get_name(path)}}
+  @spec get_via_tuple(url :: binary, config :: map) :: {:via, atom, term}
+  defp get_via_tuple(url, config) when is_binary(url) do
+    {:via, Registry, {InterloperWeb.Registry, get_name(url, config)}}
   end
 
   # Cancels existing expiry timeout, if any, and starts new one
@@ -322,16 +345,18 @@ defmodule InterloperWeb.CachingClient do
   # Finds the registered server for `url`, if
   # it exists, or creates one if not.
   # Returns {:ok, pid} or {:error, reason}.
-  @spec get_or_create_server(url :: binary) :: {:ok, pid} | {:error, any}
-  defp get_or_create_server(url) do
-    case get_path(url) do
-      {:ok, path} ->
-        # Try looking up existing process for this path
-        case find_pid(path) do
+  @spec get_or_create_server(url :: binary, config :: map) :: {:ok, pid} | {:error, any}
+  defp get_or_create_server(url, config) do
+    case get_full_url(url, config) do
+      {:ok, url} ->
+        # Try looking up existing process for this url
+        case find_pid(url, config) do
           nil ->
-            # Spawn a new process for this path
-            Logger.debug("Spawning new cache process for #{path}")
-            DynamicSupervisor.start_child(InterloperWeb.DynamicSupervisor, {__MODULE__, path})
+            # Spawn a new process for this url
+            Logger.debug("Spawning new cache process for #{url}")
+            # TODO: parameterize supervisor name?
+            DynamicSupervisor.start_child(
+              InterloperWeb.DynamicSupervisor, {__MODULE__, {url, config}})
           pid ->
             # Return first found -- shouldn't be an issue with unique keys
             {:ok, pid}
@@ -359,10 +384,10 @@ defmodule InterloperWeb.CachingClient do
   # Returns {success, headers, body}, where `success` is
   # one of :ok or :error, and `body` may be the given
   # `old_body` on status code 304 or 429
-  # Current options include:
+  # Current config options include:
   # - {:raw, bool()}
-  @spec parse_response(response :: term, old_body :: term) :: {atom, map, term}
-  defp parse_response(response, old_body, opts \\ []) do
+  @spec parse_response(response :: term, old_body :: term, config :: map) :: {atom, map, term}
+  defp parse_response(response, old_body, config) do
     # Get headers, attempt decoding response body
     # Lowercase header names for easier future use
     headers =
@@ -370,7 +395,7 @@ defmodule InterloperWeb.CachingClient do
       |> Enum.map(fn {name, value} -> {String.downcase(name), value} end)
       |> Enum.into(%{})
     {decode_success, new_body} =
-      case Keyword.get(opts, :raw) do
+      case config[:raw] do
         true -> {:ok, {:raw, response.body}}
         _ -> Jason.decode(response.body, strings: :copy)
       end
@@ -406,31 +431,32 @@ defmodule InterloperWeb.CachingClient do
 
   # Fake testing responses, full request
   defp mock_response(%{ url: url, headers: header_list } = request) do
-    {:ok, path} = get_path(url)
     etag = with {_, etag} <- List.keyfind(header_list, "If-None-Match", 0), do: etag
     # TEMP: fake delay with sleep
     Process.sleep(1000)
     # TEMP: fake values for testing
     {status_code, headers, body} =
-      case {path, etag} do
-        {"/_exit", _} ->
+      case {url, etag} do
+        {"_/exit", _} ->
           raise "Fake failure"
-        {"/_error", _} ->
+        {"_/error", _} ->
           {502, [], "{\"error\": \"Fake error message\"}"}
-        {"/_notfound", _} ->
+        {"_/notfound", _} ->
           {404, [], "Fake not found"}
-        {"/_cached", "0123456789"} ->
+        {"_/cached", "0123456789"} ->
           Logger.debug("Pretending to respond with cached data")
           {304, [{"ETag", "0123456789"}], ""}
-        {"/_cached", _} ->
+        {"_/cached", _} ->
           {200, [{"ETag", "0123456789"}], "{\"data\": \"Cached data\"}"}
-        {"/_limit", "9876543210"} ->
+        {"_/limit", "9876543210"} ->
           Logger.debug("Pretending to respond with rate-limit error")
           {429, [], ""}
-        {"/_limit", _} ->
+        {"_/limit", _} ->
           {200, [{"ETag", "9876543210"}], "{\"data\": \"Rate-limited data\"}"}
+        {"_/" <> path, _} ->
+          {200, [], "{\"path\": \"/#{path}\", \"data\": \"Fresh data\"}"}
         _ ->
-          {200, [], "{\"path\": \"#{path}\", \"data\": \"Fresh data\"}"}
+          {404, [], "Really not found"}
       end
     # TEMP: return fake HTTPoison response
     # TODO: return faked response struct
