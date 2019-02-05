@@ -22,4 +22,19 @@ defmodule InterloperWeb.GithubClient do
     |> Keyword.fetch!(:username)
   end
 
+  @doc """
+  Returns HTTP Basic authorization header based on
+  configured username/password.
+  """
+  def get_auth_header(_url) do
+    with env <- Application.get_env(:interloper_web, __MODULE__),
+         user when is_binary(user) <- env[:username],
+         pass when is_binary(pass) <- env[:password]
+    do
+      "Basic " <> Base.encode64(user <> ":" <> pass)
+    else
+      _ -> nil
+    end
+  end
+
 end
