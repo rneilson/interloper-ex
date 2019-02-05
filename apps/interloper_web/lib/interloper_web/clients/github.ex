@@ -10,8 +10,8 @@ defmodule InterloperWeb.GithubClient do
   """
 
   use InterloperWeb.CachingClient,
-    base_url: "https://api.github.com",
-    cache_timeout: 300000
+    base_url: "https://api.github.com"
+    # cache_timeout: 120000
 
   @doc """
   Returns default Github username if configured, or

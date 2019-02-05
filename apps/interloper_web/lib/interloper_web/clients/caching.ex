@@ -22,41 +22,42 @@ defmodule InterloperWeb.CachingClient do
     base_name: __MODULE__,          # Use module name
     cache_timeout: 1 * 60 * 1000,   # Cache valid for 1m
     expire_timeout: 60 * 60 * 1000, # Expire after 60m
-    username: nil,                  # Username for HTTP Basic auth
-    password: nil,                  # Password for HTTP Basic auth
-    # TODO: auth header callback
+    auth_callback: nil,             # Auth header callback
   }
+
+  @callback get_auth_header(url :: binary) :: binary | nil
+  @optional_callbacks get_auth_header: 1
 
   @doc false
   defmacro __using__(opts \\ []) do
+    %{module: module} = __CALLER__
     config_overrides =
       opts
       |> Enum.into(%{})
       |> Map.take(Map.keys(@config))
+      |> Map.put_new(:auth_callback, {module, :get_auth_header})
     config = Map.merge(@config, config_overrides)
 
     quote location: :keep do
+      @behaviour InterloperWeb.CachingClient
+
       @config unquote(Macro.escape(config))
 
       @spec fetch(url :: binary) :: {:ok, term} | {:error, term}
       def fetch(url) when is_binary(url) do
-        InterloperWeb.CachingClient.fetch(url, get_config())
+        InterloperWeb.CachingClient.fetch(url, @config)
       end
 
       @spec find_pid(url :: binary) :: pid | nil
       def find_pid(url) when is_binary(url) do
-        InterloperWeb.CachingClient.find_pid(url, get_config())
+        InterloperWeb.CachingClient.find_pid(url, @config)
       end
 
-      # Merge any env-specified settings
-      # TODO: remove or refactor
-      defp get_config() do
-        env_config =
-          Application.get_env(:interloper_web, __MODULE__, [])
-          |> Enum.into(%{})
-          |> Map.take(Map.keys(@config))
-        Map.merge(@config, env_config)
-      end
+      @spec find_pid(url :: binary) :: binary | nil
+      def get_auth_header(url), do: nil
+      defoverridable get_auth_header: 1
+
+      # TODO: code_change callback for GenServer
     end
   end
 
@@ -129,10 +130,9 @@ defmodule InterloperWeb.CachingClient do
     end
   end
 
-  # TODO: guard for url?
+  # TODO: guard for url? Check config?
   def start_link({url, config}) do
-    use_config = get_config(config)
-    GenServer.start_link(__MODULE__, {url, use_config}, name: get_via_tuple(url, use_config))
+    GenServer.start_link(__MODULE__, {url, config}, name: get_via_tuple(url, config))
   end
 
 
@@ -259,21 +259,34 @@ defmodule InterloperWeb.CachingClient do
     end
   end
 
+  # Get auth header via callback
+  defp get_auth_header(url, config) do
+    case Map.get(config, :auth_callback) do
+      nil -> nil
+      function when is_function(function, 1) ->
+        function.(url)
+      {module, fn_name} when is_atom(module) and is_atom(fn_name) ->
+        apply(module, fn_name, [url])
+      other ->
+        raise ArgumentError, "Invalid auth header callback: #{inspect(other)}"
+    end
+  end
+
   # Fresh state
   # TODO: move to its own struct type?
-  defp create_new_state(url, config, items \\ []) do
+  defp create_new_state(url, config) do
     # Get username/password, construct header
-    # TODO: change to callback...
-    auth =
-      with user when is_binary(user) <- config[:username],
-           pass when is_binary(pass) <- config[:password]
-      do
-        "Basic " <> Base.encode64(user <> ":" <> pass)
-      else
-        _ -> nil
-      end
+    auth = get_auth_header(url, config)
+      # with user when is_binary(user) <- config[:username],
+      #      pass when is_binary(pass) <- config[:password]
+      # do
+      #   "Basic " <> Base.encode64(user <> ":" <> pass)
+      # else
+      #   _ -> nil
+      # end
     # New state map
-    state = %{
+    # TODO: make struct
+    %{
       url: url,
       body: nil,
       auth: auth,
@@ -284,14 +297,12 @@ defmodule InterloperWeb.CachingClient do
       expire_ref: nil,
       config: config,
     }
-    # Merge additional items, if any
-    Map.merge(state, Enum.into(items, %{}))
   end
 
   # Get name tuple for use with registries.
   @spec get_name(url :: binary, config :: map) :: {term, binary}
   defp get_name(url, config) when is_binary(url) do
-    if !config[:base_name] do
+    unless config[:base_name] do
       raise ArgumentError, "Invalid base name: #{inspect(config[:base_name])}"
     end
     case get_full_url(url, config) do
