@@ -20,8 +20,10 @@ defmodule InterloperWeb.CachingClient do
     raw: false,                     # Return decoded JSON
     base_url: "",                   # Allow all URLs
     base_name: __MODULE__,          # Use module name
-    cache_timeout: 2 * 60 * 1000,   # Cache valid for 2m
+    cache_timeout: 1 * 60 * 1000,   # Cache valid for 1m
     expire_timeout: 60 * 60 * 1000, # Expire after 60m
+    username: nil,                  # Username for HTTP Basic auth
+    password: nil,                  # Password for HTTP Basic auth
     # TODO: auth header callback
   }
 
