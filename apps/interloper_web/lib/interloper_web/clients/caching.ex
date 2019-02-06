@@ -22,11 +22,11 @@ defmodule InterloperWeb.CachingClient do
     base_name: __MODULE__,          # Use module name
     cache_timeout: 1 * 60 * 1000,   # Cache valid for 1m
     expire_timeout: 60 * 60 * 1000, # Expire after 60m
-    auth_callback: nil,             # Auth header callback
   }
 
   @callback get_auth_header(url :: binary) :: binary | nil
-  @optional_callbacks get_auth_header: 1
+  @callback get_config() :: map
+  @optional_callbacks get_auth_header: 1, get_config: 0
 
   @doc false
   defmacro __using__(opts \\ []) do
@@ -35,8 +35,10 @@ defmodule InterloperWeb.CachingClient do
       opts
       |> Enum.into(%{})
       |> Map.take(Map.keys(@config))
-      |> Map.put_new(:auth_callback, {module, :get_auth_header})
-    config = Map.merge(@config, config_overrides)
+    config =
+      @config
+      |> Map.merge(config_overrides)
+      |> Map.put(:base_name, module)
 
     quote location: :keep do
       @behaviour InterloperWeb.CachingClient
@@ -57,7 +59,9 @@ defmodule InterloperWeb.CachingClient do
       def get_auth_header(url), do: nil
       defoverridable get_auth_header: 1
 
-      # TODO: code_change callback for GenServer
+      @spec get_config() :: map
+      def get_config(), do: @config
+      defoverridable get_config: 0
     end
   end
 
@@ -143,9 +147,20 @@ defmodule InterloperWeb.CachingClient do
     state =
       create_new_state(url, config)
       |> reset_expiry_timer(config[:expire_timeout])
-    Logger.debug("Started new cache process for #{config[:base_name]} #{url}")
+    Logger.debug("Started new cache process for #{url} (#{config[:base_name]})")
     # TODO: continue?
     {:ok, state}
+  end
+
+  def code_change(_old_vsn, %{config: %{base_name: __MODULE__}} = state, _extra) do
+    Logger.debug("Code change callback for #{__MODULE__}")
+    {:ok, %{state | config: @config}}
+  end
+
+  def code_change(_old_vsn, %{config: %{base_name: base_name}} = state, _extra) do
+    Logger.debug("Code change callback for #{base_name}")
+    config = apply(base_name, :get_config, [])
+    {:ok, %{state | config: config}}
   end
 
   # TODO: handle_continue to send first timeout message?
@@ -260,16 +275,10 @@ defmodule InterloperWeb.CachingClient do
   end
 
   # Get auth header via callback
-  defp get_auth_header(url, config) do
-    case Map.get(config, :auth_callback) do
-      nil -> nil
-      function when is_function(function, 1) ->
-        function.(url)
-      {module, fn_name} when is_atom(module) and is_atom(fn_name) ->
-        apply(module, fn_name, [url])
-      other ->
-        raise ArgumentError, "Invalid auth header callback: #{inspect(other)}"
-    end
+  defp get_auth_header(_url, %{base_name: __MODULE__} = _config), do: nil
+
+  defp get_auth_header(url, %{base_name: module} = _config) when is_atom(module) do
+    apply(module, :get_auth_header, [url])
   end
 
   # Fresh state
