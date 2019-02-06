@@ -12,7 +12,7 @@ defmodule InterloperWeb.GithubController do
         render(conn, "repo_list.html", repos: repos)
       {:error, reason} ->
         loading = "Github repo list for #{username}"
-        SharedController.render_loading_error(conn, reason, loading: loading)
+        SharedController.loading_error(conn, %{reason: reason, loading: loading})
     end
   end
 

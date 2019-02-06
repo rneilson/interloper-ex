@@ -4,5 +4,5 @@
 </div>
 <div class="textbox"><br></div>
 <div class="textbox">
-    <span class="err"><%= @reason %></span>
+    <pre class="err"><%= ensure_string(@reason, pretty: true) %></pre>
 </div>
