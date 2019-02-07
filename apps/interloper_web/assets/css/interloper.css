@@ -78,9 +78,6 @@ a {
 a:focus {
     outline: none;
 }
-pre {
-    margin: 0px;
-}
 div {
     border: none;
     // padding: 0px 4px 4px;
@@ -174,6 +171,11 @@ div.textbox {
 div.textbox p {
     padding: 0px;
     margin: 0px;
+}
+div.textbox pre {
+    margin: 0px;
+    overflow-x: auto;
+    overflow-y: hidden;
 }
 div.imgbox {
     padding: 0px;

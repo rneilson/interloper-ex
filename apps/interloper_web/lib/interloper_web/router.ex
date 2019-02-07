@@ -23,11 +23,13 @@ defmodule InterloperWeb.Router do
 
     get "/", PageController, :index
     get "/games", PageController, :games
-    get "/github", GithubController, :index
+    get "/github", GithubController, :repo_list
+    get "/twitter", TwitterController, :recent
   end
 
-  # Other scopes may use custom stacks.
-  # scope "/api", InterloperWeb do
-  #   pipe_through :api
-  # end
+  scope "/api", InterloperWeb do
+    pipe_through :api
+
+    get "/twitter/recent", TwitterController, :recent
+  end
 end

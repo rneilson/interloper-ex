@@ -4,12 +4,12 @@ defmodule InterloperWeb.GithubController do
   alias InterloperWeb.SharedController
   alias InterloperWeb.GithubClient
 
-  def index(conn, %{username: username}) do
+  def repo_list(conn, %{username: username}) do
     # First fetch repo list
     case GithubClient.fetch("/users/#{username}/repos?sort=created") do
-      {:ok, repo_list} ->
-        repos = get_repo_details(repo_list)
-        render(conn, "repo_list.html", repos: repos)
+      {:ok, repos} ->
+        repo_list = get_repo_details(repos)
+        render(conn, "repo_list.html", repo_list: repo_list)
       {:error, reason} ->
         loading = "Github repo list for #{username}"
         SharedController.loading_error(conn, %{reason: reason, loading: loading})
@@ -21,8 +21,8 @@ defmodule InterloperWeb.GithubController do
   #   index(conn, %{username: username})
   # end
 
-  def index(conn, _params) do
-    index(conn, %{username: GithubClient.get_default_user()})
+  def repo_list(conn, _params) do
+    repo_list(conn, %{username: GithubClient.get_default_user()})
   end
 
 

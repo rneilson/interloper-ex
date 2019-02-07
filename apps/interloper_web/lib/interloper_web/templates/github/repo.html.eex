@@ -1,10 +1,12 @@
-<div class="textbox"><br></div>
 <div class="textbox">
     <%= if @repo["fork"] do %>
     <a class="purple selector" href="<%= @repo["html_url"] %>" target="_blank">
-        <%= @repo["name"] %><span class="italic"> (fork)</span></a>
+        <%= @repo["name"] %><span class="italic"> (fork)</span>
+    </a>
     <% else %>
-    <a class="blue selector" href="<%= @repo["html_url"] %>" target="_blank"><%= @repo["name"] %></a>
+    <a class="blue selector" href="<%= @repo["html_url"] %>" target="_blank">
+        <%= @repo["name"] %>
+    </a>
     <% end %>
     <%= if @repo["language"] do %>
     <span class="italic">(<%= @repo["language"] %>)</span>
@@ -19,13 +21,18 @@
     <% not is_nil(assigns[:commit]) -> %>
         Last commit:
         <a class="yellow selector" href="<%= @commit["html_url"] %>">
-            <%= String.slice(@commit["sha"], 0..7) %></a>
+            <%= String.slice(@commit["sha"], 0..7) %>
+        </a>
         <span class="green" data-datetime="<%= @commit["commit"]["author"]["date"] %>">
-            <%= SharedView.date_format(@commit["commit"]["author"]["date"]) %></span>
+            <%= SharedView.date_format(@commit["commit"]["author"]["date"]) %>
+        </span>
     <% not is_nil(assigns[:commit_err]) -> %>
-        <span class="err">Error retrieving last commit: <%= @commit_err %></span>
+        <span class="err">
+            Error retrieving last commit: <%= SharedView.ensure_string(@commit_err) %>
+        </span>
     <% true -> %>
         <span class="italic">No commit details available</span>
     <% end %>
     </span>
 </div>
+<div class="textbox"><br></div>
