@@ -1,0 +1,14 @@
+<div class="pic profile">
+    <img src="<%= String.replace(@user["profile_image_url_https"], "_normal", "") %>">
+</div><div class="profilebox">
+    <span class="bold"><%= @user["name"] %></span>
+    <%= render("user_link.html", %{user: @user}) %>
+    <br>
+    <%= if @user["url"] do %>
+    <%= render("entity_link.html", %{url: @user["url"], entities: @user["entities"]["url"]}) %>
+    <br>
+    <% end %>
+    <br>
+    <%= render("tweet_text.html",
+            %{text: @user["description"], entities: @user["entities"]["description"]}) %>
+</div>

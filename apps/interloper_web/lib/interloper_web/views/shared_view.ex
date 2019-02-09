@@ -10,7 +10,7 @@ defmodule InterloperWeb.SharedView do
   def ensure_string(source, opts \\ [])
 
   # TODO: lists too?
-  def ensure_string(source, opts) when is_map(source) do
+  def ensure_string(source, opts) when is_map(source) or is_list(source) do
     case Jason.encode_to_iodata(source, opts) do
       {:ok, source_str} -> source_str
       {:error, _reason} -> "Error parsing message"
