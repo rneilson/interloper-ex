@@ -204,9 +204,11 @@ div.pic {
     padding: 0px;   
 }
 div.pic.profile {
+    height: 144px;
     width: 144px;
 }
 div.pic.tweetprofile {
+    height: 48px;
     width: 48px;
     padding: 4px 0px 4px;
 }

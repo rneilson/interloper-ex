@@ -19,6 +19,12 @@
     <% end %>
     <div class="tweettext">
         <br>
+        <%= if @tweet["in_reply_to_status_id_str"] do %>
+        <span class="small">
+            <%= render("reply_link.html", tweet: @tweet) %>
+        </span>
+        <br>
+        <% end %>
         <span class="small">
             <%= if @tweet["timestamp_ms"] do %>
             <span class="green" data-datetime="<%= @tweet["timestamp_ms"] %>">

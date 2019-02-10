@@ -96,13 +96,25 @@ defmodule InterloperWeb.TwitterView do
   end
 
   # TODO: use a file template instead?
+  def render("tweet_link.html", %{id_str: id_str, screen_name: screen_name} = assigns) do
+    href = "https://twitter.com/#{screen_name}/status/#{id_str}"
+    attrs = [href: href, data: [tweet_id_str: id_str]]
+    content_tag(:a, assigns[:text] || href, attrs ++ @link_attrs)
+  end
+
   def render("tweet_link.html", %{user: user, tweet: tweet} = assigns) do
     id_str = tweet["id_str"]
     screen_name = user["screen_name"] || ""
-    href = "https://twitter.com/#{screen_name}/status/#{id_str}"
-    attrs = [href: href, data: [tweet_id_str: id_str]]
     text = assigns[:text] || "View on Twitter"
-    content_tag(:a, text, attrs ++ @link_attrs)
+    render("tweet_link.html", %{id_str: id_str, screen_name: screen_name, text: text})
+  end
+
+  # TODO: merge with tweet_link.html?
+  def render("reply_link.html", %{tweet: tweet} = assigns) do
+    id_str = tweet["in_reply_to_status_id_str"]
+    screen_name = tweet["in_reply_to_screen_name"] || ""
+    text = assigns[:text] || "In reply to @#{screen_name}"
+    render("tweet_link.html", %{id_str: id_str, screen_name: screen_name, text: text})
   end
 
   # TODO: use a file template instead?
