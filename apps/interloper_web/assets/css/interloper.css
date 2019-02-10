@@ -234,7 +234,7 @@ div.tweetbox a > img {
     border-color: #57626d;
     border-style: solid;
     padding: 0px;
-    max-width: 480px;
+    max-width: 360px;
 }
 div.tweetbox a:focus > img, div.tweetbox a:hover > img {
     -webkit-box-shadow: 0 0 10px #298be6;

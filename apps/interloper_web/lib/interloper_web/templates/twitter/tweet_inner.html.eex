@@ -7,6 +7,11 @@
     <div class="tweettext">
         <%= render_tweet_text(@tweet) %>
     </div>
+    <%= if @tweet["extended_entities"]["media"] do %>
+    <div class="imgbox">
+        <%= render("image_link.html", media: @tweet["extended_entities"]["media"]) %>
+    </div>
+    <% end %>
     <%= if assigns[:quoted] do %>
     <div class="tweetquote">
         <%= render("tweet_inner.html", tweet: assigns[:quoted][:tweet], user: assigns[:quoted][:user]) %>

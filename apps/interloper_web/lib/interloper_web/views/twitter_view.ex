@@ -120,6 +120,29 @@ defmodule InterloperWeb.TwitterView do
     render("entity_link.html", %{url: url, entities: entity_list(entities)})
   end
 
+  def render("image_link.html", %{media: media}) do
+    img_size =
+      case media do
+        [_img_list] -> "small"
+        _ -> "thumb"
+      end
+    Enum.map(media, fn ent ->
+      img_src = ent["media_url_https"]
+      img_src_full = img_src <> ":large"
+      # TODO: do lightbox modal in JS instead?
+      # a_attrs = [href: ent["expanded_url"], data: [img_src_full: img_src_full]]
+      a_attrs = [href: img_src_full, target: "_blank", data: [img_src_full: img_src_full]]
+      # # TODO: figure out cheap way to keep img sizes in line with CSS
+      # i_attrs =
+      #   case ent["sizes"][img_size] do
+      #     %{"h" => height, "w" => width} -> [height: height, width: width]
+      #     _ -> []
+      #   end
+      i_attrs = []
+      content_tag(:a, img_tag(img_src <> ":" <> img_size, i_attrs), a_attrs ++ @link_attrs)
+    end)
+  end
+
   ## JSON
 
   def render("recent.json", %{recent: recent}) do
@@ -151,11 +174,7 @@ defmodule InterloperWeb.TwitterView do
 
   # Split text by lines, interspersing <br> elements
   def break_lines(text) do
-    joiner = Stream.cycle([tag(:br)])
-    # Split on newlines, zip with breaks, reverse pairs & flatten, drop leading break
     String.split(text, "\n")
-    |> Stream.zip(joiner)
-    |> Stream.flat_map(fn {str, br} -> [br, str] end)
-    |> Enum.drop(1)
+    |> Enum.intersperse(tag(:br))
   end
 end
