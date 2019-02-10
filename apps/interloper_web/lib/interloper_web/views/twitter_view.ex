@@ -96,28 +96,6 @@ defmodule InterloperWeb.TwitterView do
   end
 
   # TODO: use a file template instead?
-  def render("tweet_link.html", %{id_str: id_str, screen_name: screen_name} = assigns) do
-    href = "https://twitter.com/#{screen_name}/status/#{id_str}"
-    attrs = [href: href, data: [tweet_id_str: id_str]]
-    content_tag(:a, assigns[:text] || href, attrs ++ @link_attrs)
-  end
-
-  def render("tweet_link.html", %{user: user, tweet: tweet} = assigns) do
-    id_str = tweet["id_str"]
-    screen_name = user["screen_name"] || ""
-    text = assigns[:text] || "View on Twitter"
-    render("tweet_link.html", %{id_str: id_str, screen_name: screen_name, text: text})
-  end
-
-  # TODO: merge with tweet_link.html?
-  def render("reply_link.html", %{tweet: tweet} = assigns) do
-    id_str = tweet["in_reply_to_status_id_str"]
-    screen_name = tweet["in_reply_to_screen_name"] || ""
-    text = assigns[:text] || "In reply to @#{screen_name}"
-    render("tweet_link.html", %{id_str: id_str, screen_name: screen_name, text: text})
-  end
-
-  # TODO: use a file template instead?
   def render("entity_link.html", %{url: url, entities: entities}) when is_list(entities) do
     {text, href} =
       case Enum.find(entities, fn e -> e["url"] == url end) do
@@ -132,18 +110,18 @@ defmodule InterloperWeb.TwitterView do
     render("entity_link.html", %{url: url, entities: entity_list(entities)})
   end
 
-  def render("image_link.html", %{media: media}) do
+  def render("image_links.html", %{images: images}) do
     img_size =
-      case media do
+      case images do
         [_img_list] -> "small"
         _ -> "thumb"
       end
-    Enum.map(media, fn ent ->
+    Enum.map(images, fn ent ->
       img_src = ent["media_url_https"]
       img_src_full = img_src <> ":large"
       # TODO: do lightbox modal in JS instead?
       # a_attrs = [href: ent["expanded_url"], data: [img_src_full: img_src_full]]
-      a_attrs = [href: img_src_full, target: "_blank", data: [img_src_full: img_src_full]]
+      a_attrs = [href: img_src_full, data: [img_src_full: img_src_full]]
       # # TODO: figure out cheap way to keep img sizes in line with CSS
       # i_attrs =
       #   case ent["sizes"][img_size] do
@@ -168,11 +146,11 @@ defmodule InterloperWeb.TwitterView do
   end
 
 
-  ## Public helpers
+  ## Internal/private
 
-  def entity_list(nil), do: []
+  defp entity_list(nil), do: []
 
-  def entity_list(entity_map) do
+  defp entity_list(entity_map) do
     # TODO: extract indicies
     entity_map
     |> Map.take(["urls", "media", "user_mentions"])
@@ -180,13 +158,26 @@ defmodule InterloperWeb.TwitterView do
     |> Enum.sort_by(fn entity -> hd(entity["indices"]) end)
   end
 
-  def find_user(tweet, users) do
+  defp find_user(tweet, users) do
     users[tweet["user"]["id_str"]]
   end
 
   # Split text by lines, interspersing <br> elements
-  def break_lines(text) do
+  defp break_lines(text) do
     String.split(text, "\n")
+    |> Stream.map(&Phoenix.HTML.raw/1)
     |> Enum.intersperse(tag(:br))
+  end
+
+  defp get_tweet_href(id_str, screen_name) when is_binary(id_str) and is_binary(screen_name) do
+    "https://twitter.com/#{screen_name}/status/#{id_str}"
+  end
+
+  defp get_tweet_href(tweet, user) do
+    get_tweet_href(tweet["id_str"], user["screen_name"])
+  end
+
+  defp get_reply_href(tweet) do
+    get_tweet_href(tweet["in_reply_to_status_id_str"], tweet["in_reply_to_screen_name"])
   end
 end

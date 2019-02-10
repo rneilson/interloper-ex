@@ -9,7 +9,7 @@
     </div>
     <%= if @tweet["extended_entities"]["media"] do %>
     <div class="imgbox">
-        <%= render("image_link.html", media: @tweet["extended_entities"]["media"]) %>
+        <%= render("image_links.html", images: @tweet["extended_entities"]["media"]) %>
     </div>
     <% end %>
     <%= if assigns[:quoted] do %>
@@ -19,21 +19,20 @@
     <% end %>
     <div class="tweettext">
         <br>
-        <%= if @tweet["in_reply_to_status_id_str"] do %>
-        <span class="small">
-            <%= render("reply_link.html", tweet: @tweet) %>
-        </span>
+        <%= if @tweet["in_reply_to_screen_name"] do %>
+        <a class="small blue selector" target="_blank" href="<%= get_reply_href(@tweet) %>">
+            In reply to @<%= @tweet["in_reply_to_screen_name"] %>
+        </a>
         <br>
         <% end %>
-        <span class="small">
-            <%= if @tweet["timestamp_ms"] do %>
-            <span class="green" data-datetime="<%= @tweet["timestamp_ms"] %>">
-            <% else %>
-            <span class="green" data-datetime="<%= @tweet["created_at"] %>">
-            <% end %>
-                <%= @tweet["created_at"] %>
-            </span>
-            <%= render("tweet_link.html", %{tweet: @tweet, user: @user}) %>
-        </span>
+        <%# TODO: format datetime nicely %>
+        <a class="small green selector" target="_blank" href="<%= get_tweet_href(@tweet, @user) %>"
+            data-tweet-id="<%= @tweet["id_str"] %>" data-datetime="<%= @tweet["created_at"] %>">
+            <%= @tweet["created_at"] %></a>
+        <%# Only in here to satisfy Twitter's specs %>
+        <a class="small blue selector" target="_blank" href="<%= get_tweet_href(@tweet, @user) %>"
+            data-tweet-id="<%= @tweet["id_str"] %>">
+            View on Twitter
+        </a>
     </div>
 </div>
