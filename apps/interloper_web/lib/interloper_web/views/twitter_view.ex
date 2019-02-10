@@ -7,34 +7,117 @@ defmodule InterloperWeb.TwitterView do
 
   ## HTML
 
+  def render_tweets(tweets, users, user) do
+    render_tweets(tweets, Map.put_new(users, user["id_str"], user))
+  end
+
+  def render_tweets(tweets, users) do
+    # TODO: any reordering/reply refs/something else?
+    Enum.map(tweets, &render_tweet(&1, users))
+  end
+
+  def render_tweet(tweet, users) do
+    user = find_user(tweet, users)
+    # Extract retweet
+    assigns =
+      case tweet["retweeted_status"] do
+        nil ->
+          %{tweet: tweet, user: user, retweeted: nil}
+        retweet ->
+          %{tweet: retweet, user: find_user(retweet, users), retweeted: user}
+      end
+    # Extract quote tweet
+    quoted =
+      case assigns[:tweet]["quoted_status"] do
+        nil -> nil
+        quote_tweet -> %{tweet: quote_tweet, user: find_user(quote_tweet, users), retweeted: nil}
+      end
+    render("tweet.html", Map.put(assigns, :quoted, quoted))
+  end
+
+  def render_tweet_text(tweet) when is_map(tweet) do
+    # Extract text (ignore text start index, btw)
+    text =
+      case tweet["display_text_range"] do
+        [_from_idx, to_idx] -> String.slice(tweet["text"], 0, to_idx)
+        _ -> tweet["text"]
+      end
+    # Pre-extract entities
+    # TODO: any bounds checking?
+    entities = entity_list(tweet["entities"])
+    # Forward
+    render_tweet_text(text, entities)
+  end
+
+  def render_tweet_text(text) when is_binary(text) do
+    # TODO: any other checking/normalization?
+    break_lines(text)
+  end
+
+  def render_tweet_text(text, []) do
+    render_tweet_text(text)
+  end
+
+  def render_tweet_text(text, nil) do
+    render_tweet_text(text, [])
+  end
+
+  def render_tweet_text(text, entities) when is_list(entities) do
+    max_len = String.length(text)
+    {strings, final_idx} = Enum.flat_map_reduce(entities, 0, fn ent, idx ->
+      case ent["indices"] do
+        [from_idx, to_idx] when from_idx < max_len ->
+          segment = String.slice(text, idx, from_idx - idx) |> break_lines()
+          ent_html =
+            cond do
+              ent["screen_name"] -> render("user_link.html", %{user: ent})
+              ent["url"] -> render("entity_link.html", %{url: ent["url"], entities: [ent]})
+              ent["text"] -> ent["text"]
+              true -> []
+            end
+          {[segment, ent_html], to_idx}
+        _ ->
+          {:halt, idx}
+      end
+    end)
+    # Return last segment as well
+    strings ++ [String.slice(text, final_idx, max_len - final_idx) |> break_lines()]
+  end
+
+  def render_tweet_text(text, entities) when is_map(entities) do
+    render_tweet_text(text, entity_list(entities))
+  end
+
   # TODO: use a file template instead?
   def render("user_link.html", %{user: user}) do
     screen_name = user["screen_name"] || ""
-    attrs = [href: "https://twitter.com/" <> screen_name, data: [user_id_str: user[:id_str]]]
+    attrs = [href: "https://twitter.com/" <> screen_name, data: [user_id_str: user["id_str"]]]
     content_tag(:a, "@" <> screen_name, attrs ++ @link_attrs)
   end
 
   # TODO: use a file template instead?
-  def render("entity_link.html", %{url: url, entities: _entities}) do
-    # TODO: extract display url text
-    text = url
-    # TODO: extract actual url href
-    attrs = [href: url]
+  def render("tweet_link.html", %{user: user, tweet: tweet} = assigns) do
+    id_str = tweet["id_str"]
+    screen_name = user["screen_name"] || ""
+    href = "https://twitter.com/#{screen_name}/status/#{id_str}"
+    attrs = [href: href, data: [tweet_id_str: id_str]]
+    text = assigns[:text] || "View on Twitter"
     content_tag(:a, text, attrs ++ @link_attrs)
   end
 
-  def render("tweet_text.html", %{text: text, entities: entities}) when is_list(entities) do
-    # TODO: fancy parsing
-    text
+  # TODO: use a file template instead?
+  def render("entity_link.html", %{url: url, entities: entities}) when is_list(entities) do
+    {text, href} =
+      case Enum.find(entities, fn e -> e["url"] == url end) do
+        nil -> {url, url}
+        entity -> {entity["display_url"], entity["expanded_url"]}
+      end
+    attrs = [href: href]
+    content_tag(:a, text, attrs ++ @link_attrs)
   end
 
-  def render("tweet_text.html", %{text: text} = context) do
-    case Map.get(context, :entities) do
-      entities when is_map(entities) ->
-        render("tweet_text.html", %{text: text, entities: entity_list(entities)})
-      _ ->
-        text
-    end
+  def render("entity_link.html", %{url: url, entities: entities}) do
+    render("entity_link.html", %{url: url, entities: entity_list(entities)})
   end
 
   ## JSON
@@ -50,10 +133,29 @@ defmodule InterloperWeb.TwitterView do
   end
 
 
-  ## Internal/private
+  ## Public helpers
 
-  defp entity_list(entity_map) do
+  def entity_list(nil), do: []
+
+  def entity_list(entity_map) do
     # TODO: extract indicies
-    Enum.flat_map(entity_map, fn {_, entities} -> entities end)
+    entity_map
+    |> Map.take(["urls", "media", "user_mentions"])
+    |> Enum.flat_map(fn {_, entities} -> entities end)
+    |> Enum.sort_by(fn entity -> hd(entity["indices"]) end)
+  end
+
+  def find_user(tweet, users) do
+    users[tweet["user"]["id_str"]]
+  end
+
+  # Split text by lines, interspersing <br> elements
+  def break_lines(text) do
+    joiner = Stream.cycle([tag(:br)])
+    # Split on newlines, zip with breaks, reverse pairs & flatten, drop leading break
+    String.split(text, "\n")
+    |> Stream.zip(joiner)
+    |> Stream.flat_map(fn {str, br} -> [br, str] end)
+    |> Enum.drop(1)
   end
 end

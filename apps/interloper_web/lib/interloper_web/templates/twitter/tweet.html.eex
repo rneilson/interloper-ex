@@ -1,0 +1,10 @@
+<div class="textbox">
+    <%= if @retweeted do %>
+    <div class="tweettext">
+        <%# <%= render("user_link.html", %{user: @retweeted}) %>
+        Retweeted:
+    </div>
+    <% end %>
+    <%= render("tweet_inner.html", assigns) %>
+    <div class="tweetspacer"></div>
+</div>

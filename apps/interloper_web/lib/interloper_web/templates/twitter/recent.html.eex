@@ -4,9 +4,12 @@
 </div>
 <div class="textbox"><br></div>
 <div class="textbox">
-    <pre>
-        <%= SharedView.ensure_string(@recent["tweets"], pretty: true) %>
-    </pre>
+    Recent tweets:<br>
+    <div class="tweetspacer"></div>
+</div>
+<div class="textbox"><br></div>
+<div class="textbox">
+    <%= render_tweets(@recent["tweets"], @recent["others"], @recent["user"]) %>
 </div>
 <div class="textbox"><br></div>
 <div class="textbox">

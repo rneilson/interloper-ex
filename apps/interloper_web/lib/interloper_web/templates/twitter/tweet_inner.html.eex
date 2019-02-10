@@ -1,0 +1,28 @@
+<div class="pic tweetprofile">
+    <img src="<%= @user["profile_image_url_https"] %>">
+</div><div class="tweetbox">
+    <div class="tweettext">
+        <span class="bold"><%= @user["name"] %></span> <%= render("user_link.html", %{user: @user}) %>
+    </div>
+    <div class="tweettext">
+        <%= render_tweet_text(@tweet) %>
+    </div>
+    <%= if assigns[:quoted] do %>
+    <div class="tweetquote">
+        <%= render("tweet_inner.html", tweet: assigns[:quoted][:tweet], user: assigns[:quoted][:user]) %>
+    </div>
+    <% end %>
+    <div class="tweettext">
+        <br>
+        <span class="small">
+            <%= if @tweet["timestamp_ms"] do %>
+            <span class="green" data-datetime="<%= @tweet["timestamp_ms"] %>">
+            <% else %>
+            <span class="green" data-datetime="<%= @tweet["created_at"] %>">
+            <% end %>
+                <%= @tweet["created_at"] %>
+            </span>
+            <%= render("tweet_link.html", %{tweet: @tweet, user: @user}) %>
+        </span>
+    </div>
+</div>
