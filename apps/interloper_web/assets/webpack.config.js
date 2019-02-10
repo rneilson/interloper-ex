@@ -24,7 +24,7 @@ module.exports = (env, options) => ({
     ]
   },
   entry: {
-      './js/app.js': ['./js/app.js'].concat(glob.sync('./vendor/**/*.js'))
+    './js/app.js': ['./js/app.js'].concat(glob.sync('./vendor/**/*.js'))
   },
   output: {
     filename: 'app.js',
@@ -45,10 +45,13 @@ module.exports = (env, options) => ({
       }
     ]
   },
+  // externals: {
+  //   stimulus: 'Stimulus',
+  // },
   plugins: [
-    new webpack.ProvidePlugin({
-      Stimulus: path.resolve(__dirname, 'node_modules/stimulus/dist/stimulus.umd.js'),
-    }),
+    // new webpack.ProvidePlugin({
+    //   Stimulus: path.resolve(__dirname, 'node_modules/stimulus/dist/stimulus.umd.js'),
+    // }),
     new MiniCssExtractPlugin({ filename: '../css/app.css' }),
     new CopyWebpackPlugin([{ from: 'static/', to: '../' }])
   ]

@@ -1,6 +1,7 @@
 // import { Controller } from "stimulus"
+import { Controller } from "../../vendor/stimulus.umd.js";
 
-export default class extends Stimulus.Controller {
+export default class extends Controller {
   static get targets () {
     return [ "clock", "replace" ];
   }

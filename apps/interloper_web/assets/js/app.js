@@ -18,10 +18,11 @@ import css from "../css/app.css"
 // import socket from "./socket"
 
 // import { Application } from "stimulus";
+import { Application } from "../vendor/stimulus.umd.js";
 
 import DatetimeController from "./controllers/datetime_controller";
 
-const application = Stimulus.Application.start();
+const application = Application.start();
 application.register("datetime", DatetimeController);
 
 // Test hello
