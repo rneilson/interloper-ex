@@ -9,12 +9,14 @@
 <div class="textbox"><br></div>
 <div class="textbox">
   This is a test of the InterloperOS system.<br>
-  <br>
-  * Up/down arrow keys to select<br>
-  * Escape key to deselect<br>
-  * Enter key to accept
 </div>
 <div class="textbox"><br></div>
+<div class="textbox noshow instructions">
+  * Up/down arrow keys to select<br>
+  * Escape key to deselect<br>
+  * Enter key to accept<br>
+  <br>
+</div>
 <div class="textbox">
   User: <span class="yellow">Raymond Neilson</span>
 </div>
