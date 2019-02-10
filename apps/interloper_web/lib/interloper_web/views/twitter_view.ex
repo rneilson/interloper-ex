@@ -1,7 +1,7 @@
 defmodule InterloperWeb.TwitterView do
   use InterloperWeb, :view
 
-  alias InterloperWeb.SharedView
+  # alias InterloperWeb.SharedView
 
   @link_attrs [class: "blue selector", target: "_blank"]
 
