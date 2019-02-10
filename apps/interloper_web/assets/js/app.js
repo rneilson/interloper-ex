@@ -17,5 +17,12 @@ import css from "../css/app.css"
 // Local files can be imported directly using relative paths, for example:
 // import socket from "./socket"
 
+import { Application } from "stimulus";
+
+import DatetimeController from "./controllers/datetime_controller";
+
+const application = Application.start();
+application.register("datetime", DatetimeController);
+
 // Test hello
 console.log("Uh, hi?");

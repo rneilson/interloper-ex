@@ -22,12 +22,17 @@
         <div id="banner" class="bannerbox dimmer dimmed" style="background: url(<%= Routes.static_path(@conn, "/images/rodeo.png") %>) center center no-repeat">
           <!-- <img src="<%= Routes.static_path(@conn, "/images/rodeo.png") %>" title="YEE HAW" alt="Rocket Rodeo"> -->
         </div>
-        <div id="console" class="overlay">
-          <div id="status" class="status"></div>
+        <div id="console" class="overlay" data-controller="datetime">
+          <div id="status" class="status">
+            <span id="path" class="orange"><%= @conn.request_path %></span>
+            <span id="clock" class="orange floatright" data-target="datetime.clock"></span>
+          </div>
           <div id="output" class="popup" tabindex="0">
             <%= render @view_module, @view_template, assigns %>
           </div>
-          <div id="command" class="status"></div>
+          <div id="command" class="status">
+            <span id="preview" class="yellow"></span>
+          </div>
         </div>
       </div>
     </div>
