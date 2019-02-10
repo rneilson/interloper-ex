@@ -34,7 +34,9 @@ module.exports = (env, options) => ({
     rules: [
       {
         test: /\.js$/,
-        exclude: /node_modules/,
+        // exclude: /node_modules/,
+        use: ['source-map-loader'],
+        enforce: 'pre',
         // use: {
         //   loader: 'babel-loader'
         // }
@@ -46,9 +48,9 @@ module.exports = (env, options) => ({
     ]
   },
   plugins: [
-    new webpack.ProvidePlugin({
-      Stimulus: path.resolve(__dirname, 'node_modules/stimulus/dist/stimulus.umd.js'),
-    }),
+    // new webpack.ProvidePlugin({
+    //   Stimulus: path.resolve(__dirname, 'node_modules/stimulus/dist/stimulus.umd.js'),
+    // }),
     new MiniCssExtractPlugin({ filename: '../css/app.css' }),
     new CopyWebpackPlugin([{ from: 'static/', to: '../' }])
   ]
