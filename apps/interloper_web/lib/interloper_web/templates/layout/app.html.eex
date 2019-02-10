@@ -19,8 +19,8 @@
     <%# <script type="text/javascript" src="boot.js"></script> %>
     <div id="container" class="container">
       <div id="main">
-        <div id="banner" class="bannerbox dimmer dimmed">
-          <img src="<%= Routes.static_path(@conn, "/images/rodeo.png") %>" title="YEE HAW" alt="Rocket Rodeo">
+        <div id="banner" class="bannerbox dimmer dimmed" style="background: url(<%= Routes.static_path(@conn, "/images/rodeo.png") %>) center center no-repeat">
+          <!-- <img src="<%= Routes.static_path(@conn, "/images/rodeo.png") %>" title="YEE HAW" alt="Rocket Rodeo"> -->
         </div>
         <div id="console" class="overlay">
           <div id="status" class="status"></div>
