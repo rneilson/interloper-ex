@@ -1,14 +1,25 @@
 const path = require('path');
 const glob = require('glob');
+const webpack = require('webpack');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = (env, options) => ({
+  devtool: 'source-map',
   optimization: {
+    // minimize: true,
     minimizer: [
-      new UglifyJsPlugin({ cache: true, parallel: true, sourceMap: false }),
+      new UglifyJsPlugin({
+        cache: true,
+        parallel: true,
+        // sourceMap: false,
+        sourceMap: true,
+        uglifyOptions: {
+          comments: 'some',
+        },
+      }),
       new OptimizeCSSAssetsPlugin({})
     ]
   },
@@ -24,9 +35,9 @@ module.exports = (env, options) => ({
       {
         test: /\.js$/,
         exclude: /node_modules/,
-        use: {
-          loader: 'babel-loader'
-        }
+        // use: {
+        //   loader: 'babel-loader'
+        // }
       },
       {
         test: /\.css$/,
@@ -35,6 +46,9 @@ module.exports = (env, options) => ({
     ]
   },
   plugins: [
+    new webpack.ProvidePlugin({
+      Stimulus: path.resolve(__dirname, 'node_modules/stimulus/dist/stimulus.umd.js'),
+    }),
     new MiniCssExtractPlugin({ filename: '../css/app.css' }),
     new CopyWebpackPlugin([{ from: 'static/', to: '../' }])
   ]
