@@ -116,37 +116,38 @@ defmodule InterloperWeb.TwitterView do
         [_img_list] -> "small"
         _ -> "thumb"
       end
+    # TODO: move lambda into named fn
     Enum.map(images, fn ent ->
-      img_src = ent["media_url_https"]
-      img_src_full = img_src <> ":large"
-      {media_tag, media_attrs} =
-        cond do
-          ent["type"] == "video" and ent["video_info"]["variants"] ->
-            # Get, filter, and sort video variants
-            bitrater = fn v -> v["bitrate"] end
-            videos =
-              ent["video_info"]["variants"]
-              |> Enum.filter(bitrater)
-              |> Enum.sort_by(bitrater)
-            # Use highest bitrate for link
-            vid_src = List.first(videos)["url"]
-            vid_src_full = List.last(videos)["url"]
-            # TODO: use <video> tag instead?
-            a_attrs = [href: vid_src_full, data: [vid_src_full: vid_src_full]]
-            {img_tag(img_src <> ":" <> img_size), a_attrs}
-          true ->
-            # TODO: do lightbox modal in JS instead?
-            # a_attrs = [href: ent["expanded_url"], data: [img_src_full: img_src_full]]
-            a_attrs = [href: img_src_full, data: [img_src_full: img_src_full]]
-            # # TODO: figure out cheap way to keep img sizes in line with CSS
-            # i_attrs =
-            #   case ent["sizes"][img_size] do
-            #     %{"h" => height, "w" => width} -> [height: height, width: width]
-            #     _ -> []
-            #   end
-            {img_tag(img_src <> ":" <> img_size), a_attrs}
-        end
-      content_tag(:a, media_tag, media_attrs ++ @link_attrs)
+      img_src = ent["media_url_https"] <> ":" <> img_size
+      img_src_full = ent["media_url_https"] <> ":large"
+      # s_attrs =
+      #   case ent["sizes"][img_size] do
+      #     %{"h" => height, "w" => width} -> [height: height, width: width]
+      #     _ -> []
+      #   end
+      # TODO: split into named fns
+      cond do
+        ent["type"] == "video" and ent["video_info"]["variants"] ->
+          # Get, filter, and sort video variants
+          bitrater = fn v -> v["bitrate"] end
+          videos =
+            ent["video_info"]["variants"]
+            |> Enum.filter(bitrater)
+            |> Enum.sort_by(bitrater)
+          # Use highest bitrate for video
+          vid = List.last(videos)
+          vid_type = vid["content_type"]
+          vid_src_full = vid["url"]
+          # Use <video> tag instead
+          v_attrs = [controls: true, poster: img_src, data: [vid_src_full: vid_src_full]]
+          content_tag(:video, tag(:source, src: vid_src_full, type: vid_type), v_attrs)
+        true ->
+          # TODO: do lightbox modal in JS instead?
+          # a_attrs = [href: ent["expanded_url"], data: [img_src_full: img_src_full]]
+          a_attrs = [href: img_src_full, data: [img_src_full: img_src_full]]
+          # TODO: figure out cheap way to keep img sizes in line with CSS
+          content_tag(:a, img_tag(img_src), a_attrs ++ @link_attrs)
+      end
     end)
   end
 
