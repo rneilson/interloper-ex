@@ -15,6 +15,10 @@ config :interloper_web, InterloperWeb.Endpoint,
   render_errors: [view: InterloperWeb.ErrorView, accepts: ~w(html json)],
   pubsub: [name: InterloperWeb.PubSub, adapter: Phoenix.PubSub.PG2]
 
+# Github defaults
+config :interloper_web, InterloperWeb.GithubController,
+  fetch_repo_commits: false
+
 # Github client defaults
 config :interloper_web, InterloperWeb.GithubClient,
   username: "rneilson"

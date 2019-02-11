@@ -16,23 +16,29 @@
     <span><%= @repo["description"] %></span>
 </div>
 <div class="textbox indent">
-    <span class="small">
     <%= cond do %>
-    <% not is_nil(assigns[:commit]) -> %>
-        Last commit:
-        <a class="yellow selector" href="<%= @commit["html_url"] %>">
-            <%= String.slice(@commit["sha"], 0..7) %>
-        </a>
-        <span class="green" data-datetime="<%= @commit["commit"]["author"]["date"] %>">
-            <%= SharedView.date_format(@commit["commit"]["author"]["date"]) %>
+    <% assigns[:commit] -> %>
+        <span class="small">
+            Last commit:
+            <a class="yellow selector" href="<%= @commit["html_url"] %>">
+                <%= String.slice(@commit["sha"], 0..7) %>
+            </a>
+            <span class="green" data-datetime="<%= @commit["commit"]["author"]["date"] %>">
+                <%= SharedView.date_format(@commit["commit"]["author"]["date"]) %>
+            </span>
         </span>
-    <% not is_nil(assigns[:commit_err]) -> %>
-        <span class="err">
+    <% assigns[:commit_err] -> %>
+        <span class="small err">
             Error retrieving last commit: <%= SharedView.ensure_string(@commit_err) %>
         </span>
+    <% assigns[:commit_url] -> %>
+        <span class="small" data-controller="github-commit" data-github-commit-url="<%= @commit_url %>">
+            <span data-text="Last commit" data-target="githubCommit.text">&nbsp;</span>
+            <a class="yellow selector" data-link-key="html_url" data-target="githubCommit.link"></a>
+            <span class="green" data-time-key="commit.author.date" data-target="githubCommit.time"></span>
+        </span>
     <% true -> %>
-        <span class="italic">No commit details available</span>
+        <span class="small italic">No commit details available</span>
     <% end %>
-    </span>
 </div>
 <div class="textbox"><br></div>
