@@ -231,14 +231,7 @@ div.tweetbox {
 div.tweetbox > div.imgbox {
     margin-top: 16px;
 }
-div.tweetbox a > img {
-    border-width: 1px;
-    border-color: #57626d;
-    border-style: solid;
-    padding: 0px;
-    max-width: 360px;
-}
-div.tweetbox video {
+div.tweetbox a > img, div.tweetbox video {
     border-width: 1px;
     border-color: #57626d;
     border-style: solid;

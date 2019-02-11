@@ -140,7 +140,12 @@ defmodule InterloperWeb.TwitterView do
           vid_src_full = vid["url"]
           # Use <video> tag instead
           v_attrs = [controls: true, poster: img_src, data: [vid_src_full: vid_src_full]]
-          content_tag(:video, tag(:source, src: vid_src_full, type: vid_type), v_attrs)
+          a_attrs = [href: vid_src_full, data: [vid_src_full: vid_src_full]]
+          inner_tags = [
+            tag(:source, src: vid_src_full, type: vid_type),
+            content_tag(:a, img_tag(img_src), a_attrs ++ @link_attrs),
+          ]
+          content_tag(:video, inner_tags, v_attrs)
         true ->
           # TODO: do lightbox modal in JS instead?
           # a_attrs = [href: ent["expanded_url"], data: [img_src_full: img_src_full]]
