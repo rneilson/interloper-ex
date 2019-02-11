@@ -13,6 +13,7 @@ export default class extends Controller {
   connect () {
     this.updateClock();
     this.clockTimer = setInterval(() => this.updateClock(), 1000);
+    this.replaceDatetimes();
   }
 
   disconnect () {
@@ -35,5 +36,16 @@ export default class extends Controller {
     if (clock) {
       clock.innerHTML = `${h}:${m}`;
     }
+  }
+
+  replaceDatetimes () {
+    this.element
+      .querySelectorAll("[data-datetime]")
+      .forEach(el => {
+        console.log(el);
+        let dt = new Date(el.getAttribute("data-datetime"));
+        // TODO: fancier formatting
+        el.innerHTML = dt.toString();
+      });
   }
 }
