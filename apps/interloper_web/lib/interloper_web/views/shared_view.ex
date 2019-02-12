@@ -19,7 +19,9 @@ defmodule InterloperWeb.SharedView do
 
   def ensure_string(source, _opts) when is_binary(source), do: source
 
-  def ensure_string(source, _opts), do: to_string(source)
+  def ensure_string({:raw, reason}, _opts), do: reason
+
+  def ensure_string(source, _opts), do: "#{source}"
 
   # Nicely(ish) format given datetime
   # TODO: fancy it up with proper day/month strings
