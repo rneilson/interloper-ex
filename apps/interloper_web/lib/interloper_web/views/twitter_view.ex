@@ -127,7 +127,7 @@ defmodule InterloperWeb.TwitterView do
       #   end
       # TODO: split into named fns
       cond do
-        ent["type"] == "video" and ent["video_info"]["variants"] ->
+        ent["video_info"]["variants"] ->
           # Get, filter, and sort video variants
           bitrater = fn v -> v["bitrate"] end
           videos =
