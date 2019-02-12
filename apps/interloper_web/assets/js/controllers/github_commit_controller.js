@@ -58,22 +58,24 @@ export default class extends Controller {
 
   displayCommit (commit) {
     if (this.fetching) {
-      // Show text
-      const textTarget = this.textTarget;
-      if (textTarget) {
-        textTarget.textContent = 'Last commit:';
-      }
-      // Show commit sha, set link
-      const linkTarget = this.linkTarget;
-      if (linkTarget) {
-        linkTarget.setAttribute('href', commit.html_url);
-        linkTarget.textContent = commit.sha.substr(0, 7);
-      }
-      // Show commit datetime
-      const timeTarget = this.timeTarget;
-      if (timeTarget) {
-        timeTarget.textContent = dateFormat(new Date(commit.commit.author.date));
-      }
+      requestAnimationFrame(() => {
+        // Show text
+        const textTarget = this.textTarget;
+        if (textTarget) {
+          textTarget.textContent = 'Last commit:';
+        }
+        // Show commit sha, set link
+        const linkTarget = this.linkTarget;
+        if (linkTarget) {
+          linkTarget.setAttribute('href', commit.html_url);
+          linkTarget.textContent = commit.sha.substr(0, 7);
+        }
+        // Show commit datetime
+        const timeTarget = this.timeTarget;
+        if (timeTarget) {
+          timeTarget.textContent = dateFormat(new Date(commit.commit.author.date));
+        }
+      });
     }
   }
 

@@ -25,18 +25,20 @@ export default class extends Controller {
   }
 
   updateClock () {
-    const dt = new Date();
+    requestAnimationFrame(() => {
+      const dt = new Date();
 
-    let h = dt.getHours() + '';
-    if (h.length == 1) h = '0' + h;
+      let h = dt.getHours() + '';
+      if (h.length == 1) h = '0' + h;
 
-    let m = dt.getMinutes() + '';
-    if (m.length == 1) m = '0' + m;
+      let m = dt.getMinutes() + '';
+      if (m.length == 1) m = '0' + m;
 
-    const clock = this.clockTarget;
-    if (clock) {
-      clock.textContent = `${h}:${m}`;
-    }
+      const clock = this.clockTarget;
+      if (clock) {
+        clock.textContent = `${h}:${m}`;
+      }
+    });
   }
 
   replaceDatetime (el) {
@@ -46,8 +48,10 @@ export default class extends Controller {
   }
 
   replaceDatetimes () {
-    this.element
-      .querySelectorAll("[data-datetime]")
-      .forEach(el => this.replaceDatetime(el));
+    requestAnimationFrame(() => {
+      this.element
+        .querySelectorAll("[data-datetime]")
+        .forEach(el => this.replaceDatetime(el));
+    });
   }
 }
