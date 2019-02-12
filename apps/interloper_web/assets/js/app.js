@@ -21,9 +21,11 @@ import css from "../css/app.css"
 import { Application } from "../vendor/stimulus.umd.js";
 
 import DatetimeController from "./controllers/datetime_controller";
+import GithubCommitController from "./controllers/github_commit_controller";
 
 const application = Application.start();
 application.register("datetime", DatetimeController);
+application.register("github-commit", GithubCommitController);
 
 // Test hello
 console.log("Uh, hi?");

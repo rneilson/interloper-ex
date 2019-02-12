@@ -1,12 +1,10 @@
 <div class="textbox">
     <%= if @repo["fork"] do %>
     <a class="purple selector" href="<%= @repo["html_url"] %>" target="_blank">
-        <%= @repo["name"] %><span class="italic"> (fork)</span>
-    </a>
+        <%= @repo["name"] %><span class="italic"> (fork)</span></a>
     <% else %>
     <a class="blue selector" href="<%= @repo["html_url"] %>" target="_blank">
-        <%= @repo["name"] %>
-    </a>
+        <%= @repo["name"] %></a>
     <% end %>
     <%= if @repo["language"] do %>
     <span class="italic">(<%= @repo["language"] %>)</span>
@@ -33,9 +31,10 @@
         </span>
     <% assigns[:commit_url] -> %>
         <span class="small" data-controller="github-commit" data-github-commit-url="<%= @commit_url %>">
-            <span data-text="Last commit" data-target="githubCommit.text">&nbsp;</span>
-            <a class="yellow selector" data-link-key="html_url" data-target="githubCommit.link"></a>
-            <span class="green" data-time-key="commit.author.date" data-target="githubCommit.time"></span>
+            <span class="err" data-target="github-commit.err"></span>
+            <span data-target="github-commit.text">&nbsp;</span>
+            <a class="yellow selector" data-target="github-commit.link"></a>
+            <span class="green" data-target="github-commit.time"></span>
         </span>
     <% true -> %>
         <span class="small italic">No commit details available</span>
