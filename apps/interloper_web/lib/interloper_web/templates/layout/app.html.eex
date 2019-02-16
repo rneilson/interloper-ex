@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width">
-    <title>Interloper</title>
+    <title>Interloper - <%= @conn.request_path %></title>
     <%# <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Droid+Sans+Mono" /> %>
     <%# <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto+Mono:400,700" /> %>
     <%# <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Source+Code+Pro:400,700" /> %>
@@ -19,15 +19,16 @@
     <%# <script type="text/javascript" src="boot.js"></script> %>
     <div id="container" class="container">
       <div id="main">
-        <div id="banner" class="bannerbox dimmer dimmed" style="background: url(<%= Routes.static_path(@conn, "/images/rodeo.png") %>) center center no-repeat">
+        <div id="banner" class="bannerbox dimmer dimmed"
+          style="background: url(<%= Routes.static_path(@conn, "/images/rodeo.png") %>) center center no-repeat">
           <!-- <img src="<%= Routes.static_path(@conn, "/images/rodeo.png") %>" title="YEE HAW" alt="Rocket Rodeo"> -->
         </div>
-        <div id="console" class="overlay" data-controller="datetime">
-          <div id="status" class="status">
-            <span id="path" class="orange"><%= @conn.request_path %></span>
-            <span id="clock" class="orange floatright" data-target="datetime.clock"></span>
+        <div id="console" class="overlay">
+          <div id="status" class="status" data-controller="status">
+            <span id="path" class="orange" data-target="status.path"><%= @conn.request_path %></span>
+            <span id="clock" class="orange floatright" data-target="status.time"></span>
           </div>
-          <div id="output" class="popup" tabindex="0">
+          <div id="output" class="popup" tabindex="0" data-controller="replace">
             <%= render @view_module, @view_template, assigns %>
           </div>
           <div id="command" class="status">
