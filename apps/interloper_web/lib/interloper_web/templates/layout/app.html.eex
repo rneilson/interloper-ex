@@ -25,7 +25,7 @@
         </div>
         <div id="console" class="overlay">
           <div id="status" class="status" data-controller="status">
-            <span id="path" class="orange" data-target="status.path"><%= @conn.request_path %></span>
+            <span id="path" class="orange" data-target="status.path"></span>
             <span id="clock" class="orange floatright" data-target="status.time"></span>
           </div>
           <div id="output" class="popup" tabindex="0" data-controller="replace">

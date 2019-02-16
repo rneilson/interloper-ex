@@ -45,7 +45,7 @@ export default class extends Controller {
   }
 
   fetchCommit (commitUrl) {
-    console.log(`Fetching commit at ${commitUrl}`);
+    // console.log(`Fetching commit at ${commitUrl}`);
     return fetch(commitUrl)
       .then(res => {
         if (res.ok) {

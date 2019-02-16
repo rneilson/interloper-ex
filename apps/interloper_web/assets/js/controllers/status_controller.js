@@ -7,10 +7,15 @@ export default class extends Controller {
   }
 
   initialize () {
+    this.currentPath = window.location.pathname;
+    this.currentTime = null;
     this.clockTimer = null;
   }
 
   connect () {
+    if (this.pathTarget) {
+      this.updatePath();
+    }
     if (this.timeTarget) {
       this.updateClock();
       this.clockTimer = setInterval(() => this.updateClock(), 1000);
@@ -24,20 +29,32 @@ export default class extends Controller {
     }
   }
 
+  updatePath() {
+    const pathTarget = this.pathTarget;
+    if (pathTarget) {
+      requestAnimationFrame(() => {
+        pathTarget.textContent = this.currentPath;
+      });
+    }
+  }
+
   updateClock () {
-    requestAnimationFrame(() => {
+    const timeTarget = this.timeTarget;
+    if (timeTarget) {
       const dt = new Date();
 
       let h = dt.getHours() + '';
       if (h.length == 1) h = '0' + h;
-
       let m = dt.getMinutes() + '';
       if (m.length == 1) m = '0' + m;
+      let newTime = `${h}:${m}`;
 
-      const clock = this.timeTarget;
-      if (clock) {
-        clock.textContent = `${h}:${m}`;
+      if (newTime != this.currentTime) {
+        this.currentTime = newTime;
+        requestAnimationFrame(() => {
+          timeTarget.textContent = this.currentTime;
+        });
       }
-    });
+    }
   }
 }
