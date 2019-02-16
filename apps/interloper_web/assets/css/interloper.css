@@ -78,6 +78,9 @@ a {
 a:focus {
     outline: none;
 }
+a.selector {
+    display: inline-block;
+}
 div {
     border: none;
     padding: 0px;

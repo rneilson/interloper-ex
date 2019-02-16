@@ -136,22 +136,12 @@ defmodule InterloperWeb.TwitterView do
             |> Enum.sort_by(bitrater)
           # Use highest bitrate for video
           vid = List.last(videos)
+          vid_src = vid["url"]
           vid_type = vid["content_type"]
-          vid_src_full = vid["url"]
           # Use <video> tag instead
-          v_attrs = [controls: true, poster: img_src, data: [vid_src_full: vid_src_full]]
-          a_attrs = [href: vid_src_full, data: [vid_src_full: vid_src_full]]
-          inner_tags = [
-            tag(:source, src: vid_src_full, type: vid_type),
-            content_tag(:a, img_tag(img_src), a_attrs ++ @link_attrs),
-          ]
-          content_tag(:video, inner_tags, v_attrs)
+          render("video_link.html", %{vid_src: vid_src, vid_type: vid_type, img_src: img_src})
         true ->
-          # TODO: do lightbox modal in JS instead?
-          # a_attrs = [href: ent["expanded_url"], data: [img_src_full: img_src_full]]
-          a_attrs = [href: img_src_full, data: [img_src_full: img_src_full]]
-          # TODO: figure out cheap way to keep img sizes in line with CSS
-          content_tag(:a, img_tag(img_src), a_attrs ++ @link_attrs)
+          render("image_link.html", %{img_src: img_src, img_src_full: img_src_full})
       end
     end)
   end
