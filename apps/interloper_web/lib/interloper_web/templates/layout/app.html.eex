@@ -14,7 +14,7 @@
     <meta name="og:description" content="Personal site of Raymond Neilson">
     <meta name="og:image" content="<%= Routes.static_url(@conn, "/images/rodeo.png") %>">
   </head>
-  <body>
+  <body data-controller="select">
     <%# TODO: add boot script %>
     <%# <script type="text/javascript" src="boot.js"></script> %>
     <div id="container" class="container">
