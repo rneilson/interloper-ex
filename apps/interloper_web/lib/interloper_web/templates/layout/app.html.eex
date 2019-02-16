@@ -28,7 +28,7 @@
             <span id="path" class="orange" data-target="status.path"></span>
             <span id="clock" class="orange floatright" data-target="status.time"></span>
           </div>
-          <div id="output" class="popup" tabindex="0" data-controller="replace" data-target="select.init">
+          <div id="output" class="popup" tabindex="0" data-controller="output">
             <%= render @view_module, @view_template, assigns %>
           </div>
           <div id="command" class="status">

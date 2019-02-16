@@ -22,13 +22,13 @@ import { Application } from "../vendor/stimulus.umd.js";
 
 import SelectController from "./controllers/select_controller";
 import StatusController from "./controllers/status_controller";
-import ReplaceController from "./controllers/replace_controller";
+import OutputController from "./controllers/output_controller";
 import GithubCommitController from "./controllers/github_commit_controller";
 
 const application = Application.start();
 application.register("select", SelectController);
 application.register("status", StatusController);
-application.register("replace", ReplaceController);
+application.register("output", OutputController);
 application.register("github-commit", GithubCommitController);
 
 // Test hello

@@ -3,7 +3,7 @@ import { Controller } from "../../vendor/stimulus.umd.js";
 
 export default class extends Controller {
   static get targets () {
-    return [ 'init' ];
+    return [];
   }
 
   initialize () {
@@ -28,10 +28,6 @@ export default class extends Controller {
       // Add keydown handler
       this.keyHandler = this.handleKeydown.bind(this);
       this.element.addEventListener('keydown', this.keyHandler);
-    }
-    // Select main element
-    if (this.initTarget) {
-      this.initTarget.focus();
     }
   }
 

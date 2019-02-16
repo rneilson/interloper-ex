@@ -4,14 +4,22 @@ import { dateFormat } from "../utils/datetime";
 
 export default class extends Controller {
   static get targets () {
-    return [];
+    return [ 'initFocus' ];
   }
 
   initialize () {
   }
 
   connect () {
-    this.replaceDatetimes();
+    requestAnimationFrame(() => {
+      this.replaceDatetimes();
+      if (this.hasInitFocusTarget) {
+        this.initFocusTarget.focus();
+      }
+      else {
+        this.element.focus();
+      }
+    });
   }
 
   disconnect () {
@@ -24,10 +32,8 @@ export default class extends Controller {
   }
 
   replaceDatetimes () {
-    requestAnimationFrame(() => {
-      this.element
-        .querySelectorAll("[data-datetime]")
-        .forEach(el => this.replaceDatetime(el));
-    });
+    this.element
+      .querySelectorAll("[data-datetime]")
+      .forEach(el => this.replaceDatetime(el));
   }
 }
