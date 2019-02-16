@@ -3,7 +3,7 @@ import { Controller } from "../../vendor/stimulus.umd.js";
 
 export default class extends Controller {
   static get targets () {
-    return [];
+    return [ 'init' ];
   }
 
   initialize () {
@@ -12,28 +12,34 @@ export default class extends Controller {
       'Escape': this.deselect,
       'ArrowUp': this.selectUp,
       'ArrowDown': this.selectDown,
-      'Tab': this.selectDown,
+      // 'Tab': this.selectDown,
     };
     this.codemap = {
-      9: 'Tab',
+      // 9: 'Tab',
       27: 'Escape',
       38: 'ArrowUp',
       40: 'ArrowDown',
     };
+    this.keyHandler = null;
   }
 
   connect () {
-    if (!this.keyListener) {
+    if (!this.keyHandler) {
       // Add keydown handler
-      this.keyListener = this.handleKeydown.bind(this);
-      this.element.addEventListener('keydown', this.keyListener);
+      this.keyHandler = this.handleKeydown.bind(this);
+      this.element.addEventListener('keydown', this.keyHandler);
+    }
+    // Select main element
+    if (this.initTarget) {
+      this.initTarget.focus();
     }
   }
 
   disconnect () {
-    if (this.keyListener) {
+    if (this.keyHandler) {
       // Remove keydown handler
-      this.element.removeEventListener('keydown', this.keyListener);
+      this.element.removeEventListener('keydown', this.keyHandler);
+      this.keyHandler = null;
     }
   }
 
@@ -105,8 +111,10 @@ export default class extends Controller {
 
   select (el) {
     if (el) {
+      if (el != document.activeElement) {
+        el.focus();
+      }
       // Anything else?
-      el.focus();
     }
     else {
       // Easier to forward tbh
