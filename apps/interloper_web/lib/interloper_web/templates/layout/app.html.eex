@@ -18,7 +18,8 @@
     <%# TODO: add boot script %>
     <%# <script type="text/javascript" src="boot.js"></script> %>
     <div id="container" class="container">
-      <div id="main" data-controller="page" data-page-loading-class="loading">
+      <div id="main" data-controller="page" data-page-loading-class="loading"
+        data-page-navigate-selector="a[href]" data-action="click->page#navigate">
         <div id="banner" class="bannerbox dimmer dimmed"
           style="background: url(<%= Routes.static_path(@conn, "/images/rodeo.png") %>) center center no-repeat">
           <!-- <img src="<%= Routes.static_path(@conn, "/images/rodeo.png") %>" title="YEE HAW" alt="Rocket Rodeo"> -->

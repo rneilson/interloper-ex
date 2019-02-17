@@ -6,7 +6,7 @@
 <div class="textbox">
     <%# TODO: update base URL if/when _rampant subsite brought in %>
     <div class="imgbox">
-        <a class="blue selector" href="https://www.interloper.ca/rampant" target="_blank" data-link-id="rampant">
+        <a class="blue selector" href="https://www.interloper.ca/rampant" target="_blank">
             <img src="<%= Routes.static_url(@conn, "/images/rampant-banner.jpg") %>" title="_rampant">
         </a>
     </div>
@@ -18,11 +18,11 @@
 <div class="textbox"><br></div>
 <div class="textbox">
     <%# TODO: update base URL if/when _rampant subsite brought in %>
-    <a class="blue selector" href="https://www.interloper.ca/rampant" target="_blank" data-link-id="site">Visit the official site</a>
+    <a class="blue selector" href="https://www.interloper.ca/rampant" target="_blank">Visit the official site</a>
 </div>
 <div class="textbox"><br></div>
 <div class="textbox">
-    <a class="blue selector" href="https://rneilson.itch.io/rampant" target="_blank" data-link-id="buy">Buy it on itch.io</a>
+    <a class="blue selector" href="https://rneilson.itch.io/rampant" target="_blank">Buy it on itch.io</a>
 </div>
 <div class="textbox"><br></div>
 <div class="textbox">
@@ -30,12 +30,10 @@
 </div>
 <div class="textbox"><br></div>
 <div class="textbox">
-    <a class="blue selector" href="https://github.com/rneilson/rampant-src" target="_blank" data-link-id="source">Read the source on Github</a>
+    <a class="blue selector" href="https://github.com/rneilson/rampant-src" target="_blank">Read the source on Github</a>
 </div>
 <div class="textbox"><br></div>
 <div class="textbox">
-    <a class="green selector" href="<%= Routes.page_path(@conn, :index) %>" data-action="page#navigate">
-        [Main]
-    </a>
+    <a class="green selector" href="<%= Routes.page_path(@conn, :index) %>">[Main]</a>
 </div>
 <div class="textbox"><br></div>
