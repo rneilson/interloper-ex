@@ -100,7 +100,9 @@ export default class extends Controller {
       // Clear status text
       this.statusTargets.forEach(el => el.textContent = '');
     });
-    // TODO: send path update event to path target(s)
+    // Send path update event to path target(s)
+    const ev = new Event('newPath', { detail: path });
+    this.pathTargets.forEach(el => el.dispatchEvent(ev));
   }
 
   loadPage (path) {
