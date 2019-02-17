@@ -5,6 +5,8 @@
 <div class="textbox"><br></div>
 <%= Enum.map(@repo_list, fn repo_map -> render("repo.html", repo_map) end) %>
 <div class="textbox">
-    <a class="green selector" href="<%= Routes.page_path(@conn, :index) %>" data-page-id=":index">[Main]</a>
+    <a class="green selector" href="<%= Routes.page_path(@conn, :index) %>" data-action="page#navigate">
+        [Main]
+    </a>
 </div>
 <div class="textbox"><br></div>

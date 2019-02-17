@@ -34,6 +34,8 @@
 </div>
 <div class="textbox"><br></div>
 <div class="textbox">
-    <a class="green selector" href="<%= Routes.page_path(@conn, :index) %>" data-page-id=":index">[Main]</a>
+    <a class="green selector" href="<%= Routes.page_path(@conn, :index) %>" data-action="page#navigate">
+        [Main]
+    </a>
 </div>
 <div class="textbox"><br></div>

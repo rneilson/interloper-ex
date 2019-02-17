@@ -23,12 +23,13 @@
           style="background: url(<%= Routes.static_path(@conn, "/images/rodeo.png") %>) center center no-repeat">
           <!-- <img src="<%= Routes.static_path(@conn, "/images/rodeo.png") %>" title="YEE HAW" alt="Rocket Rodeo"> -->
         </div>
-        <div id="console" class="overlay">
-          <div id="status" class="status" data-controller="status">
+        <div id="console" class="overlay" data-controller="page">
+          <div id="status" class="status" data-controller="status" data-target="page.path">
             <span id="path" class="orange" data-target="status.path"></span>
             <span id="clock" class="orange floatright" data-target="status.time"></span>
           </div>
-          <div id="output" class="popup" tabindex="0" data-controller="output">
+          <div id="output" class="popup" tabindex="0" data-controller="output"
+            data-target="page.output" data-output-path="<%= @conn.request_path %>">
             <%= render @view_module, @view_template, assigns %>
           </div>
           <div id="command" class="status">
