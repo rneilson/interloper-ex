@@ -20,26 +20,13 @@ export default class extends Controller {
       38: 'ArrowUp',
       40: 'ArrowDown',
     };
-    this.keyHandler = null;
   }
 
-  connect () {
-    if (!this.keyHandler) {
-      // Add keydown handler
-      this.keyHandler = this.handleKeydown.bind(this);
-      this.element.addEventListener('keydown', this.keyHandler);
-    }
-  }
+  connect () {}
 
-  disconnect () {
-    if (this.keyHandler) {
-      // Remove keydown handler
-      this.element.removeEventListener('keydown', this.keyHandler);
-      this.keyHandler = null;
-    }
-  }
+  disconnect () {}
 
-  handleKeydown (e) {
+  handleKey (e) {
     if (e.defaultPrevented) {
       return;
     }

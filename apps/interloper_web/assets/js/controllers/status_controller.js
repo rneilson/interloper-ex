@@ -7,16 +7,13 @@ export default class extends Controller {
   }
 
   initialize () {
-    this.currentPath = window.location.pathname;
     this.currentTime = null;
     this.clockTimer = null;
   }
 
   connect () {
-    if (this.pathTarget) {
-      this.updatePath();
-    }
-    if (this.timeTarget) {
+    this.updatePath();
+    if (this.hasTimeTarget) {
       this.updateClock();
       this.clockTimer = setInterval(() => this.updateClock(), 1000);
     }
@@ -30,31 +27,28 @@ export default class extends Controller {
   }
 
   updatePath() {
-    const pathTarget = this.pathTarget;
-    if (pathTarget) {
+    const pathTargets = this.pathTargets;
+    if (pathTargets.length > 0) {
       requestAnimationFrame(() => {
-        pathTarget.textContent = this.currentPath;
+        pathTargets.forEach(el => el.textContent = window.location.pathname);
       });
     }
   }
 
   updateClock () {
-    const timeTarget = this.timeTarget;
-    if (timeTarget) {
-      const dt = new Date();
+    const dt = new Date();
 
-      let h = dt.getHours() + '';
-      if (h.length == 1) h = '0' + h;
-      let m = dt.getMinutes() + '';
-      if (m.length == 1) m = '0' + m;
-      let newTime = `${h}:${m}`;
+    let h = dt.getHours() + '';
+    if (h.length == 1) h = '0' + h;
+    let m = dt.getMinutes() + '';
+    if (m.length == 1) m = '0' + m;
+    let newTime = `${h}:${m}`;
 
-      if (newTime != this.currentTime) {
-        this.currentTime = newTime;
-        requestAnimationFrame(() => {
-          timeTarget.textContent = this.currentTime;
-        });
-      }
+    if (newTime != this.currentTime) {
+      this.currentTime = newTime;
+      requestAnimationFrame(() => {
+        this.timeTarget.textContent = this.currentTime;
+      });
     }
   }
 }
