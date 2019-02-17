@@ -30,18 +30,30 @@ export default class extends Controller {
   navigate (e) {
     // Only want to override if no modifiers
     if (!e.altKey && !e.shiftKey && !e.ctrlKey && !e.metaKey) {
-      let el = e.target;
+      const el = e.target;
+      const selector = this.data.get('navigateSelector');
+      const matches = selector ? el.matches(selector) : el.tagName == 'A';
+      // Allow specifying alternate attr
       let href = el.getAttribute('href');
-      // More for later, but only allow relative paths
-      if (href && href.startsWith('/')) {
+      if (!href || href == '#') {
+        href = el.getAttribute('data-href');
+      }
+      // More for later, but only hrefs with relative paths
+      if (matches && href && href.startsWith('/')) {
         // Don't allow normal navigation
         e.preventDefault();
         console.log(`Navigating to ${href}`);
-        // Push new state
-        const title = `Loading ${href}`;
-        window.history.pushState({ path: href, title: title }, title, href);
         // Fetch page and replace
-        this.loadPage(href);
+        this.loadPage(href)
+          .then(state => {
+            if (state) {
+              window.history.pushState(state, state.title, state.path);
+            }
+            else {
+              // Invalid inline replacement, actually navigate
+              window.location.href = href;
+            }
+          });
         return false;
       }
     }
@@ -78,21 +90,20 @@ export default class extends Controller {
     const title = tree.querySelector('head title');
     // For now, we'll assume it needs to be exactly compatible
     // TODO: parameterize id to look for?
-    const output = tree.getElementById('output');
+    const output = tree.getElementById(this.outputTarget.id);
     if (!output) {
-      throw new Error(`Couldn't find output element in retrieved page`);
+      return null;
     }
     // Clone before returning
     return {
       title: title ? title.textContent : '',
       output: output.cloneNode(true),
-    }
+    };
   }
 
   replacePage (path, output, title) {
     // Set new title, history state
     document.title = title;
-    window.history.replaceState({ path: path, title: title }, title, path);
     requestAnimationFrame(() => {
       // Set new output element
       const outputTarget = this.outputTarget;
@@ -103,6 +114,8 @@ export default class extends Controller {
     // Send path update event to path target(s)
     const ev = new Event('newPath', { detail: path });
     this.pathTargets.forEach(el => el.dispatchEvent(ev));
+    // Return new state
+    return { path: path, title: title };
   }
 
   loadPage (path) {
@@ -111,12 +124,8 @@ export default class extends Controller {
     this.showLoading(path);
     // Fire off request
     // Assume origin + path is sufficient
-    fetch(window.location.origin + path)
+    return fetch(window.location.origin + path)
       .then(res => {
-        if (!res.ok) {
-          console.error(`Got ${res.status} fetching ${path}`);
-          throw new Error(`Couldn't retrieve ${path}`);
-        }
         // Ensure state hasn't changed in the meantime
         if (currentState !== window.history.state) {
           console.log(`Old fetch for ${path}, ignoring`);
@@ -126,7 +135,7 @@ export default class extends Controller {
         return res.text();
       })
       .then(text => this.parsePage(text))
-      .then(res => this.replacePage(path, res.output, res.title))
+      .then(res => res ? this.replacePage(path, res.output, res.title) : null)
       // TODO: catch, error display
     ;
   }
