@@ -4,10 +4,9 @@
 </div>
 <div class="textbox"><br></div>
 <div class="textbox">
-    <%# TODO: update base URL if/when _rampant subsite brought in %>
     <div class="imgbox">
         <a class="blue selector" href="<%= Routes.page_path(@conn, :rampant) %>">
-            <img src="<%= Routes.static_url(@conn, "/images/rampant-banner.jpg") %>" title="_rampant">
+            <img src="<%= Routes.static_url(@conn, "/rampant/images/banner-small.jpg") %>" title="_rampant">
         </a>
     </div>
 </div>
