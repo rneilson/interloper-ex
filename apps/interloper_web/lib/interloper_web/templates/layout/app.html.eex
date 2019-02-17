@@ -14,8 +14,12 @@
     <meta name="og:description" content="Personal site of Raymond Neilson">
     <meta name="og:image" content="<%= Routes.static_url(@conn, "/images/rodeo.png") %>">
   </head>
-  <body data-controller="select" data-action="keydown->select#handleKey">
-    <%# TODO: add boot script %>
+  <body class="js-disabled" data-controller="select" data-action="keydown->select#handleKey">
+    <script type="text/javascript">
+      var el = document.querySelector('body');
+      el.classList.remove('js-disabled');
+      el.classList.add('js-enabled');
+    </script>
     <%# <script type="text/javascript" src="boot.js"></script> %>
     <div id="container" class="container">
       <div id="main" data-controller="page" data-page-loading-class="loading"
