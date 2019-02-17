@@ -18,21 +18,24 @@
     <%# TODO: add boot script %>
     <%# <script type="text/javascript" src="boot.js"></script> %>
     <div id="container" class="container">
-      <div id="main">
+      <div id="main" data-controller="page" data-page-loading-class="loading"
+        data-page-navigate-selector="a[href]" data-action="click->page#navigate">
         <div id="banner" class="bannerbox dimmer dimmed"
           style="background: url(<%= Routes.static_path(@conn, "/images/rodeo.png") %>) center center no-repeat">
           <!-- <img src="<%= Routes.static_path(@conn, "/images/rodeo.png") %>" title="YEE HAW" alt="Rocket Rodeo"> -->
         </div>
         <div id="console" class="overlay">
-          <div id="status" class="status" data-controller="status">
+          <div id="status" class="status" data-controller="status"
+            data-target="page.path" data-action="newPath->status#updatePath">
             <span id="path" class="orange" data-target="status.path"></span>
             <span id="clock" class="orange floatright" data-target="status.time"></span>
           </div>
-          <div id="output" class="popup" tabindex="0" data-controller="output">
+          <div id="output" class="popup" tabindex="0" data-controller="output"
+            data-target="page.output" data-output-path="<%= @conn.request_path %>">
             <%= render @view_module, @view_template, assigns %>
           </div>
           <div id="command" class="status">
-            <span id="preview" class="yellow"></span>
+            <span id="preview" class="yellow" data-target="page.status"></span>
           </div>
         </div>
       </div>

@@ -386,6 +386,9 @@ sup {
 .visible {
     opacity: 1;
 }
+.loading {
+    opacity: 0.6;
+}
 .dimmed {
     opacity: 0.06;
 }

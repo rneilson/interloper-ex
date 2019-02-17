@@ -20,12 +20,14 @@ import css from "../css/app.css"
 // import { Application } from "stimulus";
 import { Application } from "../vendor/stimulus.umd.js";
 
+import PageController from "./controllers/page_controller";
 import SelectController from "./controllers/select_controller";
 import StatusController from "./controllers/status_controller";
 import OutputController from "./controllers/output_controller";
 import GithubCommitController from "./controllers/github_commit_controller";
 
 const application = Application.start();
+application.register("page", PageController);
 application.register("select", SelectController);
 application.register("status", StatusController);
 application.register("output", OutputController);

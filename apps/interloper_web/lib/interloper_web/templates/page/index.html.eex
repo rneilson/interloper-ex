@@ -26,11 +26,11 @@
 </div>
 <div class="textbox"><br></div>
 <div class="textbox">
-  <a class="blue selector" href="/github" data-page-id="/github">Github repositories</a>
+  <a class="blue selector" href="<%= Routes.github_path(@conn, :repo_list) %>">Github repositories</a>
 </div>
 <div class="textbox"><br></div>
 <div class="textbox">
-  <a class="blue selector" href="<%= Routes.page_path(@conn, :games) %>" data-page-id="/games">Game projects</a>
+  <a class="blue selector" href="<%= Routes.page_path(@conn, :games) %>">Game projects</a>
 </div>
 <div class="textbox"><br></div>
 <div class="textbox">
@@ -38,7 +38,7 @@
 </div>
 <div class="textbox"><br></div>
 <div class="textbox">
-  <a class="blue selector" href="/twitter" data-page-id="/twitter">Twitter</a>
+  <a class="blue selector" href="<%= Routes.twitter_path(@conn, :recent) %>">Twitter</a>
 </div>
 <div class="textbox"><br></div>
 <div class="textbox">
