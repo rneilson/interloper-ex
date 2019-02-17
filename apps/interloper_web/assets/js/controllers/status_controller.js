@@ -3,7 +3,7 @@ import { Controller } from "../../vendor/stimulus.umd.js";
 
 export default class extends Controller {
   static get targets () {
-    return [ "path", "time" ];
+    return [ 'path', 'load', 'time', ];
   }
 
   initialize () {
@@ -26,11 +26,28 @@ export default class extends Controller {
     }
   }
 
-  updatePath() {
+  updatePath(e) {
+    const path = (e && e.detail) || window.location.pathname;
     const pathTargets = this.pathTargets;
-    if (pathTargets.length > 0) {
+    const loadTargets = this.loadTargets;
+    if (pathTargets.length > 0 || loadTargets.length > 0) {
       requestAnimationFrame(() => {
-        pathTargets.forEach(el => el.textContent = window.location.pathname);
+        pathTargets.forEach(el => el.textContent = path);
+        loadTargets.forEach(el => el.textContent = '');
+      });
+    }
+  }
+
+  loadingPath(e) {
+    const path = (e && e.detail) || (window.history.state || {}).path;
+    // const text = path ? `${path} loading` : `Loading...`;
+    const text = `Loading...`;
+    const pathTargets = this.pathTargets;
+    const loadTargets = this.loadTargets;
+    if (pathTargets.length > 0 || loadTargets.length > 0) {
+      requestAnimationFrame(() => {
+        pathTargets.forEach(el => el.textContent = '');
+        loadTargets.forEach(el => el.textContent = text);
       });
     }
   }

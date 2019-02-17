@@ -3,7 +3,7 @@ import { Controller } from "../../vendor/stimulus.umd.js";
 
 export default class extends Controller {
   static get targets () {
-    return [ 'output', 'path', 'status' ];
+    return [ 'output', 'status', ];
   }
 
   initialize () {
@@ -68,8 +68,8 @@ export default class extends Controller {
       this.outputTarget.classList.add(loadingClass);
     }
     // Set status text
-    let text = path ? `Loading ${path}` : `Loading...`;
-    this.statusTargets.forEach(el => el.textContent = text);
+    const ev = new Event('loadPath', { detail: path });
+    this.statusTargets.forEach(el => el.dispatchEvent(ev));
   }
 
   parsePage (html) {
@@ -97,10 +97,10 @@ export default class extends Controller {
       // Set new output element
       const outputTarget = this.outputTarget;
       outputTarget.parentNode.replaceChild(output, outputTarget);
-      // Clear status text
-      this.statusTargets.forEach(el => el.textContent = '');
     });
-    // TODO: send path update event to path target(s)
+    // Send path update event to path target(s)
+    const ev = new Event('newPath', { detail: path });
+    this.statusTargets.forEach(el => el.dispatchEvent(ev));
   }
 
   loadPage (path) {
