@@ -3,17 +3,29 @@ import { Controller } from "../../vendor/stimulus.umd.js";
 
 export default class extends Controller {
   static get targets () {
-    return [ 'output', 'path' ];
+    return [ 'output', 'path', 'status' ];
   }
 
-  initialize () {}
+  initialize () {
+    this.stateHandler = null;
+  }
 
   connect () {
     this.ensureState();
+    // Handle popstate (ie back)
+    if (!this.stateHandler) {
+      this.stateHandler = e => this.handleState(e.state);
+      window.addEventListener('popstate', this.stateHandler);
+    }
     // TODO: compare current state, load page as req'd
   }
 
-  disconnect () {}
+  disconnect () {
+    if (this.stateHandler) {
+      window.removeEventListener('popstate', this.stateHandler);
+      this.stateHandler = null;
+    }
+  }
 
   navigate (e) {
     // Only want to override if no modifiers
@@ -22,6 +34,7 @@ export default class extends Controller {
       let href = el.getAttribute('href');
       // More for later, but only allow relative paths
       if (href && href.startsWith('/')) {
+        // Don't allow normal navigation
         e.preventDefault();
         console.log(`Navigating to ${href}`);
         // Push new state
@@ -42,10 +55,21 @@ export default class extends Controller {
     }
   }
 
+  handleState (state) {
+    document.title = state.title;
+    console.log(`Restoring ${state.path}`);
+    this.loadPage(state.path);
+  }
+
   showLoading (path) {
-    // TODO: move into template element
+    // Add class to output
+    const loadingClass = this.data.get('loadingClass');
+    if (loadingClass) {
+      this.outputTarget.classList.add(loadingClass);
+    }
+    // Set status text
     let text = path ? `Loading ${path}` : `Loading...`;
-    this.outputTarget.innerHtml = `<div class="textbox"><span class="yellow">${text}</span></div>`;
+    this.statusTargets.forEach(el => el.textContent = text);
   }
 
   parsePage (html) {
@@ -69,10 +93,12 @@ export default class extends Controller {
     // Set new title, history state
     document.title = title;
     window.history.replaceState({ path: path, title: title }, title, path);
-    // Set new output element
     requestAnimationFrame(() => {
+      // Set new output element
       const outputTarget = this.outputTarget;
       outputTarget.parentNode.replaceChild(output, outputTarget);
+      // Clear status text
+      this.statusTargets.forEach(el => el.textContent = '');
     });
     // TODO: send path update event to path target(s)
   }
@@ -98,7 +124,7 @@ export default class extends Controller {
         return res.text();
       })
       .then(text => this.parsePage(text))
-      .then(({ title, output }) => this.replacePage(path, output, title))
+      .then(res => this.replacePage(path, res.output, res.title))
       // TODO: catch, error display
     ;
   }
