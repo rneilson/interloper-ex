@@ -31,15 +31,16 @@ export default class extends Controller {
     // Only want to override if no modifiers
     if (!e.altKey && !e.shiftKey && !e.ctrlKey && !e.metaKey) {
       const el = e.target;
-      const selector = this.data.get('navigateSelector');
-      const matches = selector ? el.matches(selector) : el.tagName == 'A';
-      // Allow specifying alternate attr
+      // Get configured selectors
+      const navSelector = this.data.get('navigateSelector') || 'a[href^="/"]';
+      const excSelector = this.data.get('excludeSelector') || 'a[target]';
+      // Allow specifying via alternate attr
       let href = el.getAttribute('href');
       if (!href || href == '#') {
         href = el.getAttribute('data-href');
       }
       // More for later, but only hrefs with relative paths
-      if (matches && href && href.startsWith('/')) {
+      if (href && el.matches(navSelector) && (!excSelector || !el.matches(excSelector))) {
         // Don't allow normal navigation
         e.preventDefault();
         console.log(`Navigating to ${href}`);
