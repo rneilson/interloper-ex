@@ -27,7 +27,7 @@ defmodule InterloperWeb.Router do
     get "/twitter", TwitterController, :recent
   end
 
-  scope "/api", InterloperWeb do
+  scope "/api", InterloperWeb, as: :api do
     pipe_through :api
 
     get "/twitter/recent", TwitterController, :recent
