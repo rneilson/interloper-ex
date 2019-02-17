@@ -32,7 +32,7 @@
     <% assigns[:commit_url] -> %>
         <span class="small" data-controller="github-commit" data-github-commit-url="<%= @commit_url %>">
             <span class="err" data-target="github-commit.err"></span>
-            <span data-target="github-commit.text">&nbsp;</span>
+            <span data-target="github-commit.text">Commit details pending</span>
             <a class="yellow selector" data-target="github-commit.link"></a>
             <span class="green" data-target="github-commit.time"></span>
         </span>
