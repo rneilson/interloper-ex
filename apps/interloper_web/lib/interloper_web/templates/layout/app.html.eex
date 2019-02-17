@@ -24,7 +24,7 @@
     <div id="container" class="container">
       <div id="main" data-controller="page" data-page-loading-class="loading"
         data-page-navigate-selector="a[href^=&quot;/&quot;]"
-        data-page-exclude-selector="a[target], a[href^=&quot;/api/&quot;], a[href^=&quot;/rampant/&quot;]"
+        data-page-exclude-selector="a[target], a[href^=&quot;/api/&quot;], a[href^=&quot;/rampant&quot;]"
         data-action="click->page#navigate">
         <div id="banner" class="bannerbox dimmer dimmed"
           style="background: url(<%= Routes.static_path(@conn, "/images/rodeo.png") %>) center center no-repeat">

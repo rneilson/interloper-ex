@@ -6,7 +6,7 @@
 <div class="textbox">
     <%# TODO: update base URL if/when _rampant subsite brought in %>
     <div class="imgbox">
-        <a class="blue selector" href="https://www.interloper.ca/rampant" target="_blank">
+        <a class="blue selector" href="<%= Routes.page_path(@conn, :rampant) %>">
             <img src="<%= Routes.static_url(@conn, "/images/rampant-banner.jpg") %>" title="_rampant">
         </a>
     </div>
@@ -18,7 +18,7 @@
 <div class="textbox"><br></div>
 <div class="textbox">
     <%# TODO: update base URL if/when _rampant subsite brought in %>
-    <a class="blue selector" href="https://www.interloper.ca/rampant" target="_blank">Visit the official site</a>
+    <a class="blue selector" href="<%= Routes.page_path(@conn, :rampant) %>">Visit the official site</a>
 </div>
 <div class="textbox"><br></div>
 <div class="textbox">

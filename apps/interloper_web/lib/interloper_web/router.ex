@@ -25,6 +25,7 @@ defmodule InterloperWeb.Router do
     get "/games", PageController, :games
     get "/github", GithubController, :repo_list
     get "/twitter", TwitterController, :recent
+    get "/rampant", PageController, :rampant
   end
 
   scope "/api", InterloperWeb, as: :api do

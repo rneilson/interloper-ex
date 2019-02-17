@@ -8,4 +8,8 @@ defmodule InterloperWeb.PageController do
   def games(conn, _params) do
     render(conn, "games.html")
   end
+
+  def rampant(conn, _params) do
+    redirect(conn, to: InterloperWeb.Router.Helpers.static_path(conn, "/rampant/index.html"))
+  end
 end
