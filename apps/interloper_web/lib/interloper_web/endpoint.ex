@@ -13,7 +13,7 @@ defmodule InterloperWeb.Endpoint do
   plug Plug.Static,
     at: "/",
     from: :interloper_web,
-    gzip: false,
+    gzip: true,
     only: ~w(css fonts images js rampant favicon.ico robots.txt)
 
   # Code reloading can be explicitly enabled under the
