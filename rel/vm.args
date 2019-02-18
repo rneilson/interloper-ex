@@ -20,7 +20,7 @@
 ##+SDio 5
 
 ## Increase number of concurrent ports/sockets
-##-env ERL_MAX_PORTS 4096
+-env ERL_MAX_PORTS 65536
 
 ## Tweak GC to run more often
 ##-env ERL_FULLSWEEP_AFTER 10
@@ -28,3 +28,5 @@
 # Enable SMP automatically based on availability
 # On OTP21+, this is not needed anymore.
 -smp auto
+
+-kernel inet_dist_listen_min <%= dist_port_min %> inet_dist_listen_max <%= dist_port_max %>

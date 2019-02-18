@@ -32,6 +32,10 @@ environment :dev do
   set dev_mode: true
   set include_erts: false
   set cookie: :"WERc.im9:%;J.7!p9k.H,HYcn)!TGqk98[q|:Oi?%g%}`x0SAesy;5P7su(leHL$"
+  set overlay_vars: [
+    dist_port_min: 14000,
+    dist_port_max: 14010,
+  ]
 end
 
 environment :prod do
@@ -39,6 +43,16 @@ environment :prod do
   set include_src: false
   set cookie: :"[[u*P`M{z.Rbi*Krd0Kq~<<ojIy~ZQ]m~N=R8[B{nn~/Fd=cwZMMwtC(~$YRp5WJ"
   set vm_args: "rel/vm.args"
+  set config_providers: [
+    {Mix.Releases.Config.Providers.Elixir, ["${RELEASE_ROOT_DIR}/etc/config.exs"]}
+  ]
+  set overlays: [
+    {:copy, "rel/config/config.exs", "etc/config.exs"}
+  ]
+  set overlay_vars: [
+    dist_port_min: System.get_env("DIST_PORT_MIN") || 14000,
+    dist_port_max: System.get_env("DIST_PORT_MAX") || 14010,
+  ]
 end
 
 # You may define one or more releases in this file.
@@ -47,7 +61,7 @@ end
 # will be used by default
 
 release :interloper_ex do
-  set version: "0.2.0"
+  set version: current_version(:interloper)
   set applications: [
     :runtime_tools,
     interloper: :permanent,
