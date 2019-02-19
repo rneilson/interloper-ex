@@ -112,6 +112,8 @@ defmodule InterloperWeb.Endpoint do
             url: [host: host, port: url_port],
             http: [:inet6, port: port],
             https: false,
+            # No HSTS for now until we're stable
+            force_ssl: [hsts: false, host: "#{host}:#{url_port}"]
           ]
         true ->
           # HTTP-only, direct (probably local)
