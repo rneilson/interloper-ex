@@ -52,6 +52,25 @@ config :interloper_web, InterloperWeb.Endpoint,
 #
 # Check `Plug.SSL` for all available options in `force_ssl`.
 
+cond do
+  # No HSTS for now until we're stable
+  System.get_env("SITE_TLS_CRT") ->
+    # HTTPS, assume redirect
+    config :interloper_web, InterloperWeb.Endpoint,
+      force_ssl: [
+        hsts: false,
+        host: {InterloperWeb.Endpoint, :redirect_host, []},
+      ]
+  System.get_env("SITE_SCHEME") == "https" ->
+    # Behind TLS-terminating proxy
+    config :interloper_web, InterloperWeb.Endpoint,
+      force_ssl: [
+        hsts: false,
+        host: {InterloperWeb.Endpoint, :redirect_host, []},
+        rewrite_on: [:x_forwarded_proto],
+      ]
+end
+
 # ## Using releases (distillery)
 #
 # If you are doing OTP releases, you need to instruct Phoenix

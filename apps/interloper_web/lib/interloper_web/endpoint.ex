@@ -14,7 +14,7 @@ defmodule InterloperWeb.Endpoint do
     at: "/",
     from: :interloper_web,
     gzip: true,
-    only: ~w(css fonts images js rampant favicon.ico robots.txt)
+    only_matching: ~w(css fonts images js rampant favicon robots)
 
   # Code reloading can be explicitly enabled under the
   # :code_reloader configuration of your endpoint.
@@ -67,6 +67,11 @@ defmodule InterloperWeb.Endpoint do
       end
     site_port = System.get_env("SITE_PORT")
     site_scheme = System.get_env("SITE_SCHEME")
+    url_port =
+      cond do
+        site_port -> String.to_integer(site_port)
+        true -> nil
+      end
     # HTTP/S config
     tls_crt = System.get_env("SITE_TLS_CRT")
     tls_key = System.get_env("SITE_TLS_KEY") || tls_crt
@@ -75,20 +80,9 @@ defmodule InterloperWeb.Endpoint do
       cond do
         tls_crt ->
           # HTTPS, assume redirect
-          url_port =
-            cond do
-              site_port -> String.to_integer(site_port)
-              true -> port_https
-            end
-          # Force port number if nonstandard
-          redir_host =
-            cond do
-              url_port == 443 -> host
-              true -> "#{host}:#{url_port}"
-            end
           # Set HTTP and HTTPS listeners, force redirect
           [
-            url: [host: host, port: url_port, scheme: "https"],
+            url: [host: host, port: url_port || port_https, scheme: "https"],
             http: [:inet6, port: port],
             https: [
               :inet6,
@@ -97,23 +91,14 @@ defmodule InterloperWeb.Endpoint do
               certfile: tls_crt,
               keyfile: tls_key,
             ],
-            # No HSTS for now until we're stable
-            force_ssl: [hsts: false, host: redir_host]
           ]
         site_scheme == "https" ->
           # Behind TLS-terminating proxy
-          url_port =
-            cond do
-              site_port -> String.to_integer(site_port)
-              true -> port
-            end
           # Set HTTP, force scheme
           [
-            url: [host: host, port: url_port],
+            url: [host: host, port: url_port || port, scheme: "https"],
             http: [:inet6, port: port],
             https: false,
-            # No HSTS for now until we're stable
-            force_ssl: [hsts: false, host: "#{host}:#{url_port}"]
           ]
         true ->
           # HTTP-only, direct (probably local)
@@ -133,5 +118,15 @@ defmodule InterloperWeb.Endpoint do
       end
     # Merge with provided config
     {:ok, Keyword.merge(config, new_config)}
+  end
+
+  # Get configured HTTPS redirect URL
+  # Done as a callback so we can pass it to Plug.SSL at compile time
+  def redirect_host do
+    url = config(:url)
+    host = url[:host]
+    port = url[:port]
+    # Sneak in nonstandard port if cfg'd
+    if port == 443, do: host, else: "#{host}:#{port}"
   end
 end
