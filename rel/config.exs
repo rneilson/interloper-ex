@@ -33,8 +33,8 @@ environment :dev do
   set include_erts: false
   set cookie: :"WERc.im9:%;J.7!p9k.H,HYcn)!TGqk98[q|:Oi?%g%}`x0SAesy;5P7su(leHL$"
   set overlay_vars: [
-    dist_port_min: 14000,
-    dist_port_max: 14010,
+    dist_port_min: 40000,
+    dist_port_max: 40040,
   ]
 end
 
@@ -50,8 +50,8 @@ environment :prod do
     {:copy, "rel/config/config.exs", "etc/config.exs"}
   ]
   set overlay_vars: [
-    dist_port_min: System.get_env("DIST_PORT_MIN") || 14000,
-    dist_port_max: System.get_env("DIST_PORT_MAX") || 14010,
+    dist_port_min: System.get_env("DIST_PORT_MIN") || 40000,
+    dist_port_max: System.get_env("DIST_PORT_MAX") || 40040,
   ]
 end
 
