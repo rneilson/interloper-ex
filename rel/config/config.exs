@@ -1,6 +1,9 @@
 ## Runtime configuration
 use Mix.Config
 
+# Phoenix config
+config :phoenix, :serve_endpoints, true
+
 # Github config
 if github_user = System.get_env("GITHUB_USER") do
   config :interloper_web, InterloperWeb.GithubClient,
