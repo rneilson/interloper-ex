@@ -72,7 +72,8 @@ div.container {
 	padding-right: calc(50% - 480px);
 	padding-top: 0px;
 	padding-bottom: 0px;
-	overflow-x: hidden;
+	/*overflow-x: hidden;*/
+	overflow: hidden;
 }
 div.column {
 	position: relative;
