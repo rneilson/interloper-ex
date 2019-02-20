@@ -43,6 +43,7 @@ environment :prod do
   set include_src: false
   set cookie: :"[[u*P`M{z.Rbi*Krd0Kq~<<ojIy~ZQ]m~N=R8[B{nn~/Fd=cwZMMwtC(~$YRp5WJ"
   set vm_args: "rel/vm.args"
+  set pre_configure_hooks: "rel/hooks/pre_configure.d"
   set config_providers: [
     {Mix.Releases.Config.Providers.Elixir, ["${RELEASE_ROOT_DIR}/etc/config.exs"]}
   ]
