@@ -46,6 +46,11 @@ export default class extends Controller {
         console.log(`Navigating to ${href}`);
         // Fetch page and replace
         this.loadPage(href)
+          .catch(err => {
+            // Generate error page
+            const msg = (err && err.message) || `Could not load ${href}`;
+            return this.errorPage(href, msg);
+          })
           .then(state => {
             if (state) {
               window.history.pushState(state, state.title, state.path);
@@ -54,7 +59,8 @@ export default class extends Controller {
               // Invalid inline replacement, actually navigate
               window.location.href = href;
             }
-          });
+          })
+          ;
         return false;
       }
     }
@@ -117,6 +123,26 @@ export default class extends Controller {
     this.pathTargets.forEach(el => el.dispatchEvent(ev));
     // Return new state
     return { path: path, title: title };
+  }
+
+  errorPage (path, message) {
+    const errTemplate = document.querySelector('#page-load-error');
+    const errTitle = `Error - ${path}`;
+    let errNode;
+    if (errTemplate) {
+      // Clone template, substitute data
+      errNode = document.importNode(errTemplate.content, true);
+      const pathText = errNode.querySelector('#error-path');
+      const reasonText = errNode.querySelector('#error-reason');
+      if (pathText) pathText.textContent = path;
+      if (reasonText) reasonText.textContent = message;
+    }
+    else {
+      // Bare-bones fallback
+      errNode = message ? `${message}` : `Error loading ${path}`;
+    }
+    // Replace page, which will return updated state
+    return this.replacePage(path, errNode, errTitle);
   }
 
   loadPage (path) {
