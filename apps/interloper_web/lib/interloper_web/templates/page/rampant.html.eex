@@ -164,9 +164,9 @@
         </div>
         <div class="bannerspacer"></div>
       </div><div id="leftcol" class="column leftbg"
-        style="background-image: url(&quot;<%= Routes.static_path(@conn, "/rampant/images/sidebar-left.jpg") %>");&quot;>
+        style="background-image: url(&quot;<%= Routes.static_path(@conn, "/rampant/images/sidebar-left.jpg") %>&quot;);">
       </div><div id="rightcol" class="column rightbg"
-        style="background-image: url(&quot;<%= Routes.static_path(@conn, "/rampant/images/sidebar-right.jpg") %>");&quot;>
+        style="background-image: url(&quot;<%= Routes.static_path(@conn, "/rampant/images/sidebar-right.jpg") %>&quot;);">
       </div>
     </div>
   </body>

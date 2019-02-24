@@ -6,7 +6,7 @@
 <div class="textbox">
     <div class="imgbox">
         <a class="blue selector" href="<%= Routes.page_path(@conn, :rampant) %>" target="_blank">
-            <img src="<%= Routes.static_url(@conn, "/rampant/images/banner-small.jpg") %>" title="_rampant">
+            <img src="<%= Routes.static_path(@conn, "/rampant/images/banner-small.jpg") %>" title="_rampant">
         </a>
     </div>
 </div>
