@@ -77,7 +77,7 @@ defmodule InterloperWeb.Endpoint do
     # Return either TLS-enabled or HTTP-only
     overrides =
       cond do
-        byte_size(tls_crt) > 0 ->
+        is_binary(tls_crt) and tls_crt != "" ->
           # HTTPS, assume redirect
           # Set HTTP and HTTPS listeners, force redirect
           [

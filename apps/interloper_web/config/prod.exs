@@ -55,7 +55,7 @@ config :interloper_web, InterloperWeb.Endpoint,
 tls_crt = System.get_env("SITE_TLS_CRT")
 cond do
   # No HSTS for now until we're stable
-  byte_size(tls_crt) > 0 ->
+  is_binary(tls_crt) and tls_crt != "" ->
     # HTTPS, assume redirect
     config :interloper_web, InterloperWeb.Endpoint,
       force_ssl: [
