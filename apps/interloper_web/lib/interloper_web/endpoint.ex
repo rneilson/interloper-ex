@@ -50,11 +50,6 @@ defmodule InterloperWeb.Endpoint do
   # Conditional configuration via OS env vars
   def init(_key, config) do
     # URL and port config -- note, assumes base config already in env
-    host =
-      case System.get_env("SITE_NAME") do
-        nil -> Keyword.get(config, :url, []) |> Keyword.get(:host, "localhost")
-        site_name -> site_name
-      end
     port =
       case System.get_env("PORT") do
         nil -> (Keyword.get(config, :http) || []) |> Keyword.get(:port, 4000)
@@ -65,13 +60,17 @@ defmodule InterloperWeb.Endpoint do
         nil -> (Keyword.get(config, :https) || []) |> Keyword.get(:port, 4040)
         port_str -> String.to_integer(port_str)
       end
-    site_port = System.get_env("SITE_PORT")
-    site_scheme = System.get_env("SITE_SCHEME")
-    url_port =
-      cond do
-        site_port -> String.to_integer(site_port)
-        true -> nil
+    site_host =
+      case System.get_env("SITE_NAME") do
+        nil -> Keyword.get(config, :url, []) |> Keyword.get(:host, "localhost")
+        site_name -> site_name
       end
+    site_port =
+      case System.get_env("SITE_PORT") do
+        nil -> nil
+        port_ -> String.to_integer(port_)
+      end
+    site_scheme = System.get_env("SITE_SCHEME")
     # HTTP/S config
     tls_crt = System.get_env("SITE_TLS_CRT")
     tls_key = System.get_env("SITE_TLS_KEY") || tls_crt
@@ -82,7 +81,7 @@ defmodule InterloperWeb.Endpoint do
           # HTTPS, assume redirect
           # Set HTTP and HTTPS listeners, force redirect
           [
-            url: [host: host, port: url_port || port_https, scheme: "https"],
+            url: [host: site_host, port: site_port || port_https, scheme: "https"],
             http: [:inet6, port: port],
             https: [
               :inet6,
@@ -96,14 +95,14 @@ defmodule InterloperWeb.Endpoint do
           # Behind TLS-terminating proxy
           # Set HTTP, force scheme
           [
-            url: [host: host, port: url_port || port, scheme: "https"],
+            url: [host: site_host, port: site_port || port, scheme: "https"],
             http: [:inet6, port: port],
             https: false,
           ]
         true ->
           # HTTP-only, direct (probably local)
           [
-            url: [host: host, port: port],
+            url: [host: site_host, port: port],
             http: [:inet6, port: port],
             https: false,
           ]
