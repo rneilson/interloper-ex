@@ -15,8 +15,8 @@ use Mix.Config
 # before starting your production server.
 config :interloper_web, InterloperWeb.Endpoint,
   http: [:inet6, port: System.get_env("PORT") || 4000],
-  url: [host: "www.interloper.ca", port: 80]#,
-  # cache_static_manifest: "priv/static/cache_manifest.json"
+  url: [host: "www.interloper.ca", port: 80],
+  cache_static_manifest: "priv/static/cache_manifest.json"
 
 # ## SSL Support
 #
@@ -70,6 +70,9 @@ cond do
         host: {InterloperWeb.Endpoint, :redirect_host, []},
         rewrite_on: [:x_forwarded_proto],
       ]
+  true ->
+    config :interloper_web, InterloperWeb.Endpoint,
+      force_ssl: false
 end
 
 # ## Using releases (distillery)
