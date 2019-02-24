@@ -135,12 +135,12 @@ div.popup {
     transition-duration: 500ms;
     will-change: left, right, top, bottom, opacity;
 }
-div.popup.inactive-x {
+body.intro-sequence.inactive-x div.popup {
     left: 50%;
     right: 50%;
     overflow: hidden;
 }
-div.popup.inactive-y {
+body.intro-sequence.inactive-y div.popup {
     top: 50%;
     bottom: 50%;
     overflow: hidden;
@@ -387,6 +387,12 @@ sup {
 #command {
     bottom: 0px;
     white-space: nowrap;
+}
+body.intro-sequence div.popup > * {
+    display: none;
+}
+body.intro-sequence #status, body.intro-sequence #command {
+    opacity: 0;
 }
 .visible {
     opacity: 1;

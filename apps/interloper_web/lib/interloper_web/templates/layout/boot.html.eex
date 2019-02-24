@@ -1,0 +1,9 @@
+<script type="text/javascript">
+  var el = document.querySelector('body');
+  el.classList.remove('js-disabled');
+  el.classList.add('js-enabled');
+  if (!window.history.state) {
+    el.classList.add('intro-sequence', 'inactive-x', 'inactive-y');
+  }
+</script>
+<%# <script type="text/javascript" src="boot.js"></script> %>
