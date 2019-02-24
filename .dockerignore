@@ -1,0 +1,9 @@
+.git/
+.gitignore
+.dockerignore
+Dockerfile
+Dockerfile*
+_build/
+deps/
+apps/*/priv
+apps/*/assets/node_modules

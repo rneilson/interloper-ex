@@ -13,8 +13,8 @@ defmodule InterloperWeb.Endpoint do
   plug Plug.Static,
     at: "/",
     from: :interloper_web,
-    gzip: false,
-    only: ~w(css fonts images js rampant favicon.ico robots.txt)
+    gzip: true,
+    only_matching: ~w(css fonts images js rampant favicon robots)
 
   # Code reloading can be explicitly enabled under the
   # :code_reloader configuration of your endpoint.
@@ -46,4 +46,86 @@ defmodule InterloperWeb.Endpoint do
   #   signing_salt: "VpTe81l8"
 
   plug InterloperWeb.Router
+
+  # Conditional configuration via OS env vars
+  def init(_key, config) do
+    # URL and port config -- note, assumes base config already in env
+    port =
+      case System.get_env("PORT") do
+        nil -> (Keyword.get(config, :http) || []) |> Keyword.get(:port, 4000)
+        port_str -> String.to_integer(port_str)
+      end
+    port_https =
+      case System.get_env("PORT_HTTPS") do
+        nil -> (Keyword.get(config, :https) || []) |> Keyword.get(:port, 4040)
+        port_str -> String.to_integer(port_str)
+      end
+    site_host =
+      case System.get_env("SITE_NAME") do
+        nil -> Keyword.get(config, :url, []) |> Keyword.get(:host, "localhost")
+        site_name -> site_name
+      end
+    site_port =
+      case System.get_env("SITE_PORT") do
+        nil -> nil
+        port_ -> String.to_integer(port_)
+      end
+    site_scheme = System.get_env("SITE_SCHEME")
+    # HTTP/S config
+    tls_crt = System.get_env("SITE_TLS_CRT")
+    tls_key = System.get_env("SITE_TLS_KEY") || tls_crt
+    # Return either TLS-enabled or HTTP-only
+    overrides =
+      cond do
+        byte_size(tls_crt) > 0 ->
+          # HTTPS, assume redirect
+          # Set HTTP and HTTPS listeners, force redirect
+          [
+            url: [host: site_host, port: site_port || port_https, scheme: "https"],
+            http: [:inet6, port: port],
+            https: [
+              :inet6,
+              port: port_https,
+              cipher_suite: :strong,
+              certfile: tls_crt,
+              keyfile: tls_key,
+            ],
+          ]
+        site_scheme == "https" ->
+          # Behind TLS-terminating proxy
+          # Set HTTP, force scheme
+          [
+            url: [host: site_host, port: site_port || port, scheme: "https"],
+            http: [:inet6, port: port],
+            https: false,
+          ]
+        true ->
+          # HTTP-only, direct (probably local)
+          [
+            url: [host: site_host, port: port],
+            http: [:inet6, port: port],
+            https: false,
+          ]
+      end
+    # Possibly override secret key
+    new_config = 
+      case System.get_env("SECRET_KEY_BASE") do
+        nil ->
+          overrides
+        secret_key_base ->
+          Keyword.put(overrides, :secret_key_base, secret_key_base)
+      end
+    # Merge with provided config
+    {:ok, Keyword.merge(config, new_config)}
+  end
+
+  # Get configured HTTPS redirect URL
+  # Done as a callback so we can pass it to Plug.SSL at compile time
+  def redirect_host do
+    url = config(:url)
+    host = url[:host]
+    port = url[:port]
+    # Sneak in nonstandard port if cfg'd
+    if port == 443, do: host, else: "#{host}:#{port}"
+  end
 end

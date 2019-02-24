@@ -15,8 +15,8 @@ use Mix.Config
 # before starting your production server.
 config :interloper_web, InterloperWeb.Endpoint,
   http: [:inet6, port: System.get_env("PORT") || 4000],
-  url: [host: "www.interloper.ca", port: 80],
-  cache_static_manifest: "priv/static/cache_manifest.json"
+  url: [host: "www.interloper.ca", port: 80]#,
+  # cache_static_manifest: "priv/static/cache_manifest.json"
 
 # ## SSL Support
 #
@@ -52,6 +52,26 @@ config :interloper_web, InterloperWeb.Endpoint,
 #
 # Check `Plug.SSL` for all available options in `force_ssl`.
 
+tls_crt = System.get_env("SITE_TLS_CRT")
+cond do
+  # No HSTS for now until we're stable
+  byte_size(tls_crt) > 0 ->
+    # HTTPS, assume redirect
+    config :interloper_web, InterloperWeb.Endpoint,
+      force_ssl: [
+        hsts: false,
+        host: {InterloperWeb.Endpoint, :redirect_host, []},
+      ]
+  System.get_env("SITE_SCHEME") == "https" ->
+    # Behind TLS-terminating proxy
+    config :interloper_web, InterloperWeb.Endpoint,
+      force_ssl: [
+        hsts: false,
+        host: {InterloperWeb.Endpoint, :redirect_host, []},
+        rewrite_on: [:x_forwarded_proto],
+      ]
+end
+
 # ## Using releases (distillery)
 #
 # If you are doing OTP releases, you need to instruct Phoenix
@@ -69,4 +89,6 @@ config :interloper_web, InterloperWeb.Endpoint,
 
 # Finally import the config/prod.secret.exs which should be versioned
 # separately.
-import_config "prod.secret.exs"
+if System.get_env("INCLUDE_SECRETS") != "false" do
+  import_config "prod.secret.exs"
+end
