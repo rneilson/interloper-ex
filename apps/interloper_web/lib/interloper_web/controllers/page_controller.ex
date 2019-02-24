@@ -10,6 +10,7 @@ defmodule InterloperWeb.PageController do
   end
 
   def rampant(conn, _params) do
-    redirect(conn, to: InterloperWeb.Router.Helpers.static_path(conn, "/rampant/index.html"))
+    put_layout(conn, false)
+    |> render("rampant.html")
   end
 end

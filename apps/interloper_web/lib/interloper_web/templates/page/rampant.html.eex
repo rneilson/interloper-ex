@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width">
+    <link rel="canonical" href="<%= Routes.page_url(@conn, :rampant) %>">
+    <link rel="shortcut icon" type="image/x-icon" href="<%= Routes.static_path(@conn, "/rampant/_favicon2.ico") %>" />
+    <title>_rampant</title>
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Droid+Sans+Mono" />
+    <link rel="stylesheet" type="text/css" href="<%= Routes.static_path(@conn, "/rampant/rampant.css") %>" />
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@delta_vee">
+    <meta name="twitter:title" content="_rampant">
+    <meta name="twitter:description" content="_rampant is a twin stick arena shooter — a fun and challenging session game that you can play for five minutes or fifty.">
+    <meta name="twitter:image" content="<%= Routes.static_url(@conn, "/rampant/images/banner-card.png") %>">
+    <meta name="og:title" content="_rampant">
+    <meta name="og:description" content="_rampant is a twin stick arena shooter — a fun and challenging session game that you can play for five minutes or fifty.">
+    <meta name="og:image" content="<%= Routes.static_url(@conn, "/rampant/images/banner-card.png") %>">
+  </head>
+  <body>
+    <div id="topbanner" class="spacerbox">
+      <p class="big">
+        Buy it now for $1.00 at <a href="https://rneilson.itch.io/rampant">itch.io!</a>
+      </p>
+    </div>
+    <div id="container" class="container">
+      <div id="main" class="column">
+        <div id="banner" class="nopadding bannerbox">
+          <img src="<%= Routes.static_path(@conn, "/rampant/images/banner.jpg") %>">
+        </div>
+        <div class="bannerspacer"></div>
+        <div id="intro" class="sectionbox">
+          <div class="textbox intro">
+            <p>
+              the many-angled ones, they come...
+            </p>
+            <p>
+              they crawl up from the infrared...
+            </p>
+            <p>
+              they swarm the low harmonics...
+            </p>
+            <p>
+              they stellate on the hallowed plane...
+            </p>
+            <p>
+              they sing blue tessellations...
+            </p>
+            <p>
+              they rise and spread their vertices...
+            </p>
+            <p>
+              the many-angled ones have come!
+            </p>
+          </div>
+          <div class="imgbox">
+            <a href="<%= Routes.static_path(@conn, "/rampant/screens/_rampant1-5_small.png") %>" target="_blank">
+              <img src="<%= Routes.static_path(@conn, "/rampant/thumbs/_rampant1-5_thumb.png") %>"></a>
+          </div>
+        </div>
+        <div class="spacerbox"></div>
+        <div id="about" class="sectionbox">
+          <div class="textbox">
+            <p class="heading">
+              _rampant
+            </p>
+            <p>
+              <strong><em>_rampant</em></strong> is a twin stick arena shooter &#8212; a fun and challenging session game that you can play for five minutes or fifty. Fight your way through endless waves of intelligent and ruthless enemies in multiple modes designed for any kind of session, from brief and intense to long and relaxing.
+            </p>
+          </div><div class="imgbox">
+            <a href="<%= Routes.static_path(@conn, "/rampant/screens/_rampant7-2_small.png") %>" target="_blank">
+              <img src="<%= Routes.static_path(@conn, "/rampant/thumbs/_rampant7-2_thumb.png") %>"></a>
+          </div>
+        </div>
+        <div class="spacerbox"></div>
+        <div id="features" class="sectionbox">
+          <div class="textbox">
+            <p class="heading">
+              _features
+            </p>
+            <p>
+              - Tackle increasingly challenging enemies that anticipate your movements and evade your fire, with dynamic physics that pushes, tosses, and scatters you and your enemies alike.
+            </p>
+            <p>
+              - Play any of six different modes to suit your mood. Go without checkpoints in Marathon, enjoy a quick playthrough in Short, or dive straight into the insanity of Skirmish.
+            </p>
+            <p>
+              - Evade, shoot, and bomb your foes using either gamepad or mouse and keyboard.
+            </p>
+            <p>
+              - Match the music to your style with a five-song soundtrack. (Music by 
+              <a href="http://teknoaxe.com/" target="_blank">Teknoaxe</a>, CC-licensed.)
+            </p>
+            <p>
+              <em>Available for Windows &#8212; Linux and Mac versions coming soon!</em>
+            </p>
+          </div><div class="imgbox">
+            <a href="<%= Routes.static_path(@conn, "/rampant/screens/_rampant8-2_small.png") %>" target="_blank">
+              <img src="<%= Routes.static_path(@conn, "/rampant/thumbs/_rampant8-2_thumb.png") %>"></a>
+          </div>
+        </div>
+        <div class="spacerbox"></div>
+        <div id="watch" class="sectionbox">
+          <div class="textbox">
+            <p class="heading">
+              _watch
+            </p>
+            <div class="watchcontainer">
+              <div class="watchbox">
+                <iframe src="https://www.youtube.com/embed/L9RNKRnfUKE" frameborder="0" allowfullscreen></iframe>
+              </div>
+            </div>
+          </div><div class="imgbox">
+            <a href="<%= Routes.static_path(@conn, "/rampant/screens/_rampant3_small.png") %>" target="_blank">
+              <img src="<%= Routes.static_path(@conn, "/rampant/thumbs/_rampant3_thumb.png") %>"></a>
+          </div>
+        </div>
+        <div class="spacerbox"></div>
+        <div id="purchase" class="sectionbox">
+          <div class="textbox">
+            <p class="heading">
+              _purchase
+            </p>
+            <div class="buycontainer">
+              <div class="buybox">
+                <iframe src="https://itch.io/embed/54655?dark=true"></iframe>
+              </div>
+            </div>
+            <p class="ralignlink">Or view game on <a href="https://rneilson.itch.io/rampant">itch.io</a><p>
+          </div><div class="imgbox">
+            <a href="<%= Routes.static_path(@conn, "/rampant/screens/_rampant4_small.png") %>" target="_blank">
+              <img src="<%= Routes.static_path(@conn, "/rampant/thumbs/_rampant4_thumb.png") %>"></a>
+          </div>
+        </div>
+        <div class="spacerbox"></div>
+        <div id="contact" class="sectionbox">
+          <div class="textbox">
+            <p class="heading">
+              _contact
+            </p>
+            <p>
+              <em><strong>_rampant</strong></em> is designed and programmed by 
+              <a href="mailto:interloper@interloper.ca">Raymond Neilson</a> (<a href="https://twitter.com/delta_vee" target="_blank">@delta_vee</a>), with additional contributions by Matt Hawk.
+            </p>
+            <p>&nbsp;</p>
+            <p>
+              For technical support or press inquiries, please contact:<br>
+            </p>
+            <p class="email">
+              <a href="mailto:interloper@interloper.ca">interloper@interloper.ca</a>
+            </p>
+            <!--
+            <p>
+              Press inquiries can be sent to:<br>
+            </p>
+            <p class="email">
+              &nbsp;&nbsp;<a href="mailto:interloper@interloper.ca">interloper@interloper.ca</a>
+            </p>
+            -->
+          </div><div class="imgbox">
+            <a href="<%= Routes.static_path(@conn, "/rampant/screens/_rampant5-2_small.png") %>" target="_blank">
+              <img src="<%= Routes.static_path(@conn, "/rampant/thumbs/_rampant5-2_thumb.png") %>"></a>
+          </div>
+        </div>
+        <div class="bannerspacer"></div>
+      </div><div id="leftcol" class="column leftbg"
+        style="background-image: url(&quot;<%= Routes.static_path(@conn, "/rampant/images/sidebar-left.jpg") %>");&quot;>
+      </div><div id="rightcol" class="column rightbg"
+        style="background-image: url(&quot;<%= Routes.static_path(@conn, "/rampant/images/sidebar-right.jpg") %>");&quot;>
+      </div>
+    </div>
+  </body>
+</html>
