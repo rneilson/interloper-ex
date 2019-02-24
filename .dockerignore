@@ -5,5 +5,5 @@ Dockerfile
 Dockerfile*
 _build/
 deps/
-apps/*/priv
+apps/*/priv/static
 apps/*/assets/node_modules
