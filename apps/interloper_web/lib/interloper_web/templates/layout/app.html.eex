@@ -15,7 +15,7 @@
     <meta name="og:image" content="<%= Routes.static_url(@conn, "/images/rodeo.png") %>">
     <template id="page-load-error">
       <div id="output" class="popup" tabindex="0" data-controller="output"
-        data-target="page.output" data-output-path="<%= @conn.request_path %>">
+        data-target="page.output" data-output-error="true">
         <%= SharedView.render("loading_error.html", reason: "", loading: "") %>
       </div>
     </template>
