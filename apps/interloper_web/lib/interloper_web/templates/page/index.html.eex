@@ -12,9 +12,9 @@
 </div>
 <div class="textbox"><br></div>
 <div class="textbox js-only instructions">
-  * Up/down arrow keys to select<br>
-  * Escape key to deselect<br>
-  * Enter key to accept<br>
+  <span class="small">* Up/down arrow keys to select</span><br>
+  <span class="small">* Escape key to deselect</span><br>
+  <span class="small">* Enter key to accept</span><br>
   <br>
 </div>
 <div class="textbox">

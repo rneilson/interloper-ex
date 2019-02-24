@@ -1,6 +1,6 @@
 <video controls poster="<%= @img_src %>" data-vid-src="<%= @vid_src %>">
     <source src="<%= @vid_src %>" type="<%= @vid_type %>">
-    <a href="<%= @vid_src %>" class="blue selector" target="_blank">
+    <a href="<%= @vid_src %>" class="blue selector image" target="_blank">
         <img src="<%= @img_src %>">
     </a>
 </video>

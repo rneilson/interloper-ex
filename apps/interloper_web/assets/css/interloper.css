@@ -82,8 +82,9 @@ a {
 a:focus {
     outline: none;
 }
-a.selector {
+a.selector.image {
     display: inline-block;
+    margin-right: 4px;
 }
 div {
     border: none;
