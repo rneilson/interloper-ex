@@ -1,8 +1,9 @@
-.git
+.git/
 .gitignore
 .dockerignore
 Dockerfile
 Dockerfile*
-/deps
-/apps/*/priv
-/apps/*/assets/node_modules
+_build/
+deps/
+apps/*/priv
+apps/*/assets/node_modules
