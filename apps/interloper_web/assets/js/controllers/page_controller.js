@@ -64,18 +64,12 @@ export default class extends Controller {
   ensureState () {
     const path = window.location.pathname;
     const title = document.title;
-    if (!window.history.state) {
-      const state = { path: path, title: title, html: this.outputTarget.outerHTML };
-      window.history.replaceState(state, title, path);
-    }
-    else if (!window.history.state.html) {
-      // Gotta look for *something*
-      const isError = this.outputTarget.getAttribute("data-output-error") || "";
-      if (isError.toLowerCase() != "true") {
-        const state = { path: path, title: title, html: this.outputTarget.outerHTML };
-        window.history.replaceState(state, state.title, state.path);
-      }
-    }
+    // Gotta look for *something*
+    const error = this.outputTarget.getAttribute("data-output-error") || "";
+    // TODO: Any reason to check if currently error but valid cached?
+    const html = error ? false : this.outputTarget.outerHTML;
+    const state = { path: path, title: title, html: html };
+    window.history.replaceState(state, title, path);
   }
 
   handleState (state) {
@@ -119,23 +113,6 @@ export default class extends Controller {
     };
   }
 
-  replacePage (path, output, title, error) {
-    // Set new title, history state
-    document.title = title;
-    requestAnimationFrame(() => {
-      // Set new output element
-      const outputTarget = this.outputTarget;
-      outputTarget.parentNode.replaceChild(output, outputTarget);
-      // Clear status text
-      // this.statusTargets.forEach(el => el.textContent = '');
-    });
-    // Send path update event to path target(s)
-    const ev = new CustomEvent('newPath', { detail: path });
-    this.pathTargets.forEach(el => el.dispatchEvent(ev));
-    // Return new state
-    return { path: path, title: title, html: error ? false : output.outerHTML };
-  }
-
   errorPage (path, message) {
     const errTemplate = document.getElementById('page-load-error');
     // If (somehow) no error template configured, skip
@@ -155,6 +132,23 @@ export default class extends Controller {
     }
     // Return arg for replacePage()
     return { title: errTitle, output: errNode, error: message };
+  }
+
+  replacePage (path, output, title, error) {
+    // Set new title, history state
+    document.title = title;
+    requestAnimationFrame(() => {
+      // Set new output element
+      const outputTarget = this.outputTarget;
+      outputTarget.parentNode.replaceChild(output, outputTarget);
+      // Clear status text
+      // this.statusTargets.forEach(el => el.textContent = '');
+    });
+    // Send path update event to path target(s)
+    const ev = new CustomEvent('newPath', { detail: path });
+    this.pathTargets.forEach(el => el.dispatchEvent(ev));
+    // Return new state
+    return { path: path, title: title, html: error ? false : output.outerHTML };
   }
 
   loadPage (path, html) {
