@@ -4,18 +4,13 @@ ARG ALPINE_VERSION=3.9
 ## Build image
 FROM elixir:1.8-alpine AS builder
 
-# Application name, version
-ARG MIX_ENV=prod
-ARG APP_NAME=interloper_ex
-ARG APP_NAME_WEB=interloper_web
-
 # Build settings (mostly regarding HTTPS)
+ARG MIX_ENV=prod
 ARG SITE_SCHEME=https
 ARG SITE_TLS_CRT=true
 
 # Env var versions of above
 ENV MIX_ENV=${MIX_ENV} \
-    APP_NAME=${APP_NAME} \
     SITE_SCHEME=${SITE_SCHEME} \
     SITE_TLS_CRT=${SITE_TLS_CRT}
 
@@ -49,7 +44,7 @@ RUN mkdir -p deps && \
     mix do deps.get, deps.compile, compile
 
 # Build web assets
-RUN cd apps/${APP_NAME_WEB}/assets && \
+RUN cd apps/interloper_web/assets && \
     NODE_ENV=production && \
     npm install && \
     npm run deploy && \
@@ -59,12 +54,12 @@ RUN cd apps/${APP_NAME_WEB}/assets && \
 # Build release
 RUN mkdir -p /opt/build && \
     mix release --verbose && \
-    RELEASES_DIR="$(pwd)/_build/${MIX_ENV}/rel/${APP_NAME}/releases" && \
+    RELEASES_DIR="$(pwd)/_build/${MIX_ENV}/rel/interloper_ex/releases" && \
     REL_VSN="$(cut -d' ' -f2 "${RELEASES_DIR}"/start_erl.data)" && \
-    cp "${RELEASES_DIR}/${REL_VSN}/${APP_NAME}.tar.gz" /opt/build/ && \
+    cp "${RELEASES_DIR}/${REL_VSN}/interloper_ex.tar.gz" /opt/build/ && \
     cd /opt/build && \
-    tar -xzf "${APP_NAME}.tar.gz" && \
-    rm "${APP_NAME}.tar.gz"
+    tar -xzf "interloper_ex.tar.gz" && \
+    rm "interloper_ex.tar.gz"
 
 
 ## Release image
@@ -72,7 +67,6 @@ FROM alpine:${ALPINE_VERSION}
 
 # Previously-defined vars
 ARG MIX_ENV=prod
-ARG APP_NAME=interloper_ex
 ARG SITE_SCHEME=https
 ARG SITE_TLS_CRT=
 
@@ -89,7 +83,6 @@ RUN apk update && \
 
 # Set env
 ENV MIX_ENV=${MIX_ENV} \
-    APP_NAME=${APP_NAME} \
     SITE_NAME=${SITE_NAME} \
     SITE_SCHEME=${SITE_SCHEME} \
     SITE_TLS_CRT=${SITE_TLS_CRT} \
@@ -115,4 +108,5 @@ USER 1000:1000
 # Copy TLS cert/key
 COPY --chown=1000:1000 tls/ tls/
 
-CMD trap 'exit' INT; /opt/app/bin/${APP_NAME} foreground
+ENTRYPOINT ["/opt/app/bin/interloper_ex"]
+CMD ["foreground"]
