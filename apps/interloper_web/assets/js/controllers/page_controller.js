@@ -50,28 +50,39 @@ export default class extends Controller {
             if (state) {
               window.history.pushState(state, state.title, state.path);
             }
-            else {
+            else if (state === null) {
               // Invalid inline replacement, actually navigate
               window.location.href = href;
             }
-          });
+          })
+          ;
         return false;
       }
     }
   }
 
   ensureState () {
-    if (!window.history.state) {
-      const path = window.location.pathname;
-      const title = document.title;
-      window.history.replaceState({ path: path, title: title }, title, path);
-    }
+    const path = window.location.pathname;
+    const title = document.title;
+    // Gotta look for *something*
+    const error = this.outputTarget.getAttribute("data-output-error") || "";
+    // TODO: Any reason to check if currently error but valid cached?
+    const html = error ? false : this.outputTarget.outerHTML;
+    const state = { path: path, title: title, html: html };
+    window.history.replaceState(state, title, path);
   }
 
   handleState (state) {
     document.title = state.title;
     console.log(`Restoring ${state.path}`);
-    this.loadPage(state.path);
+    this.loadPage(state.path, state.html)
+      .then(newState => {
+        // Update state if fetch now successful
+        if (newState.html && !state.html) {
+          window.history.replaceState(newState, newState.title, newState.path);
+        }
+      })
+    ;
   }
 
   showLoading (path) {
@@ -80,9 +91,9 @@ export default class extends Controller {
     if (loadingClass) {
       this.outputTarget.classList.add(loadingClass);
     }
-    // Set status text
-    let text = path ? `Loading ${path}` : `Loading...`;
-    this.statusTargets.forEach(el => el.textContent = text);
+    // Send path update event to path target(s)
+    const ev = new CustomEvent('loadPath', { detail: path });
+    this.pathTargets.forEach(el => el.dispatchEvent(ev));
   }
 
   parsePage (html) {
@@ -102,7 +113,28 @@ export default class extends Controller {
     };
   }
 
-  replacePage (path, output, title) {
+  errorPage (path, message) {
+    const errTemplate = document.getElementById('page-load-error');
+    // If (somehow) no error template configured, skip
+    if (!errTemplate) {
+      return null;
+    }
+    // Clone template, substitute data
+    const errNode = document.importNode(errTemplate.content, true);
+    const errTitle = `Error - ${path}`;
+    const pathText = errNode.getElementById('error-path');
+    const reasonText = errNode.getElementById('error-reason');
+    if (pathText) {
+      pathText.textContent = path;
+    }
+    if (reasonText) {
+      reasonText.textContent = message;
+    }
+    // Return arg for replacePage()
+    return { title: errTitle, output: errNode, error: message };
+  }
+
+  replacePage (path, output, title, error) {
     // Set new title, history state
     document.title = title;
     requestAnimationFrame(() => {
@@ -110,34 +142,43 @@ export default class extends Controller {
       const outputTarget = this.outputTarget;
       outputTarget.parentNode.replaceChild(output, outputTarget);
       // Clear status text
-      this.statusTargets.forEach(el => el.textContent = '');
+      // this.statusTargets.forEach(el => el.textContent = '');
     });
     // Send path update event to path target(s)
-    const ev = new Event('newPath', { detail: path });
+    const ev = new CustomEvent('newPath', { detail: path });
     this.pathTargets.forEach(el => el.dispatchEvent(ev));
     // Return new state
-    return { path: path, title: title };
+    return { path: path, title: title, html: error ? false : output.outerHTML };
   }
 
-  loadPage (path) {
+  loadPage (path, html) {
     const currentState = window.history.state;
     // Show loading placeholder
     this.showLoading(path);
-    // Fire off request
-    // Assume origin + path is sufficient
-    return fetch(window.location.origin + path)
-      .then(res => {
-        // Ensure state hasn't changed in the meantime
-        if (currentState !== window.history.state) {
-          console.log(`Old fetch for ${path}, ignoring`);
-          return null;
-        }
-        // TODO: ensure HTML?
-        return res.text();
-      })
+    let promise;
+    if (html) {
+      // Use cached HTML
+      promise = Promise.resolve(html);
+    }
+    else {
+      // Fire off request
+      // Assume origin + path is sufficient
+      promise = fetch(window.location.origin + path)
+        .then(res => {
+          // Ensure state hasn't changed in the meantime
+          if (currentState !== window.history.state) {
+            console.log(`Old fetch for ${path}, ignoring`);
+            return false;
+          }
+          // TODO: ensure HTML?
+          return res.text();
+        })
+      ;
+    }
+    return promise
       .then(text => this.parsePage(text))
-      .then(res => res ? this.replacePage(path, res.output, res.title) : null)
-      // TODO: catch, error display
+      .catch(err => this.errorPage(path, (err && err.message) || `Could not load ${path}`))
+      .then(res => res && this.replacePage(path, res.output, res.title, res.error))
     ;
   }
 }
