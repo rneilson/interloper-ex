@@ -3,12 +3,13 @@ import { Controller } from "../../vendor/stimulus.umd.js";
 
 export default class extends Controller {
   static get targets () {
-    return [ "path", "time" ];
+    return [ 'path', 'load', 'time' ];
   }
 
   initialize () {
     this.currentTime = null;
     this.clockTimer = null;
+    this.reqFrame = null;
   }
 
   connect () {
@@ -26,11 +27,31 @@ export default class extends Controller {
     }
   }
 
-  updatePath() {
+  loadingPath(ev = {}) {
     const pathTargets = this.pathTargets;
-    if (pathTargets.length > 0) {
-      requestAnimationFrame(() => {
-        pathTargets.forEach(el => el.textContent = window.location.pathname);
+    const loadTargets = this.loadTargets;
+    const loadPath = ev.detail ? `${ev.detail} loading...` : 'Loading...';
+    if (pathTargets.length > 0 || loadTargets.length > 0) {
+      this.reqFrame = requestAnimationFrame(() => {
+        this.reqFrame = null;
+        pathTargets.forEach(el => el.textContent = '');
+        loadTargets.forEach(el => el.textContent = loadPath);
+      });
+    }
+  }
+
+  updatePath(ev = {}) {
+    const pathTargets = this.pathTargets;
+    const loadTargets = this.loadTargets;
+    const newPath = ev.detail || window.location.pathname;
+    if (pathTargets.length > 0 || loadTargets.length > 0) {
+      if (this.reqFrame) {
+        cancelAnimationFrame(this.reqFrame);
+      }
+      this.reqFrame = requestAnimationFrame(() => {
+        this.reqFrame = null;
+        pathTargets.forEach(el => el.textContent = newPath);
+        loadTargets.forEach(el => el.textContent = '');
       });
     }
   }

@@ -80,9 +80,9 @@ export default class extends Controller {
     if (loadingClass) {
       this.outputTarget.classList.add(loadingClass);
     }
-    // Set status text
-    let text = path ? `Loading ${path}` : `Loading...`;
-    this.statusTargets.forEach(el => el.textContent = text);
+    // Send path update event to path target(s)
+    const ev = new CustomEvent('loadPath', { detail: path });
+    this.pathTargets.forEach(el => el.dispatchEvent(ev));
   }
 
   parsePage (html) {
@@ -110,10 +110,10 @@ export default class extends Controller {
       const outputTarget = this.outputTarget;
       outputTarget.parentNode.replaceChild(output, outputTarget);
       // Clear status text
-      this.statusTargets.forEach(el => el.textContent = '');
+      // this.statusTargets.forEach(el => el.textContent = '');
     });
     // Send path update event to path target(s)
-    const ev = new Event('newPath', { detail: path });
+    const ev = new CustomEvent('newPath', { detail: path });
     this.pathTargets.forEach(el => el.dispatchEvent(ev));
     // Return new state
     return { path: path, title: title };

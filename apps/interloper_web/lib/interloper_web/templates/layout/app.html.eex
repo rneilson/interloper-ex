@@ -32,8 +32,9 @@
         </div>
         <div id="console" class="overlay">
           <div id="status" class="status" data-controller="status"
-            data-target="page.path" data-action="newPath->status#updatePath">
+            data-target="page.path" data-action="newPath->status#updatePath loadPath->status#loadingPath">
             <span id="path" class="orange" data-target="status.path"></span>
+            <span id="load" class="yellow" data-target="status.load"></span>
             <span id="clock" class="orange floatright" data-target="status.time"></span>
           </div>
           <div id="output" class="popup" tabindex="0" data-controller="output"
