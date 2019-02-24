@@ -21,12 +21,7 @@
     </template>
   </head>
   <body class="js-disabled" data-controller="select" data-action="keydown->select#handleKey">
-    <script type="text/javascript">
-      var el = document.querySelector('body');
-      el.classList.remove('js-disabled');
-      el.classList.add('js-enabled');
-    </script>
-    <%# <script type="text/javascript" src="boot.js"></script> %>
+    <%= render("boot.html", assigns) %>
     <div id="container" class="container">
       <div id="main" data-controller="page" data-page-loading-class="loading"
         data-page-navigate-selector="a[href^=&quot;/&quot;]"

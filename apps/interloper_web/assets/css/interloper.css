@@ -126,21 +126,21 @@ div.popup {
     left: 0px;
     right: 0px;
     -webkit-transition-property: left, right, top, bottom, opacity;
-    -webkit-transition-duration: 500ms;
+    -webkit-transition-duration: 450ms;
     -moz-transition-property: left, right, top, bottom, opacity;
-    -moz-transition-duration: 500ms;
+    -moz-transition-duration: 450ms;
     -o-transition-property: left, right, top, bottom, opacity;
-    -o-transition-duration: 500ms;
+    -o-transition-duration: 450ms;
     transition-property: left, right, top, bottom, opacity;
-    transition-duration: 500ms;
+    transition-duration: 450ms;
     will-change: left, right, top, bottom, opacity;
 }
-div.popup.inactive-x {
+body.intro-sequence.inactive-x div.popup {
     left: 50%;
     right: 50%;
     overflow: hidden;
 }
-div.popup.inactive-y {
+body.intro-sequence.inactive-y div.popup {
     top: 50%;
     bottom: 50%;
     overflow: hidden;
@@ -387,6 +387,12 @@ sup {
 #command {
     bottom: 0px;
     white-space: nowrap;
+}
+body.intro-sequence #output > * {
+    display: none;
+}
+body.intro-sequence #status, body.intro-sequence #command {
+    opacity: 0;
 }
 .visible {
     opacity: 1;

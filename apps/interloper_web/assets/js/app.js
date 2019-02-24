@@ -35,3 +35,14 @@ application.register("github-commit", GithubCommitController);
 
 // Test hello
 console.log("Uh, hi?");
+
+// Intro
+if (document.body.classList.contains('intro-sequence')) {
+  let timeoutMs = 250;
+  for (let cls of ['inactive-x', 'inactive-y', 'intro-sequence']) {
+    setTimeout(() => {
+      document.querySelectorAll('.' + cls).forEach(el => el.classList.remove(cls));
+    }, timeoutMs);
+    timeoutMs += 500;
+  }
+}
