@@ -52,9 +52,10 @@ config :interloper_web, InterloperWeb.Endpoint,
 #
 # Check `Plug.SSL` for all available options in `force_ssl`.
 
+tls_crt = System.get_env("SITE_TLS_CRT")
 cond do
   # No HSTS for now until we're stable
-  System.get_env("SITE_TLS_CRT") ->
+  byte_size(tls_crt) > 0 ->
     # HTTPS, assume redirect
     config :interloper_web, InterloperWeb.Endpoint,
       force_ssl: [
