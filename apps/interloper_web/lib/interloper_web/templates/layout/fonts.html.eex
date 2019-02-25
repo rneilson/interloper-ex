@@ -1,0 +1,44 @@
+<%# <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Droid+Sans+Mono" /> %>
+<%# <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto+Mono:400,700" /> %>
+<%# <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Source+Code+Pro:400,700" /> %>
+<style type="text/css">
+    /**
+     * @license
+     * MyFonts Webfont Build ID 3284492, 2016-09-16T15:21:14-0400
+     * 
+     * The fonts listed in this notice are subject to the End User License
+     * Agreement(s) entered into by the website owner. All other parties are 
+     * explicitly restricted from using the Licensed Webfonts(s).
+     * 
+     * You may obtain a valid license at the URLs below.
+     * 
+     * Webfont: Native-Italic by Fort Foundry
+     * URL: http://www.myfonts.com/fonts/fort-foundry/native/italic/
+     * 
+     * Webfont: Native-LightItalic by Fort Foundry
+     * URL: http://www.myfonts.com/fonts/fort-foundry/native/light-italic/
+     * 
+     * Webfont: Native-Bold by Fort Foundry
+     * URL: http://www.myfonts.com/fonts/fort-foundry/native/bold/
+     * 
+     * Webfont: Native-Regular by Fort Foundry
+     * URL: http://www.myfonts.com/fonts/fort-foundry/native/regular/
+     * 
+     * Webfont: Native-Light by Fort Foundry
+     * URL: http://www.myfonts.com/fonts/fort-foundry/native/light/
+     * 
+     * Webfont: Native-BoldItalic by Fort Foundry
+     * URL: http://www.myfonts.com/fonts/fort-foundry/native/bold-italic/
+     * 
+     * 
+     * License: http://www.myfonts.com/viewlicense?type=web&buildid=3284492
+     * Licensed pageviews: 10,000
+     * Webfonts copyright: Copyright &#x00A9; 2016 by Mattox Shuler. All rights reserved.
+     * 
+     * © 2016 MyFonts Inc
+    */
+    @font-face {font-family: 'Native';font-weight: normal;font-style: normal;src: url('<%= Routes.static_path(@conn, "/fonts/321E40_3_0.eot") %>');src: url('<%= Routes.static_path(@conn, "/fonts/321E40_3_0.eot") %>') format('embedded-opentype'),url('<%= Routes.static_path(@conn, "/fonts/321E40_3_0.woff2") %>') format('woff2'),url('<%= Routes.static_path(@conn, "/fonts/321E40_3_0.woff") %>') format('woff'),url('<%= Routes.static_path(@conn, "/fonts/321E40_3_0.ttf") %>') format('truetype');}
+    @font-face {font-family: 'Native';font-weight: normal;font-style: italic;src: url('<%= Routes.static_path(@conn, "/fonts/321E40_0_0.eot") %>');src: url('<%= Routes.static_path(@conn, "/fonts/321E40_0_0.eot") %>') format('embedded-opentype'),url('<%= Routes.static_path(@conn, "/fonts/321E40_0_0.woff2") %>') format('woff2'),url('<%= Routes.static_path(@conn, "/fonts/321E40_0_0.woff") %>') format('woff'),url('<%= Routes.static_path(@conn, "/fonts/321E40_0_0.ttf") %>') format('truetype');}
+    @font-face {font-family: 'Native';font-weight: bold;font-style: normal;src: url('<%= Routes.static_path(@conn, "/fonts/321E40_2_0.eot") %>');src: url('<%= Routes.static_path(@conn, "/fonts/321E40_2_0.eot") %>') format('embedded-opentype'),url('<%= Routes.static_path(@conn, "/fonts/321E40_2_0.woff2") %>') format('woff2'),url('<%= Routes.static_path(@conn, "/fonts/321E40_2_0.woff") %>') format('woff'),url('<%= Routes.static_path(@conn, "/fonts/321E40_2_0.ttf") %>') format('truetype');}
+    @font-face {font-family: 'Native';font-weight: bold;font-style: italic;src: url('<%= Routes.static_path(@conn, "/fonts/321E40_5_0.eot") %>');src: url('<%= Routes.static_path(@conn, "/fonts/321E40_5_0.eot") %>') format('embedded-opentype'),url('<%= Routes.static_path(@conn, "/fonts/321E40_5_0.woff2") %>') format('woff2'),url('<%= Routes.static_path(@conn, "/fonts/321E40_5_0.woff") %>') format('woff'),url('<%= Routes.static_path(@conn, "/fonts/321E40_5_0.ttf") %>') format('truetype');}    
+</style>
