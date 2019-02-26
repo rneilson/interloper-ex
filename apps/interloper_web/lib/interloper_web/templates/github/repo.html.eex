@@ -1,13 +1,13 @@
 <div class="textbox">
     <%= if @repo["fork"] do %>
     <a class="purple selector" href="<%= @repo["html_url"] %>" target="_blank">
-        <%= @repo["name"] %> <span>(fork)</span></a>
+        <%= @repo["name"] %> <span class="italic">(fork)</span></a>
     <% else %>
     <a class="blue selector" href="<%= @repo["html_url"] %>" target="_blank">
         <%= @repo["name"] %></a>
     <% end %>
     <%= if @repo["language"] do %>
-    <span>(<%= @repo["language"] %>)</span>
+    <span class="italic">(<%= @repo["language"] %>)</span>
     <% end %>
 </div>
 <div class="textbox indent">
@@ -37,7 +37,7 @@
             <span class="green" data-target="github-commit.time"></span>
         </span>
     <% true -> %>
-        <span class="small italic">No commit details available</span>
+        <span class="small">No commit details available</span>
     <% end %>
 </div>
 <div class="textbox"><br></div>
