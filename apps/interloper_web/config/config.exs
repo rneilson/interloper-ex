@@ -25,8 +25,8 @@ config :interloper_web, InterloperWeb.GithubClient,
 
 # Twitter defaults
 config :interloper_web, InterloperWeb.TwitterController,
-  base_url: ["https://www.interloper.ca/twitter"],
-  recent_path: "recent.json"
+  base_url: ["https://www.interloper.ca"],
+  recent_path: "/api/twitter/recent"
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
