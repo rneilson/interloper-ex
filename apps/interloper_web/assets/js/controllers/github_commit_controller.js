@@ -85,5 +85,9 @@ export default class extends Controller {
     if (errTarget) {
       errTarget.textContent = err.message || `${err}`;
     }
+    const textTarget = this.textTarget;
+    if (textTarget) {
+      textTarget.textContent = '';
+    }
   }
 }
