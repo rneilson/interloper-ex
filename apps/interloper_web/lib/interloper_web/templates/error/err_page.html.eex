@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width">
+    <title><%= @status_code %> - <%= @conn.request_path %></title>
+    <%= SharedView.render("fonts.html", assigns) %>
+    <link rel="stylesheet" type="text/css" href="<%= Routes.static_path(@conn, "/css/app.css") %>"/>
+    <link rel="icon" href="<%= Routes.static_path(@conn, "/favicon.ico") %>" />
+  </head>
+  <body class="js-disabled">
+    <div id="container" class="container">
+      <div id="main">
+        <div id="banner" class="bannerbox dimmer dimmed"
+          style="background: url(<%= Routes.static_path(@conn, "/images/rodeo.png") %>) center center no-repeat">
+        </div>
+        <div id="console" class="overlay">
+          <div id="status" class="status">
+            <span id="path" class="orange"><%= @conn.request_path %></span>
+            <span id="load" class="yellow"></span>
+            <span id="clock" class="orange floatright"></span>
+          </div>
+          <div id="output" class="popup" tabindex="0" data-target="page.output"
+            data-output-error="<%= Plug.Conn.Status.reason_phrase(@status_code) %>">
+            <%=
+              SharedView.render(
+                "loading_error.html",
+                reason: Plug.Conn.Status.reason_phrase(@status_code),
+                loading: @conn.request_path
+              )
+            %>
+          </div>
+          <div id="command" class="status">
+            <span id="preview" class="yellow"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
