@@ -1,13 +1,13 @@
 <div class="textbox">
     <%= if @repo["fork"] do %>
     <a class="purple selector" href="<%= @repo["html_url"] %>" target="_blank">
-        <%= @repo["name"] %><span class="italic"> (fork)</span></a>
+        <%= @repo["name"] %> <span>(fork)</span></a>
     <% else %>
     <a class="blue selector" href="<%= @repo["html_url"] %>" target="_blank">
         <%= @repo["name"] %></a>
     <% end %>
     <%= if @repo["language"] do %>
-    <span class="italic">(<%= @repo["language"] %>)</span>
+    <span>(<%= @repo["language"] %>)</span>
     <% end %>
 </div>
 <div class="textbox indent">
