@@ -6,3 +6,8 @@
 <div class="textbox">
     <pre class="err" id="error-reason"><%= ensure_string(@reason, pretty: true) %></pre>
 </div>
+<div class="textbox"><br></div>
+<div class="textbox">
+    <a class="green selector html-only" href="/">[Main]</a>
+    <a class="yellow selector js-only" href="javascript:history.back()">[Back]</a>
+</div>

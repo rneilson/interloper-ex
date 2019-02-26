@@ -22,7 +22,7 @@ body {
     /*line-height: 1.2;*/
     margin: 0px;
 }
-body.js-disabled .js-only {
+body.js-disabled .js-only, body.js-enabled .html-only {
     display: none !important;
     opacity: 0 !important;
 }

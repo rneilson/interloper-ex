@@ -11,7 +11,7 @@
   <body class="js-disabled">
     <div id="container" class="container">
       <div id="main">
-        <div id="banner" class="bannerbox dimmer dimmed"
+        <div id="banner" class="bannerbox dimmed"
           style="background: url(<%= Routes.static_path(@conn, "/images/rodeo.png") %>) center center no-repeat">
         </div>
         <div id="console" class="overlay">
