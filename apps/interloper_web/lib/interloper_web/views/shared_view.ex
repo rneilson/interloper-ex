@@ -78,5 +78,10 @@ defmodule InterloperWeb.SharedView do
 
   defp convert_datetime(%DateTime{} = dt), do: dt
 
+  defp convert_datetime(true) do
+    {:ok, dt} = DateTime.now("Etc/UTC")
+    dt
+  end
+
   defp convert_datetime(_), do: nil
 end
