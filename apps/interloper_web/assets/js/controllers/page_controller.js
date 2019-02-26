@@ -11,12 +11,12 @@ export default class extends Controller {
   }
 
   connect () {
-    this.ensureState();
     // Handle popstate (ie back)
     if (!this.stateHandler) {
       this.stateHandler = e => this.handleState(e.state);
       window.addEventListener('popstate', this.stateHandler);
     }
+    this.ensureState();
   }
 
   disconnect () {
@@ -61,16 +61,17 @@ export default class extends Controller {
   }
 
   ensureState () {
-    const path = window.location.pathname;
+    const state = window.history.state;
     const title = document.title;
+    const path = window.location.pathname;
     // Gotta look for *something* (can't check status code on first page load)
     const error = this.outputTarget.getAttribute('data-output-error') || '';
     const html = error ? false : this.outputTarget.outerHTML;
-    // Set state if empty, reset if previously an error and now...not (somehow)
-    if (!window.history.state || (!error && window.history.state.html != html)) {
-      const state = { path: path, title: title, html: html };
-      console.log(`${window.history.state ? 'Resetting' : 'Setting'} state for ${path}`);
-      window.history.replaceState(state, title, path);
+    if (!state || (!error && state.html != html)) {
+      // Set state if empty, reset if refreshed
+      const newState = { path: path, title: title, html: html };
+      console.log(`${state ? 'Resetting' : 'Setting'} state for ${path}`);
+      window.history.replaceState(newState, title, path);
     }
   }
 
