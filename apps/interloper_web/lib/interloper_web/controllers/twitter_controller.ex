@@ -19,7 +19,9 @@ defmodule InterloperWeb.TwitterController do
       {:ok, recent} ->
         render(conn, :recent, recent: recent)
       {:error, reason} ->
-        SharedController.loading_error(conn, %{reason: reason, loading: "recent tweets"})
+        conn
+        |> put_status(503)
+        |> SharedController.loading_error(%{reason: reason, loading: "recent tweets"})
     end
   end
 end
