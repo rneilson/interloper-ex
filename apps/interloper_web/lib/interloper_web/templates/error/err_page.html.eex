@@ -20,10 +20,10 @@
             <span id="load" class="yellow"></span>
             <span id="clock" class="orange floatright"></span>
           </div>
-          <div id="output" class="popup" tabindex="0"
-            data-target="page.output" data-output-error="<%= @status_text %>">
+          <div id="output" class="popup" tabindex="0" data-output-error="<%= @status_text %>">
             <%=
-              SharedView.render("loading_error.html", reason: @status_text, loading: @conn.request_path)
+              SharedView.render(
+                "loading_error.html", reason: @status_text, loading: @conn.request_path)
             %>
           </div>
           <div id="command" class="status">

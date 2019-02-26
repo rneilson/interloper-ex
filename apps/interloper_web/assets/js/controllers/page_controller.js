@@ -11,11 +11,13 @@ export default class extends Controller {
   }
 
   connect () {
+    this.outputId = this.outputTarget.id;
     // Handle popstate (ie back)
     if (!this.stateHandler) {
       this.stateHandler = e => this.handleState(e.state);
       window.addEventListener('popstate', this.stateHandler);
     }
+    // Init or refresh state
     this.ensureState();
   }
 
@@ -24,6 +26,10 @@ export default class extends Controller {
       window.removeEventListener('popstate', this.stateHandler);
       this.stateHandler = null;
     }
+  }
+
+  getOutput () {
+    return this.element.querySelector('#' + this.outputId);
   }
 
   navigate (e) {
@@ -65,8 +71,8 @@ export default class extends Controller {
     const title = document.title;
     const path = window.location.pathname;
     // Gotta look for *something* (can't check status code on first page load)
-    const error = this.outputTarget.getAttribute('data-output-error') || '';
-    const html = error ? false : this.outputTarget.outerHTML;
+    const error = this.getOutput().getAttribute('data-output-error') || '';
+    const html = error ? false : this.getOutput().outerHTML;
     if (!state || (!error && state.html != html)) {
       // Set state if empty, reset if refreshed
       const newState = { path: path, title: title, html: html };
@@ -93,7 +99,7 @@ export default class extends Controller {
     // Add class to output
     const loadingClass = this.data.get('loadingClass');
     if (loadingClass) {
-      this.outputTarget.classList.add(loadingClass);
+      this.getOutput().classList.add(loadingClass);
     }
     // Send path update event to path target(s)
     const ev = new CustomEvent('loadPath', { detail: path });
@@ -106,7 +112,7 @@ export default class extends Controller {
     const title = tree.querySelector('head title');
     // For now, we'll assume it needs to be exactly compatible
     // TODO: parameterize id to look for?
-    const output = tree.getElementById(this.outputTarget.id);
+    const output = tree.getElementById(this.outputId);
     if (!output) {
       return null;
     }
@@ -144,7 +150,7 @@ export default class extends Controller {
     document.title = title;
     requestAnimationFrame(() => {
       // Set new output element
-      const outputTarget = this.outputTarget;
+      const outputTarget = this.getOutput();
       outputTarget.parentNode.replaceChild(output, outputTarget);
       // Clear status text
       // this.statusTargets.forEach(el => el.textContent = '');
