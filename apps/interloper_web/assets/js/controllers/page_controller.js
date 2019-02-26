@@ -112,6 +112,7 @@ export default class extends Controller {
     return {
       title: title ? title.textContent : '',
       output: output.cloneNode(true),
+      error: false,
     };
   }
 
@@ -157,29 +158,29 @@ export default class extends Controller {
     const currentState = window.history.state;
     // Show loading placeholder
     this.showLoading(path);
-    let promise;
-    if (html) {
-      // Use cached HTML
-      promise = Promise.resolve(html);
-    }
-    else {
-      // Fire off request
-      // Assume origin + path is sufficient
-      promise = fetch(window.location.origin + path)
-        .then(res => {
-          // Ensure state hasn't changed in the meantime
-          if (currentState !== window.history.state) {
-            console.log(`Old fetch for ${path}, ignoring`);
-            return false;
-          }
-          // TODO: ensure HTML?
-          return res.text();
-        })
-      ;
-    }
-    return promise
-      .then(text => this.parsePage(text))
-      .catch(err => this.errorPage(path, (err && err.message) || `Could not load ${path}`))
+    // Fire off request
+    // Assume origin + path is sufficient
+    return fetch(window.location.origin + path)
+      .then(res => {
+        // Ensure state hasn't changed in the meantime
+        if (currentState !== window.history.state) {
+          console.log(`Old fetch for ${path}, ignoring`);
+          return false;
+        }
+        // TODO: ensure HTML?
+        return res.text().then(text => this.parsePage(text));
+      })
+      .catch(err => {
+        const msg = (err && err.message) || `Could not load ${path}`;
+        console.error(`Error loading ${path}: {msg}`);
+        // If fetch errors out, use cached (state) html if available
+        if (html) {
+          console.log('Using cached HTML from state');
+          return this.parsePage(html);
+        }
+        // Otherwise generate error page
+        return this.errorPage(path, msg);
+      })
       .then(res => res && this.replacePage(path, res.output, res.title, res.error))
     ;
   }
