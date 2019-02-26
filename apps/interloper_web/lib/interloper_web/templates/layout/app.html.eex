@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width">
     <title>Interloper - <%= @conn.request_path %></title>
-    <%= render("fonts.html", assigns) %>
+    <%= SharedView.render("fonts.html", assigns) %>
     <link rel="stylesheet" type="text/css" href="<%= Routes.static_path(@conn, "/css/app.css") %>"/>
     <link rel="shortcut icon" href="<%= Routes.static_path(@conn, "/favicon.ico") %>" />
     <link rel="icon" href="<%= Routes.static_path(@conn, "/favicon.ico") %>" />
