@@ -64,7 +64,7 @@ export default class extends Controller {
     const path = window.location.pathname;
     const title = document.title;
     // Gotta look for *something* (can't check status code on first page load)
-    const error = this.outputTarget.getAttribute("data-output-error") || "";
+    const error = this.outputTarget.getAttribute('data-output-error') || '';
     const html = error ? false : this.outputTarget.outerHTML;
     // Set state if empty, reset if previously an error and now...not (somehow)
     if (!window.history.state || (!error && window.history.state.html != html)) {
@@ -81,6 +81,7 @@ export default class extends Controller {
       .then(newState => {
         // Update state if fetch now successful
         if (newState.html && newState.html != state.html) {
+          console.log(`Updated ${state.path}`);
           window.history.replaceState(newState, newState.title, newState.path);
         }
       })
@@ -98,7 +99,7 @@ export default class extends Controller {
     this.pathTargets.forEach(el => el.dispatchEvent(ev));
   }
 
-  parsePage (html) {
+  parsePage (html, error) {
     const parser = new DOMParser();
     const tree = parser.parseFromString(html, 'text/html');
     const title = tree.querySelector('head title');
@@ -112,7 +113,7 @@ export default class extends Controller {
     return {
       title: title ? title.textContent : '',
       output: output.cloneNode(true),
-      error: false,
+      error: error || output.getAttribute('data-output-error') || '',
     };
   }
 
@@ -168,11 +169,12 @@ export default class extends Controller {
           return false;
         }
         // TODO: ensure HTML?
-        return res.text().then(text => this.parsePage(text));
+        const error = res.ok ? '' : res.statusText;
+        return res.text().then(text => this.parsePage(text, error));
       })
       .catch(err => {
         const msg = (err && err.message) || `Could not load ${path}`;
-        console.error(`Error loading ${path}: {msg}`);
+        console.error(`Error loading ${path}: ${msg}`);
         // If fetch errors out, use cached (state) html if available
         if (html) {
           console.log('Using cached HTML from state');
