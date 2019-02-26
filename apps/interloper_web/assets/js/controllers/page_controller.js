@@ -17,7 +17,6 @@ export default class extends Controller {
       this.stateHandler = e => this.handleState(e.state);
       window.addEventListener('popstate', this.stateHandler);
     }
-    // TODO: compare current state, load page as req'd
   }
 
   disconnect () {
@@ -64,12 +63,15 @@ export default class extends Controller {
   ensureState () {
     const path = window.location.pathname;
     const title = document.title;
-    // Gotta look for *something*
+    // Gotta look for *something* (can't check status code on first page load)
     const error = this.outputTarget.getAttribute("data-output-error") || "";
-    // TODO: Any reason to check if currently error but valid cached?
     const html = error ? false : this.outputTarget.outerHTML;
-    const state = { path: path, title: title, html: html };
-    window.history.replaceState(state, title, path);
+    // Set state if empty, reset if previously an error and now...not (somehow)
+    if (!window.history.state || (!error && window.history.state.html != html)) {
+      const state = { path: path, title: title, html: html };
+      console.log(`${window.history.state ? 'Resetting' : 'Setting'} state for ${path}`);
+      window.history.replaceState(state, title, path);
+    }
   }
 
   handleState (state) {
@@ -78,7 +80,7 @@ export default class extends Controller {
     this.loadPage(state.path, state.html)
       .then(newState => {
         // Update state if fetch now successful
-        if (newState.html && !state.html) {
+        if (newState.html && newState.html != state.html) {
           window.history.replaceState(newState, newState.title, newState.path);
         }
       })
