@@ -104,8 +104,7 @@ defmodule InterloperWeb.CachingClient do
       |> add_header("Authorization", opts[:auth])
       |> add_header("If-None-Match", opts[:etag])
     # Options
-    # TODO: SSL options, possibly?
-    options = [follow_redirect: true]
+    options = [ follow_redirect: true, ssl: [{:versions, [:'tlsv1.2']}] ]
     # TEMP: remove this later?
     Logger.debug("Request url: #{url}")
     Logger.debug("Request headers: #{inspect(headers)}")
