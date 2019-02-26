@@ -19,9 +19,10 @@ defmodule InterloperWeb.TwitterController do
       {:ok, recent} ->
         render(conn, :recent, recent: recent)
       {:error, reason} ->
+        msg = if InterloperWeb.Endpoint.config(:debug_errors), do: reason, else: "Service unavailable"
         conn
         |> put_status(503)
-        |> SharedController.loading_error(%{reason: reason, loading: "recent tweets"})
+        |> SharedController.loading_error(%{reason: msg, loading: "recent tweets"})
     end
   end
 end

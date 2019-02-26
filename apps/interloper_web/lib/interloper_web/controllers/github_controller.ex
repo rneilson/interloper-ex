@@ -12,9 +12,10 @@ defmodule InterloperWeb.GithubController do
         render(conn, "repo_list.html", repo_list: repo_list)
       {:error, reason} ->
         loading = "Github repo list for #{username}"
+        msg = if InterloperWeb.Endpoint.config(:debug_errors), do: reason, else: "Service unavailable"
         conn
         |> put_status(503)
-        |> SharedController.loading_error(%{reason: reason, loading: loading})
+        |> SharedController.loading_error(%{reason: msg, loading: loading})
     end
   end
 
