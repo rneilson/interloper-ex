@@ -9,7 +9,6 @@ html {
 }
 body {
     height: 100vh;
-    /*background-color: #2D2D2D;*/
     background-color: black;
     color: #d2cfcd;
     font-family: "Native", "Lucida Console", "Liberation Mono", Monaco, monospace;
@@ -19,7 +18,8 @@ body {
     font-variant: normal;
     font-weight: normal;
     font-size: 15px;
-    line-height: 1.2;
+    line-height: 19px;
+    /*line-height: 1.2;*/
     margin: 0px;
 }
 body.js-disabled .js-only {
@@ -29,12 +29,6 @@ body.js-disabled .js-only {
 a {
     color: #298be6;
     text-decoration: none;
-    /*
-    -webkit-transition: 100ms linear 0s;
-    -moz-transition: 100ms linear 0s;
-    -o-transition: 100ms linear 0s;
-    transition: 100ms linear 0s;
-    */
 }
 a:focus {
     outline: none;
@@ -73,8 +67,8 @@ div.overlay {
     padding: 0px;
     z-index: 1;
     position: absolute;
-    top: -1px;
-    bottom: -1px;
+    top: 0px;
+    bottom: 0px;
     left: 0px;
     right: 0px;
 }
@@ -83,13 +77,13 @@ div.popup {
     left: 0px;
     right: 0px;
     -webkit-transition-property: left, right, top, bottom, opacity;
-    -webkit-transition-duration: 450ms;
+    -webkit-transition-duration: 400ms;
     -moz-transition-property: left, right, top, bottom, opacity;
-    -moz-transition-duration: 450ms;
+    -moz-transition-duration: 400ms;
     -o-transition-property: left, right, top, bottom, opacity;
-    -o-transition-duration: 450ms;
+    -o-transition-duration: 400ms;
     transition-property: left, right, top, bottom, opacity;
-    transition-duration: 450ms;
+    transition-duration: 400ms;
     will-change: left, right, top, bottom, opacity;
 }
 body.intro-sequence.inactive-x div.popup {
@@ -216,7 +210,7 @@ div.tweettext {
     padding: 0px;
 }
 div.tweetquote {
-    margin-top: 18px;
+    margin-top: 19px;
     padding: 2px 4px 0px;
     border-width: 1px;
     border-color: #57626d;
@@ -243,23 +237,26 @@ div.tweetspacer {
 }
 @media all and (min-width: 728px) {
     .popup {
-        top: 18px;
-        bottom: 18px;
+        top: 19px;
+        bottom: 19px;
     }
     .small {
         font-size: 12px;
+        line-height: 17px;
     }
 }
 @media all and (max-width: 727px) and (min-width: 549px) {
     body {
         font-size: 2.06044vw;
+        line-height: 2.60989vw;
     }
     .popup {
-        top: 2.47253vw;
-        bottom: 2.47253vw;
+        top: 2.60989vw;
+        bottom: 2.60989vw;
     }
     .small {
         font-size: 1.64835vw;
+        line-height: 2.33516vw;
     }
     .indent {
         margin-left: 2.06044vw;
@@ -268,6 +265,7 @@ div.tweetspacer {
 @media all and (max-width: 548px) {
     body {
         font-size: 11px;
+        line-height: 14px;
     }
     .popup {
         top: 14px;
@@ -275,6 +273,7 @@ div.tweetspacer {
     }
     .small {
         font-size: 9px;
+        line-height: 12px;
     }
     .indent {
         margin-left: 11px;
@@ -368,10 +367,10 @@ body.intro-sequence #status, body.intro-sequence #command {
     opacity: 0 !important;
 }
 .dimmer {
-    -webkit-transition: opacity 500ms;
-    -moz-transition: opacity 500ms;
-    -o-transition: opacity 500ms;
-    transition: opacity 500ms;
+    -webkit-transition: opacity 400ms;
+    -moz-transition: opacity 400ms;
+    -o-transition: opacity 400ms;
+    transition: opacity 400ms;
     will-change: opacity;
 }
 .big {
@@ -388,7 +387,7 @@ body.intro-sequence #status, body.intro-sequence #command {
     font-style: italic;
 }
 .indent {
-    margin-left: 14px;
+    margin-left: 15px;
 }
 .bright {
     color: black !important;
