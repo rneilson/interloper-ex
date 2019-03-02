@@ -6,6 +6,8 @@ export REPLACE_OS_VARS=true
 export NODENAME="${NODENAME:-interloper_ex}"
 export HOSTNAME="${HOSTNAME:-$(hostname -f)}"
 
+export PROTO_DIST="${PROTO_DIST:-inet_tcp}"
+
 export COOKIE
 
 if [[ -z "$COOKIE" ]]; then
