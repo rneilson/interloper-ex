@@ -2,7 +2,9 @@
 use Mix.Config
 
 # Phoenix config
-config :phoenix, :serve_endpoints, true
+if System.get_env("SERVE_ENDPOINTS") != "false" do
+  config :phoenix, :serve_endpoints, true
+end
 
 # Github config
 if github_user = System.get_env("GITHUB_USER") do
