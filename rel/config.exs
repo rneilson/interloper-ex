@@ -62,7 +62,7 @@ end
 # will be used by default
 
 release :interloper_ex do
-  set version: current_version(:interloper)
+  set version: current_version(:interloper_web)
   set applications: [
     :runtime_tools,
     interloper: :permanent,

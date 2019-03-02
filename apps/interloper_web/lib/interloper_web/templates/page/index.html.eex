@@ -2,8 +2,8 @@
 <div class="textbox">
   <span class="green" id="motd">
     Welcome to InterloperOS!<br>
-    Version: <span class="orange"><%= get_version() %> (alpha)</span><br>
-    Mode: <span class="orange">Elixir</span><span class="orange js-only"> + Stimulus</span>
+    Version: <span class="orange"><%= get_version() %></span><br>
+    Mode: <span class="orange">Elixir</span><span class="orange js-only">/Stimulus</span>
   </span>
 </div>
 <div class="textbox"><br></div>
