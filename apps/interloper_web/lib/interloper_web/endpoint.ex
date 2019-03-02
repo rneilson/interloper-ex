@@ -82,13 +82,14 @@ defmodule InterloperWeb.Endpoint do
           # Set HTTP and HTTPS listeners, force redirect
           [
             url: [host: site_host, port: site_port || port_https, scheme: "https"],
-            http: [:inet6, port: port],
+            http: [:inet6, port: port, compress: true],
             https: [
               :inet6,
               port: port_https,
               cipher_suite: :strong,
               certfile: tls_crt,
               keyfile: tls_key,
+              compress: true,
             ],
           ]
         site_scheme == "https" ->
@@ -96,14 +97,14 @@ defmodule InterloperWeb.Endpoint do
           # Set HTTP, force scheme
           [
             url: [host: site_host, port: site_port || port, scheme: "https"],
-            http: [:inet6, port: port],
+            http: [:inet6, port: port, compress: true],
             https: false,
           ]
         true ->
           # HTTP-only, direct (probably local)
           [
             url: [host: site_host, port: port],
-            http: [:inet6, port: port],
+            http: [:inet6, port: port, compress: true],
             https: false,
           ]
       end
