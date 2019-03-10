@@ -29,4 +29,8 @@
 # On OTP21+, this is not needed anymore.
 -smp auto
 
+# Specify min/max node distribution ports
 -kernel inet_dist_listen_min <%= dist_port_min %> inet_dist_listen_max <%= dist_port_max %>
+
+# Specify distribution protocol
+-proto_dist ${PROTO_DIST}

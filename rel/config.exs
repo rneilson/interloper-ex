@@ -42,14 +42,6 @@ environment :prod do
   set include_erts: true
   set include_src: false
   set cookie: :"[[u*P`M{z.Rbi*Krd0Kq~<<ojIy~ZQ]m~N=R8[B{nn~/Fd=cwZMMwtC(~$YRp5WJ"
-  set vm_args: "rel/vm.args"
-  set pre_configure_hooks: "rel/hooks/pre_configure.d"
-  set config_providers: [
-    {Mix.Releases.Config.Providers.Elixir, ["${RELEASE_ROOT_DIR}/etc/config.exs"]}
-  ]
-  set overlays: [
-    {:copy, "rel/config/config.exs", "etc/config.exs"}
-  ]
   set overlay_vars: [
     dist_port_min: System.get_env("DIST_PORT_MIN") || 40000,
     dist_port_max: System.get_env("DIST_PORT_MAX") || 40040,
@@ -67,6 +59,14 @@ release :interloper_ex do
     :runtime_tools,
     interloper: :permanent,
     interloper_web: :permanent
+  ]
+  set vm_args: "rel/vm.args"
+  set pre_configure_hooks: "rel/hooks/pre_configure.d"
+  set config_providers: [
+    {Mix.Releases.Config.Providers.Elixir, ["${RELEASE_ROOT_DIR}/etc/config.exs"]}
+  ]
+  set overlays: [
+    {:copy, "rel/config/config.exs", "etc/config.exs"}
   ]
 end
 
