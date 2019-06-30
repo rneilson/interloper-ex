@@ -389,6 +389,9 @@ body.intro-sequence #status, body.intro-sequence #command {
 .indent {
     margin-left: 15px;
 }
+.indent-lg {
+    margin-left: 30px;
+}
 .bright {
     color: black !important;
     background-color: #D4D2CF !important;

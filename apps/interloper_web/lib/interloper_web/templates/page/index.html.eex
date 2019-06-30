@@ -20,17 +20,11 @@
 <div class="textbox">
   User: <span class="yellow">Raymond Neilson</span>
 </div>
-<div class="textbox"><br></div>
 <div class="textbox">
-  <span class="bold underline">Software</span>
-</div>
-<div class="textbox"><br></div>
-<div class="textbox">
-  <a class="blue selector" href="<%= Routes.github_path(@conn, :repo_list) %>">Github repositories</a>
-</div>
-<div class="textbox"><br></div>
-<div class="textbox">
-  <a class="blue selector" href="<%= Routes.page_path(@conn, :games) %>">Game projects</a>
+  Pubkey:
+  <a class="blue selector" href="<%= Routes.static_path(@conn, "/pubkey.asc") %>" target="_blank">
+    A838 D61B D3E0 539A 021A DA43 038E 477B 290B 5662
+  </a>
 </div>
 <div class="textbox"><br></div>
 <div class="textbox">
@@ -38,9 +32,33 @@
 </div>
 <div class="textbox"><br></div>
 <div class="textbox">
-  <a class="blue selector" href="<%= Routes.twitter_path(@conn, :recent) %>">Twitter</a>
+  &gt;&nbsp;<a class="blue selector" href="mailto:rneilson@interloper.ca" target="_blank">Email</a>
 </div>
 <div class="textbox"><br></div>
 <div class="textbox">
-  <a class="blue selector" href="mailto:rneilson@interloper.ca" target="_blank" data-link-id="email">Email</a>
+  &gt;&nbsp;<a class="blue selector" href="https://twitter.com/delta_vee" rel="nofollow me" target="_blank">Twitter</a>
+</div>
+<div class="textbox"><br></div>
+<div class="textbox">
+  &gt;&nbsp;<a class="blue selector" href="https://github.com/rneilson" rel="nofollow me" target="_blank">Github</a>
+</div>
+<div class="textbox"><br></div>
+<div class="textbox">
+  <span class="bold underline">Stuff</span>
+</div>
+<div class="textbox"><br></div>
+<div class="textbox">
+  &gt;&nbsp;<a class="blue selector" href="<%= Routes.twitter_path(@conn, :recent) %>">Recent tweets</a>
+</div>
+<div class="textbox"><br></div>
+<div class="textbox">
+  &gt;&nbsp;<a class="blue selector" href="<%= Routes.github_path(@conn, :repo_list) %>">Code repositories</a>
+</div>
+<div class="textbox"><br></div>
+<div class="textbox">
+  &gt;&nbsp;<a class="blue selector" href="<%= Routes.page_path(@conn, :games) %>">Game projects</a>
+</div>
+<div class="textbox"><br></div>
+<div class="textbox">
+  <span class="italic">More, eventually...</a>
 </div>
