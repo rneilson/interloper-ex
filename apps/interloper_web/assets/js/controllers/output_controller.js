@@ -1,6 +1,6 @@
 // import { Controller } from "stimulus"
 import { Controller } from "../../vendor/stimulus.umd.js";
-import { dateFormat } from "../utils/datetime";
+import { insertDatetime } from "../utils/datetime";
 
 export default class extends Controller {
   static get targets () {
@@ -25,15 +25,9 @@ export default class extends Controller {
   disconnect () {
   }
 
-  replaceDatetime (el) {
-    let dt = new Date(el.getAttribute("data-datetime"));
-    // TODO: fancier formatting
-    el.textContent = dateFormat(dt);
-  }
-
   replaceDatetimes () {
     this.element
       .querySelectorAll("[data-datetime]")
-      .forEach(el => this.replaceDatetime(el));
+      .forEach(el => insertDatetime(el, el.getAttribute("data-datetime")));
   }
 }

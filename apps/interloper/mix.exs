@@ -4,7 +4,7 @@ defmodule Interloper.MixProject do
   def project do
     [
       app: :interloper,
-      version: "0.2.2-alpha",
+      version: "0.2.3",
       build_path: "../../_build",
       config_path: "../../config/config.exs",
       deps_path: "../../deps",

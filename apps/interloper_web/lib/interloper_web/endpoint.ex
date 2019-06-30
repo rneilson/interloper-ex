@@ -14,7 +14,7 @@ defmodule InterloperWeb.Endpoint do
     at: "/",
     from: :interloper_web,
     gzip: true,
-    only_matching: ~w(css fonts images js rampant favicon robots)
+    only_matching: ~w(css fonts images js rampant favicon pubkey)
 
   # Code reloading can be explicitly enabled under the
   # :code_reloader configuration of your endpoint.
