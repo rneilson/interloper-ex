@@ -23,7 +23,7 @@ defmodule Interloper.Umbrella.MixProject do
   # and cannot be accessed from applications inside the apps folder
   defp deps do
     [
-      {:distillery, "~> 2.0"},
+      {:distillery, "~> 2.1"},
     ]
   end
 end

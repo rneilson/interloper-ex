@@ -53,7 +53,7 @@ RUN cd apps/interloper_web/assets && \
 
 # Build release
 RUN mkdir -p /opt/build && \
-    mix release --verbose && \
+    mix distillery.release --verbose && \
     RELEASES_DIR="$(pwd)/_build/${MIX_ENV}/rel/interloper_ex/releases" && \
     REL_VSN="$(cut -d' ' -f2 "${RELEASES_DIR}"/start_erl.data)" && \
     cp "${RELEASES_DIR}/${REL_VSN}/interloper_ex.tar.gz" /opt/build/ && \
