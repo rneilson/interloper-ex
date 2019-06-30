@@ -1,6 +1,6 @@
 // import { Controller } from "stimulus"
 import { Controller } from "../../vendor/stimulus.umd.js";
-import { dateFormat } from "../utils/datetime";
+import { insertDatetime } from "../utils/datetime";
 
 export default class extends Controller {
   static get targets () {
@@ -73,7 +73,7 @@ export default class extends Controller {
         // Show commit datetime
         const timeTarget = this.timeTarget;
         if (timeTarget) {
-          timeTarget.textContent = dateFormat(new Date(commit.commit.author.date));
+          insertDatetime(timeTarget, commit.commit.author.date);
         }
       });
     }

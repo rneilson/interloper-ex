@@ -5,7 +5,6 @@ const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
 function dateFormat (dt) {
-
   if (typeof dt === 'string' || typeof dt === 'number') {
     dt = new Date(dt);
   }
@@ -26,4 +25,14 @@ function dateFormat (dt) {
     trimpad(dt.getHours()) + ':' + trimpad(dt.getMinutes()) + ':' + trimpad(dt.getSeconds());
 }
 
-export { dateFormat };
+function insertDatetime (el, dt) {
+  if (typeof dt === 'string' || typeof dt === 'number') {
+    dt = new Date(dt);
+  }
+  // TODO: fancier formatting
+  el.innerHTML = `<time datetime="${dt.toISOString()}">${dateFormat(dt)}`;
+
+  return el;
+}
+
+export { dateFormat, insertDatetime };

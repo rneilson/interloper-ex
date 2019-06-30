@@ -22,7 +22,7 @@
 </div>
 <div class="textbox">
   Pubkey:
-  <a class="blue selector" href="<%= Routes.static_path(@conn, "/pubkey.asc") %>" target="_blank">
+  <a class="purple selector" href="<%= Routes.static_path(@conn, "/pubkey.asc") %>" target="_blank">
     A838 D61B D3E0 539A 021A DA43 038E 477B 290B 5662
   </a>
 </div>
