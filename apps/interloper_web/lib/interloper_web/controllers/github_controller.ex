@@ -5,17 +5,18 @@ defmodule InterloperWeb.GithubController do
   alias InterloperWeb.GithubClient
 
   def repo_list(conn, %{username: username}) do
+    description = "Github repositories for #{username}"
     # First fetch repo list
-    case GithubClient.fetch("/users/#{username}/repos?sort=created") do
+    case GithubClient.fetch("/users/#{username}/repos?sort=pushed") do
       {:ok, repos} ->
         repo_list = get_repo_details(repos)
-        render(conn, "repo_list.html", repo_list: repo_list)
+        meta = %{ :description => description }
+        render(conn, "repo_list.html", repo_list: repo_list, meta: meta)
       {:error, reason} ->
-        loading = "Github repo list for #{username}"
         msg = if InterloperWeb.Endpoint.config(:debug_errors), do: reason, else: "Service unavailable"
         conn
         |> put_status(503)
-        |> SharedController.loading_error(%{reason: msg, loading: loading})
+        |> SharedController.loading_error(%{reason: msg, loading: description})
     end
   end
 
