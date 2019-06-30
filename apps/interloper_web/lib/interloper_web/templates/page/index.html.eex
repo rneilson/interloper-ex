@@ -27,38 +27,41 @@
   </a>
 </div>
 <div class="textbox"><br></div>
-<div class="textbox">
-  <span class="bold underline">About</span>
-</div>
-<div class="textbox"><br></div>
-<div class="textbox">
-  &gt;&nbsp;<a class="blue selector" href="mailto:rneilson@interloper.ca" target="_blank">Email</a>
-</div>
-<div class="textbox"><br></div>
-<div class="textbox">
-  &gt;&nbsp;<a class="blue selector" href="https://twitter.com/delta_vee" rel="nofollow me" target="_blank">Twitter</a>
-</div>
-<div class="textbox"><br></div>
-<div class="textbox">
-  &gt;&nbsp;<a class="blue selector" href="https://github.com/rneilson" rel="nofollow me" target="_blank">Github</a>
-</div>
-<div class="textbox"><br></div>
-<div class="textbox">
-  <span class="bold underline">Stuff</span>
-</div>
-<div class="textbox"><br></div>
-<div class="textbox">
-  &gt;&nbsp;<a class="blue selector" href="<%= Routes.twitter_path(@conn, :recent) %>">Recent tweets</a>
-</div>
-<div class="textbox"><br></div>
-<div class="textbox">
-  &gt;&nbsp;<a class="blue selector" href="<%= Routes.github_path(@conn, :repo_list) %>">Code repositories</a>
-</div>
-<div class="textbox"><br></div>
-<div class="textbox">
-  &gt;&nbsp;<a class="blue selector" href="<%= Routes.page_path(@conn, :games) %>">Game projects</a>
-</div>
-<div class="textbox"><br></div>
+<section class="chunk">
+  <div class="textbox">
+    <span class="bold underline">Places</span>
+  </div>
+  <div class="textbox"><br></div>
+  <div class="textbox">
+    &gt;&nbsp;<a class="blue selector" href="https://twitter.com/delta_vee" rel="nofollow me" target="_blank">Twitter</a>
+  </div>
+  <div class="textbox"><br></div>
+  <div class="textbox">
+    &gt;&nbsp;<a class="blue selector" href="https://github.com/rneilson" rel="nofollow me" target="_blank">Github</a>
+  </div>
+  <div class="textbox"><br></div>
+  <div class="textbox">
+    &gt;&nbsp;<a class="blue selector" href="mailto:rneilson@interloper.ca" target="_blank">Email</a>
+  </div>
+  <div class="textbox"><br></div>
+</section><section class="chunk">
+  <div class="textbox">
+    <span class="bold underline">Things</span>
+  </div>
+  <div class="textbox"><br></div>
+  <div class="textbox">
+    &gt;&nbsp;<a class="blue selector" href="<%= Routes.twitter_path(@conn, :recent) %>">Recent tweets</a>
+  </div>
+  <div class="textbox"><br></div>
+  <div class="textbox">
+    &gt;&nbsp;<a class="blue selector" href="<%= Routes.github_path(@conn, :repo_list) %>">Code repositories</a>
+  </div>
+  <div class="textbox"><br></div>
+  <div class="textbox">
+    &gt;&nbsp;<a class="blue selector" href="<%= Routes.page_path(@conn, :games) %>">Game projects</a>
+  </div>
+  <div class="textbox"><br></div>
+</section>
 <div class="textbox">
   <span class="italic">More, eventually...</a>
 </div>

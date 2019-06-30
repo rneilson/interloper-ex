@@ -314,8 +314,8 @@ sup {
     overflow-x: hidden;
     position: relative;
     height: 100vh;
-    padding-left: 4px;
-    padding-right: 4px;
+    padding-left: 12px;
+    padding-right: 12px;
 }
 #main {
     background-color: black;
@@ -391,6 +391,11 @@ body.intro-sequence #status, body.intro-sequence #command {
 }
 .indent-lg {
     margin-left: 30px;
+}
+.chunk {
+    display: inline-block;
+    vertical-align: top;
+    padding-right: 8em;
 }
 .bright {
     color: black !important;
