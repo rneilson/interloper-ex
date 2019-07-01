@@ -73,12 +73,17 @@ defmodule InterloperWeb.Endpoint do
     site_scheme = System.get_env("SITE_SCHEME")
     # HTTP/S config
     tls_crt = System.get_env("SITE_TLS_CRT")
-    tls_cacrt = System.get_env("SITE_TLS_CA")
+    tls_cacrt = System.get_env("SITE_TLS_CA") || nil
     tls_key = System.get_env("SITE_TLS_KEY") || tls_crt
     # Return either TLS-enabled or HTTP-only
     overrides =
       cond do
         is_binary(tls_crt) and tls_crt != "" ->
+          ca_opts =
+            case tls_cacrt do
+              nil -> []
+              cacertfile -> [cacertfile: cacertfile]
+            end
           # HTTPS, assume redirect
           # Set HTTP and HTTPS listeners, force redirect
           [
@@ -87,12 +92,11 @@ defmodule InterloperWeb.Endpoint do
             https: [
               :inet6,
               port: port_https,
+              compress: true,
               cipher_suite: :strong,
               certfile: tls_crt,
               keyfile: tls_key,
-              cacertfile: tls_cacrt,
-              compress: true,
-            ],
+            ] ++ ca_opts,
           ]
         site_scheme == "https" ->
           # Behind TLS-terminating proxy

@@ -101,7 +101,7 @@ ARG SITE_NAME=www.interloper.ca
 ARG SITE_SCHEME=https
 ARG SITE_TLS_CRT=/opt/app/tls/${SITE_NAME}.pem
 ARG SITE_TLS_KEY=/opt/app/tls/${SITE_NAME}.key
-ARG SITE_TLS_CA=/opt/app/tls/${SITE_NAME}_chain.pem
+# ARG SITE_TLS_CA=/opt/app/tls/${SITE_NAME}_chain.pem
 
 # Copy TLS cert(s)
 COPY --chown=1000:1000 tls/ tls/
@@ -111,5 +111,5 @@ ENV MIX_ENV=${MIX_ENV} \
     SITE_NAME=${SITE_NAME} \
     SITE_SCHEME=${SITE_SCHEME} \
     SITE_TLS_CRT=${SITE_TLS_CRT} \
-    SITE_TLS_KEY=${SITE_TLS_KEY} \
-    SITE_TLS_CA=${SITE_TLS_CA}
+    SITE_TLS_KEY=${SITE_TLS_KEY}
+    # SITE_TLS_CA=${SITE_TLS_CA}
