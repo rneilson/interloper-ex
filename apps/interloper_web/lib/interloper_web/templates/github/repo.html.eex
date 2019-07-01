@@ -33,7 +33,7 @@
         <span class="small" data-controller="github-commit" data-github-commit-url="<%= @commit_url %>">
             <span class="err" data-target="github-commit.err"></span>
             <span data-target="github-commit.text">Commit details pending</span>
-            <a class="yellow selector" data-target="github-commit.link"></a>
+            <a class="yellow selector" data-target="github-commit.link" target="_blank"></a>
             <span class="green" data-target="github-commit.time"></span>
         </span>
     <% true -> %>

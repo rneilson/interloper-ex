@@ -195,6 +195,7 @@ div.tweetbox a > img, div.tweetbox video {
     border-color: #57626d;
     border-style: solid;
     padding: 0px;
+    width: 100%;
     max-width: 480px;
 }
 div.tweetbox a:focus > img, div.tweetbox a:hover > img {
