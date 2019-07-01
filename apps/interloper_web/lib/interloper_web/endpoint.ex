@@ -73,6 +73,7 @@ defmodule InterloperWeb.Endpoint do
     site_scheme = System.get_env("SITE_SCHEME")
     # HTTP/S config
     tls_crt = System.get_env("SITE_TLS_CRT")
+    tls_cacrt = System.get_env("SITE_TLS_CA")
     tls_key = System.get_env("SITE_TLS_KEY") || tls_crt
     # Return either TLS-enabled or HTTP-only
     overrides =
@@ -89,6 +90,7 @@ defmodule InterloperWeb.Endpoint do
               cipher_suite: :strong,
               certfile: tls_crt,
               keyfile: tls_key,
+              cacertfile: tls_cacrt,
               compress: true,
             ],
           ]
