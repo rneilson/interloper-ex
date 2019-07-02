@@ -1,5 +1,4 @@
 <!-- Twitter fetched at <%= SharedView.date_format(@recent["as_of"] || true) %> -->
-<div class="textbox"><br></div>
 <div class="textbox">
     <%= render("user.html", user: @recent["user"]) %>
 </div>

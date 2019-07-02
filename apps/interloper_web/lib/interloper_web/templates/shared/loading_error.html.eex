@@ -1,4 +1,3 @@
-<div class="textbox"><br></div>
 <div class="textbox">
     <span class="err">Error loading </span><span class="err" id="error-path"><%= @loading %></span>
 </div>
