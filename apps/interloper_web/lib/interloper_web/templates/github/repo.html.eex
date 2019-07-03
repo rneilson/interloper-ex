@@ -1,43 +1,41 @@
-<div class="textbox">
-    <%= if @repo["fork"] do %>
-    <a class="purple selector" href="<%= @repo["html_url"] %>" target="_blank">
-        <%= @repo["name"] %> <span class="italic">(fork)</span></a>
-    <% else %>
-    <a class="blue selector" href="<%= @repo["html_url"] %>" target="_blank">
-        <%= @repo["name"] %></a>
-    <% end %>
-    <%= if @repo["language"] do %>
-    <span class="italic">(<%= @repo["language"] %>)</span>
-    <% end %>
-</div>
-<div class="textbox indent">
-    <span><%= @repo["description"] %></span>
-</div>
-<div class="textbox indent">
+<p>
+  <%= if @repo["fork"] do %>
+  <a class="purple selector" href="<%= @repo["html_url"] %>" target="_blank">
+    <%= @repo["name"] %> <span class="italic">(fork)</span></a>
+  <% else %>
+  <a class="blue selector" href="<%= @repo["html_url"] %>" target="_blank">
+    <%= @repo["name"] %></a>
+  <% end %>
+  <%= if @repo["language"] do %>
+  <span class="italic">(<%= @repo["language"] %>)</span>
+  <% end %>
+  <br>
+  <span class="indent"><%= @repo["description"] %></span><br>
+  <span class="indent">
     <%= cond do %>
     <% assigns[:commit] -> %>
-        <span class="small">
-            Last commit:
-            <a class="yellow selector" href="<%= @commit["html_url"] %>">
-                <%= String.slice(@commit["sha"], 0..7) %>
-            </a>
-            <span class="green" data-datetime="<%= @commit["commit"]["author"]["date"] %>">
-                <%= SharedView.date_format(@commit["commit"]["author"]["date"]) %>
-            </span>
+      <span class="small">
+        Last commit:
+        <a class="yellow selector" href="<%= @commit["html_url"] %>">
+          <%= String.slice(@commit["sha"], 0..7) %>
+        </a>
+        <span class="green" data-datetime="<%= @commit["commit"]["author"]["date"] %>">
+          <%= SharedView.date_format(@commit["commit"]["author"]["date"]) %>
         </span>
+      </span>
     <% assigns[:commit_err] -> %>
-        <span class="small err">
-            Error retrieving last commit: <%= SharedView.ensure_string(@commit_err) %>
-        </span>
+      <span class="small err">
+        Error retrieving last commit: <%= SharedView.ensure_string(@commit_err) %>
+      </span>
     <% assigns[:commit_url] -> %>
-        <span class="small" data-controller="github-commit" data-github-commit-url="<%= @commit_url %>">
-            <span class="err" data-target="github-commit.err"></span>
-            <span data-target="github-commit.text">Commit details pending</span>
-            <a class="yellow selector" data-target="github-commit.link" target="_blank"></a>
-            <span class="green" data-target="github-commit.time"></span>
-        </span>
+      <span class="small" data-controller="github-commit" data-github-commit-url="<%= @commit_url %>">
+        <span class="err" data-target="github-commit.err"></span>
+        <span data-target="github-commit.text">Commit details pending</span>
+        <a class="yellow selector" data-target="github-commit.link" target="_blank"></a>
+        <span class="green" data-target="github-commit.time"></span>
+      </span>
     <% true -> %>
-        <span class="small">No commit details available</span>
+      <span class="small">No commit details available</span>
     <% end %>
-</div>
-<div class="textbox"><br></div>
+  </span>
+</p>

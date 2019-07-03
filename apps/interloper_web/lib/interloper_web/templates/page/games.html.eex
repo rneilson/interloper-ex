@@ -1,38 +1,29 @@
-<div class="textbox"><br></div>
 <div class="textbox">
+  <p>
     <span class="bold underline">Game projects</span>
-</div>
-<div class="textbox"><br></div>
-<div class="textbox">
-    <div class="imgbox">
-        <a class="blue selector" href="<%= Routes.page_path(@conn, :rampant) %>" target="_blank">
-            <img src="<%= Routes.static_path(@conn, "/rampant/images/banner-small.jpg") %>" title="_rampant">
-        </a>
-    </div>
-</div>
-<div class="textbox"><br></div>
-<div class="textbox">
+  </p>
+  <p class="imgbox">
+    <a class="blue selector" href="<%= Routes.page_path(@conn, :rampant) %>" target="_blank">
+        <img src="<%= Routes.static_path(@conn, "/rampant/images/banner-small.jpg") %>" title="_rampant">
+    </a>
+  </p>
+  <p>
     A twin-stick arena shooter, featuring dynamic physics, a distinct aesthetic, multiple game modes, and intelligent enemy AI.
-</div>
-<div class="textbox"><br></div>
-<div class="textbox">
+  </p>
+  <p>
     <%# TODO: update base URL if/when _rampant subsite brought in %>
     <a class="blue selector" href="<%= Routes.page_path(@conn, :rampant) %>" target="_blank">Visit the official site</a>
-</div>
-<div class="textbox"><br></div>
-<div class="textbox">
+  </p>
+  <p>
     <a class="blue selector" href="https://rneilson.itch.io/rampant" target="_blank">Buy it on itch.io</a>
-</div>
-<div class="textbox"><br></div>
-<div class="textbox">
+  </p>
+  <p>
     <a class="blue selector" href="https://www.youtube.com/watch?v=L9RNKRnfUKE" target="_blank" data-page-id="trailer">Watch the trailer on Youtube</a>
-</div>
-<div class="textbox"><br></div>
-<div class="textbox">
+  </p>
+  <p>
     <a class="blue selector" href="https://github.com/rneilson/rampant-src" target="_blank">Read the source on Github</a>
-</div>
-<div class="textbox"><br></div>
-<div class="textbox">
+  </p>
+  <p>
     <a class="green selector" href="<%= Routes.page_path(@conn, :index) %>">[Main]</a>
+  </p>
 </div>
-<div class="textbox"><br></div>

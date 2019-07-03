@@ -1,13 +1,10 @@
-<div class="textbox"><br></div>
 <div class="textbox">
+  <p>
     <span class="err">Error loading </span><span class="err" id="error-path"><%= @loading %></span>
-</div>
-<div class="textbox"><br></div>
-<div class="textbox">
-    <pre class="err" id="error-reason"><%= ensure_string(@reason, pretty: true) %></pre>
-</div>
-<div class="textbox"><br></div>
-<div class="textbox">
+  </p>
+  <pre class="err" id="error-reason"><%= ensure_string(@reason, pretty: true) %></pre>
+  <p>
     <a class="green selector html-only" href="/">[Main]</a>
     <a class="yellow selector js-only" href="javascript:history.back()">[Back]</a>
+  </p>
 </div>

@@ -1,16 +1,16 @@
 <!-- Twitter fetched at <%= SharedView.date_format(@recent["as_of"] || true) %> -->
-<div class="textbox"><br></div>
-<div class="textbox">
-    <%= render("user.html", user: @recent["user"]) %>
+<div class="sectionbox">
+  <%= render("user.html", user: @recent["user"]) %>
 </div>
-<div class="textbox"><br></div>
 <div class="textbox">
-    Recent tweets:<br>
-    <div class="tweetspacer"></div>
+  Recent tweets:
+  <hr class="tweetspacer"></hr>
 </div>
-<%= render_tweets(@recent["tweets"], @recent["others"], @recent["user"]) %>
-<div class="textbox"><br></div>
+<div class="sectionbox">
+  <%= render_tweets(@recent["tweets"], @recent["others"], @recent["user"]) %>
+</div>
 <div class="textbox">
+  <p>
     <a class="green selector" href="<%= Routes.page_path(@conn, :index) %>">[Main]</a>
+  </p>
 </div>
-<div class="textbox"><br></div>

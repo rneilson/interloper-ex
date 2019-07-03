@@ -91,10 +91,18 @@ body.intro-sequence.inactive-x div.popup {
     right: 50%;
     overflow: hidden;
 }
+body.intro-sequence.inactive-x #output {
+    padding-left: 0px;
+    padding-right: 0px;
+}
 body.intro-sequence.inactive-y div.popup {
     top: 50%;
     bottom: 50%;
     overflow: hidden;
+}
+body.intro-sequence.inactive-y #output {
+    padding-top: 0px;
+    /*padding-bottom: 0px;*/
 }
 div.status {
     left: 0px;
@@ -117,7 +125,7 @@ div.bannerbox {
     width: 100%;
     height: 100%;
 }
-div.bannerbox img{
+div.bannerbox img {
     max-width: 95.55556%;
     max-height: 95.55556%;
     vertical-align: middle;
@@ -126,36 +134,13 @@ div.textbox {
     border: none;
     padding: 0px 4px;
 }
-div.textbox p {
-    padding: 0px;
+div.sectionbox, div.textbox p, div.textbox pre {
+    padding: 0px 0px 19px;
     margin: 0px;
 }
 div.textbox pre {
-    margin: 0px;
     overflow-x: auto;
     overflow-y: hidden;
-}
-div.imgbox {
-    padding: 0px;
-    margin: 0px;
-}
-div.imgbox img {
-    border: none;
-}
-div.imgbox a > img {
-    display: inline-block;
-    vertical-align: top;
-    max-width: 100%;
-    padding: 1px;
-}
-div.imgbox a:focus > img, div.imgbox a:hover > img {
-    -webkit-box-shadow: 0 0 10px #19c119;
-    -moz-box-shadow: 0 0 10px #19c119;
-    box-shadow: 0 0 10px #19c119;
-    border-width: 1px;
-    border-color: #19c119;
-    border-style: solid;
-    padding: 0px;
 }
 div.pic {
     display: inline-block;
@@ -187,7 +172,7 @@ div.tweetbox {
     width: calc(100% - 48px);
     padding: 0px 4px 4px;
 }
-div.tweetbox > div.imgbox {
+div.tweetbox > .imgbox {
     margin-top: 16px;
 }
 div.tweetbox a > img, div.tweetbox video {
@@ -217,7 +202,7 @@ div.tweetquote {
     border-color: #57626d;
     border-style: solid;
 }
-div.tweetspacer {
+hr.tweetspacer {
     margin: 0px -1px 4px 0px;
     padding: 0px;
     border-width: 1px 0px 0px;
@@ -251,6 +236,13 @@ div.tweetspacer {
         font-size: 2.06044vw;
         line-height: 2.60989vw;
     }
+    div.sectionbox, div.textbox p, div.textbox pre {
+        padding-bottom: 2.60989vw;
+    }
+    #output {
+        padding-top: 2.60989vw;
+        /*padding-bottom: 2.60989vw;*/
+    }
     .popup {
         top: 2.60989vw;
         bottom: 2.60989vw;
@@ -267,6 +259,13 @@ div.tweetspacer {
     body {
         font-size: 11px;
         line-height: 14px;
+    }
+    div.sectionbox, div.textbox p, div.textbox pre {
+        padding-bottom: 14px;
+    }
+    #output {
+        padding-top: 14px;
+        /*padding-bottom: 14px;*/
     }
     .popup {
         top: 14px;
@@ -334,6 +333,8 @@ sup {
     border-color: #298be6;
     border-style: solid;
     border-width: 1px 0px;
+    padding-top: 19px;
+    /*padding-bottom: 19px;*/
 }
 #output:focus {
     outline: none;
@@ -350,6 +351,28 @@ body.intro-sequence #output > * {
 }
 body.intro-sequence #status, body.intro-sequence #command {
     opacity: 0;
+}
+.imgbox {
+    padding: 0px;
+    margin: 0px;
+}
+.imgbox img {
+    border: none;
+}
+.imgbox a > img {
+    display: inline-block;
+    vertical-align: top;
+    max-width: 100%;
+    padding: 1px;
+}
+.imgbox a:focus > img, .imgbox a:hover > img {
+    -webkit-box-shadow: 0 0 10px #19c119;
+    -moz-box-shadow: 0 0 10px #19c119;
+    box-shadow: 0 0 10px #19c119;
+    border-width: 1px;
+    border-color: #19c119;
+    border-style: solid;
+    padding: 0px;
 }
 .visible {
     opacity: 1;
