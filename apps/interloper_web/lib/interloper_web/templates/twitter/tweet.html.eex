@@ -1,10 +1,9 @@
 <div class="textbox" data-tweet-id="<%= @tweet["id_str"] %>">
-    <%= if @retweeted do %>
-    <div class="tweettext">
-        <%# <%= render("user_link.html", %{user: @retweeted}) %>
-        Retweeted:
-    </div>
-    <% end %>
-    <%= render("tweet_inner.html", assigns) %>
-    <div class="tweetspacer"></div>
+  <%= if @retweeted do %>
+  <div class="tweettext">
+    Retweeted: <%# <%= render("user_link.html", %{user: @retweeted}) %>
+  </div>
+  <% end %>
+  <%= render("tweet_inner.html", assigns) %>
+  <hr class="tweetspacer"></hr>
 </div>

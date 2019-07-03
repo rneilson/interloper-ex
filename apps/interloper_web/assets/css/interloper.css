@@ -102,7 +102,7 @@ body.intro-sequence.inactive-y div.popup {
 }
 body.intro-sequence.inactive-y #output {
     padding-top: 0px;
-    padding-bottom: 0px;
+    /*padding-bottom: 0px;*/
 }
 div.status {
     left: 0px;
@@ -134,13 +134,11 @@ div.textbox {
     border: none;
     padding: 0px 4px;
 }
-div.textbox p {
-    margin: 0px 0px 19px;
-    padding: 0px;
+div.sectionbox, div.textbox p, div.textbox pre {
+    padding: 0px 0px 19px;
+    margin: 0px;
 }
 div.textbox pre {
-    margin: 0px 0px 19px;
-    padding: 0px;
     overflow-x: auto;
     overflow-y: hidden;
 }
@@ -204,7 +202,7 @@ div.tweetquote {
     border-color: #57626d;
     border-style: solid;
 }
-div.tweetspacer {
+hr.tweetspacer {
     margin: 0px -1px 4px 0px;
     padding: 0px;
     border-width: 1px 0px 0px;
@@ -238,12 +236,12 @@ div.tweetspacer {
         font-size: 2.06044vw;
         line-height: 2.60989vw;
     }
-    div.textbox p, div.textbox pre {
-        margin-bottom: 2.60989vw;
+    div.sectionbox, div.textbox p, div.textbox pre {
+        padding-bottom: 2.60989vw;
     }
     #output {
         padding-top: 2.60989vw;
-        padding-bottom: 2.60989vw;
+        /*padding-bottom: 2.60989vw;*/
     }
     .popup {
         top: 2.60989vw;
@@ -262,12 +260,12 @@ div.tweetspacer {
         font-size: 11px;
         line-height: 14px;
     }
-    div.textbox p, div.textbox pre {
-        margin-bottom: 14px;
+    div.sectionbox, div.textbox p, div.textbox pre {
+        padding-bottom: 14px;
     }
     #output {
         padding-top: 14px;
-        padding-bottom: 14px;
+        /*padding-bottom: 14px;*/
     }
     .popup {
         top: 14px;
@@ -336,7 +334,7 @@ sup {
     border-style: solid;
     border-width: 1px 0px;
     padding-top: 19px;
-    padding-bottom: 19px;
+    /*padding-bottom: 19px;*/
 }
 #output:focus {
     outline: none;
