@@ -1,67 +1,54 @@
 <div class="textbox">
-  <span class="green" id="motd">
+  <p class="green" id="motd">
     Welcome to InterloperOS!<br>
     Version: <span class="orange"><%= get_version() %></span><br>
     Mode: <span class="orange">Elixir</span><span class="orange js-only">/Stimulus</span>
-  </span>
+  </p>
+  <p>
+    This is a test of the InterloperOS system.
+  </p>
+  <p class="js-only instructions">
+    <span class="small">* Up/down arrow keys to select</span><br>
+    <span class="small">* Escape key to deselect</span><br>
+    <span class="small">* Enter key to accept</span><br>
+  </p>
 </div>
-<div class="textbox"><br></div>
-<div class="textbox">
-  This is a test of the InterloperOS system.<br>
-</div>
-<div class="textbox"><br></div>
-<div class="textbox js-only instructions">
-  <span class="small">* Up/down arrow keys to select</span><br>
-  <span class="small">* Escape key to deselect</span><br>
-  <span class="small">* Enter key to accept</span><br>
-  <br>
-</div>
-<div class="noborder h-card">
-  <div class="textbox">
+<div class="textbox h-card">
+  <p>
     User:
-    <a class="yellow p-name u-url" href="<%= Routes.static_url(@conn, "/") %>">Raymond Neilson</a>
-  </div>
-  <div class="textbox">
+    <a class="yellow p-name u-url" href="<%= Routes.static_url(@conn, "/") %>">Raymond Neilson</a><br>
     Pubkey:
-    <a class="purple selector u-key" href="<%= Routes.static_url(@conn, "/pubkey.asc") %>" target="_blank">A838 D61B D3E0 539A 021A DA43 038E 477B 290B 5662</a>
-  </div>
-  <div class="textbox"><br></div>
-  <section class="chunk">
-    <div class="textbox">
+    <a class="purple selector u-key" href="<%= Routes.static_url(@conn, "/pubkey.asc") %>" target="_blank">
+      A838&nbsp;D61B&nbsp;D3E0&nbsp;539A&nbsp;021A DA43&nbsp;038E&nbsp;477B&nbsp;290B&nbsp;5662</a><br>
+  </p>
+  <section class="sectionbox chunk">
+    <p>
       <span class="bold underline">Places</span>
-    </div>
-    <div class="textbox"><br></div>
-    <div class="textbox">
+    </p>
+    <p>
       &gt;&nbsp;<a class="blue selector u-url" href="https://twitter.com/delta_vee" rel="nofollow me" target="_blank">Twitter</a>
-    </div>
-    <div class="textbox"><br></div>
-    <div class="textbox">
+    </p>
+    <p>
       &gt;&nbsp;<a class="blue selector u-url" href="https://github.com/rneilson" rel="nofollow me" target="_blank">Github</a>
-    </div>
-    <div class="textbox"><br></div>
-    <div class="textbox">
+    </p>
+    <p>
       &gt;&nbsp;<a class="blue selector u-email" href="mailto:rneilson@interloper.ca">Email</a>
-    </div>
-    <div class="textbox"><br></div>
-  </section><section class="chunk">
-    <div class="textbox">
+    </p>
+  </section><section class="sectionbox chunk">
+    <p>
       <span class="bold underline">Things</span>
-    </div>
-    <div class="textbox"><br></div>
-    <div class="textbox">
+    </p>
+    <p>
       &gt;&nbsp;<a class="blue selector" href="<%= Routes.twitter_path(@conn, :recent) %>">Recent tweets</a>
-    </div>
-    <div class="textbox"><br></div>
-    <div class="textbox">
+    </p>
+    <p>
       &gt;&nbsp;<a class="blue selector" href="<%= Routes.github_path(@conn, :repo_list) %>">Code repositories</a>
-    </div>
-    <div class="textbox"><br></div>
-    <div class="textbox">
+    </p>
+    <p>
       &gt;&nbsp;<a class="blue selector" href="<%= Routes.page_path(@conn, :games) %>">Game projects</a>
-    </div>
-    <div class="textbox"><br></div>
+    </p>
   </section>
 </div>
 <div class="textbox">
-  <span class="italic">More, eventually...</a>
+  <span class="italic">More, eventually...</a><!-- Login here soon, me -->
 </div>
