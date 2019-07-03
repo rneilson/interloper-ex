@@ -144,28 +144,6 @@ div.textbox pre {
     overflow-x: auto;
     overflow-y: hidden;
 }
-div.imgbox {
-    padding: 0px;
-    margin: 0px;
-}
-div.imgbox img {
-    border: none;
-}
-div.imgbox a > img {
-    display: inline-block;
-    vertical-align: top;
-    max-width: 100%;
-    padding: 1px;
-}
-div.imgbox a:focus > img, div.imgbox a:hover > img {
-    -webkit-box-shadow: 0 0 10px #19c119;
-    -moz-box-shadow: 0 0 10px #19c119;
-    box-shadow: 0 0 10px #19c119;
-    border-width: 1px;
-    border-color: #19c119;
-    border-style: solid;
-    padding: 0px;
-}
 div.pic {
     display: inline-block;
     vertical-align: top;
@@ -196,7 +174,7 @@ div.tweetbox {
     width: calc(100% - 48px);
     padding: 0px 4px 4px;
 }
-div.tweetbox > div.imgbox {
+div.tweetbox > .imgbox {
     margin-top: 16px;
 }
 div.tweetbox a > img, div.tweetbox video {
@@ -375,6 +353,28 @@ body.intro-sequence #output > * {
 }
 body.intro-sequence #status, body.intro-sequence #command {
     opacity: 0;
+}
+.imgbox {
+    padding: 0px;
+    margin: 0px;
+}
+.imgbox img {
+    border: none;
+}
+.imgbox a > img {
+    display: inline-block;
+    vertical-align: top;
+    max-width: 100%;
+    padding: 1px;
+}
+.imgbox a:focus > img, .imgbox a:hover > img {
+    -webkit-box-shadow: 0 0 10px #19c119;
+    -moz-box-shadow: 0 0 10px #19c119;
+    box-shadow: 0 0 10px #19c119;
+    border-width: 1px;
+    border-color: #19c119;
+    border-style: solid;
+    padding: 0px;
 }
 .visible {
     opacity: 1;
