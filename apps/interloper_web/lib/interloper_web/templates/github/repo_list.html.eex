@@ -1,9 +1,9 @@
 <div class="textbox">
+  <p>
     <span class="bold underline">Github repositories</span>
-</div>
-<div class="textbox"><br></div>
-<%= Enum.map(@repo_list, fn repo_map -> render("repo.html", repo_map) end) %>
-<div class="textbox">
+  </p>
+  <%= Enum.map(@repo_list, fn repo_map -> render("repo.html", repo_map) end) %>
+  <p>
     <a class="green selector" href="<%= Routes.page_path(@conn, :index) %>">[Main]</a>
+  </p>
 </div>
-<div class="textbox"><br></div>
