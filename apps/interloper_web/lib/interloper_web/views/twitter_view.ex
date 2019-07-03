@@ -8,7 +8,7 @@ defmodule InterloperWeb.TwitterView do
   ## HTML
 
   def render_tweets(tweets, users, user) do
-    render_tweets(tweets, Map.put_new(users, user["id_str"], user))
+    render_tweets(tweets, Map.put_new(users || %{}, user["id_str"], user))
   end
 
   def render_tweets(tweets, users) do

@@ -28,6 +28,7 @@ defmodule InterloperWeb.TwitterController do
     end
   end
 
+  # TODO: allow others from params?
   def recent(conn, _params) do
     username =
       Application.fetch_env!(:interloper_web, __MODULE__)
