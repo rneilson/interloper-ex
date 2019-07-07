@@ -1,4 +1,4 @@
 <link rel="author" href="<%= assigns[:meta][:author_url] || Routes.static_url(@conn, "/") %>" />
-<meta property="og:title" content="<%= assigns[:meta][:title] || "Interloper" %>">
+<meta property="og:title" content="<%= assigns[:meta][:title] || "Interloper - #{@conn.request_path}" %>">
 <meta property="og:description" content="<%= assigns[:meta][:description] || "Personal site of Raymond Neilson" %>">
 <meta property="og:image" content="<%= assigns[:meta][:image_url] || Routes.static_url(@conn, "/images/rodeo.png") %>">
