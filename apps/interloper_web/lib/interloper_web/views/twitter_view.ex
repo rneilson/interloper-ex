@@ -39,8 +39,8 @@ defmodule InterloperWeb.TwitterView do
     # Extract text (ignore text start index, btw)
     text =
       case tweet["display_text_range"] do
-        [_from_idx, to_idx] -> String.slice(tweet["text"], 0, to_idx)
-        _ -> tweet["text"]
+        [_from_idx, to_idx] -> String.slice(get_tweet_text(tweet), 0, to_idx)
+        _ -> get_tweet_text(tweet)
       end
     # Pre-extract entities
     # TODO: any bounds checking?
@@ -181,6 +181,10 @@ defmodule InterloperWeb.TwitterView do
     |> Stream.map(&Phoenix.HTML.raw/1)
     |> Enum.intersperse(tag(:br))
   end
+
+  defp get_tweet_text(%{"full_text" => full_text}), do: full_text
+
+  defp get_tweet_text(tweet), do: tweet["text"]
 
   defp get_tweet_href(id_str, screen_name) when is_binary(id_str) and is_binary(screen_name) do
     "https://twitter.com/#{screen_name}/status/#{id_str}"
