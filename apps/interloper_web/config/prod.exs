@@ -52,21 +52,39 @@ config :interloper_web, InterloperWeb.Endpoint,
 #
 # Check `Plug.SSL` for all available options in `force_ssl`.
 
+# NOTE: must set to any non-empty value during build
+# to enable force_ssl, as it's a compile-time option
 tls_crt = System.get_env("SITE_TLS_CRT")
+# Find HSTS value, set to "true" to use default of 1yr
+# Slightly complicated to catch literal "true" as well as
+# integer seconds values
+use_hsts =
+  case System.get_env("SITE_TLS_HSTS") do
+    hsts when is_binary(hsts) ->
+      if String.downcase(hsts) == "true" do
+        true
+      else
+        case Integer.parse(hsts) do
+          {hsts_seconds, ""} -> hsts_seconds
+          _ -> false
+        end
+      end
+    _ -> false
+  end
+# Main options switch
 cond do
-  # No HSTS for now until we're stable
   is_binary(tls_crt) and tls_crt != "" ->
     # HTTPS, assume redirect
     config :interloper_web, InterloperWeb.Endpoint,
       force_ssl: [
-        hsts: false,
+        hsts: use_hsts,
         host: {InterloperWeb.Endpoint, :redirect_host, []},
       ]
   System.get_env("SITE_SCHEME") == "https" ->
     # Behind TLS-terminating proxy
     config :interloper_web, InterloperWeb.Endpoint,
       force_ssl: [
-        hsts: false,
+        hsts: use_hsts,
         host: {InterloperWeb.Endpoint, :redirect_host, []},
         rewrite_on: [:x_forwarded_proto],
       ]
