@@ -92,7 +92,6 @@ defmodule InterloperWeb.Endpoint do
             https: [
               :inet6,
               port: port_https,
-              compress: true,
               cipher_suite: :strong,
               certfile: tls_crt,
               keyfile: tls_key,
@@ -103,7 +102,7 @@ defmodule InterloperWeb.Endpoint do
           # Set HTTP, force scheme
           [
             url: [host: site_host, port: site_port || port, scheme: "https"],
-            http: [:inet6, port: port, compress: true],
+            http: [:inet6, port: port],
             https: false,
           ]
         true ->
