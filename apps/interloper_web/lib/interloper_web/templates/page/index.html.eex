@@ -17,7 +17,7 @@
   <p>
     User:
     <a class="yellow p-name u-url" href="<%= Routes.static_url(@conn, "/") %>">Raymond Neilson</a><br>
-    Pubkey:
+    PGP:
     <a class="purple selector u-key" href="<%= Routes.static_url(@conn, "/pubkey.asc") %>" target="_blank">
       A838&nbsp;D61B&nbsp;D3E0&nbsp;539A&nbsp;021A DA43&nbsp;038E&nbsp;477B&nbsp;290B&nbsp;5662</a><br>
   </p>
