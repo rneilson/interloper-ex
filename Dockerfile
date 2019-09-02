@@ -1,18 +1,21 @@
-# Elixir image uses erlang:21-alpine, which uses alpine:3.9
+ARG ELIXIR_VERSION=1.9
+# Elixir image uses erlang:22-alpine, which uses alpine:3.9
 ARG ALPINE_VERSION=3.9
 
 ## Build image
-FROM elixir:1.8-alpine AS builder
+FROM elixir:${ELIXIR_VERSION}-alpine AS builder
 
 # Build settings (mostly regarding HTTPS)
 ARG MIX_ENV=prod
 ARG SITE_SCHEME=https
 ARG SITE_TLS_CRT=true
+ARG SITE_TLS_HSTS=false
 
 # Env var versions of above
 ENV MIX_ENV=${MIX_ENV} \
     SITE_SCHEME=${SITE_SCHEME} \
-    SITE_TLS_CRT=${SITE_TLS_CRT}
+    SITE_TLS_CRT=${SITE_TLS_CRT} \
+    SITE_TLS_HSTS=${SITE_TLS_HSTS}
 
 # Install build tools
 RUN apk update && \
