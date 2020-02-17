@@ -1,6 +1,6 @@
 ARG ELIXIR_VERSION=1.9
-# Elixir image uses erlang:22-alpine, which uses alpine:3.9
-ARG ALPINE_VERSION=3.9
+# Elixir image uses erlang:22-alpine, which uses alpine:3.11
+ARG ALPINE_VERSION=3.11
 
 ## Build image
 FROM elixir:${ELIXIR_VERSION}-alpine AS builder
