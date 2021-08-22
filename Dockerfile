@@ -1,6 +1,6 @@
 ARG ELIXIR_VERSION=1.9
-# Elixir image uses erlang:22-alpine, which uses alpine:3.11
-ARG ALPINE_VERSION=3.11
+# Elixir image uses erlang:22-alpine, which uses alpine:3.14
+ARG ALPINE_VERSION=3.14
 
 ## Build image
 FROM elixir:${ELIXIR_VERSION}-alpine AS builder
@@ -23,7 +23,7 @@ RUN apk update && \
     apk add --no-cache \
         git \
         nodejs \
-        nodejs-npm \
+        npm \
         build-base
 
 # Create user (to avoid perm issues later)
