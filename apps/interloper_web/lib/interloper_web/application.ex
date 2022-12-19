@@ -14,6 +14,8 @@ defmodule InterloperWeb.Application do
       {DynamicSupervisor, strategy: :one_for_one, name: InterloperWeb.DynamicSupervisor},
       # Task supervisor for fetch tasks (etc)
       {Task.Supervisor, name: InterloperWeb.TaskSupervisor},
+      # Phoenix Pubsub
+      {Phoenix.PubSub, name: InterloperWeb.PubSub},
       # Start the endpoint when the application starts
       InterloperWeb.Endpoint,
       # Starts a worker by calling: InterloperWeb.Worker.start_link(arg)

@@ -13,7 +13,7 @@ config :interloper_web, InterloperWeb.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "JvBFy2NnlcJ7SbDc4pu6u89g5T1HtcPU/s+jB7Ws9w2qr2xKOMhTF2tdZ931H8/Y",
   render_errors: [view: InterloperWeb.ErrorView, accepts: ~w(html json)],
-  pubsub: [name: InterloperWeb.PubSub, adapter: Phoenix.PubSub.PG2]
+  pubsub_server: InterloperWeb.PubSub
 
 # Github defaults
 config :interloper_web, InterloperWeb.GithubController,

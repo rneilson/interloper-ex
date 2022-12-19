@@ -35,7 +35,7 @@
           </div>
           <div id="output" class="popup" tabindex="0" data-controller="output"
             data-target="page.output" data-output-path="<%= @conn.request_path %>">
-            <%= render @view_module, @view_template, assigns %>
+            <%= @inner_content %>
           </div>
           <div id="command" class="status">
             <span id="preview" class="yellow" data-target="page.status"></span>
