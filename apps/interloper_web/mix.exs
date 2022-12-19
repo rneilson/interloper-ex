@@ -45,7 +45,7 @@ defmodule InterloperWeb.MixProject do
       {:interloper, in_umbrella: true},
       {:jason, "~> 1.0"},
       {:plug_cowboy, "~> 2.1"},
-      {:httpoison, "~> 1.5"},
+      {:httpoison, "~> 1.8"},
       {:uri_template, "~> 1.2"},
     ]
   end
