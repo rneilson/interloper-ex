@@ -2,7 +2,7 @@
 # should only configure the :interloper_web application itself
 # and only for organization purposes. All other config goes to
 # the umbrella root.
-use Mix.Config
+import Config
 
 # General application configuration
 config :interloper_web,
@@ -31,4 +31,4 @@ config :interloper_web, InterloperWeb.TwitterController,
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
-import_config "#{Mix.env()}.exs"
+import_config "#{config_env()}.exs"

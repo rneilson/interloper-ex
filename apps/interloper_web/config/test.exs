@@ -2,7 +2,7 @@
 # should only configure the :interloper_web application itself
 # and only for organization purposes. All other config goes to
 # the umbrella root.
-use Mix.Config
+import Config
 
 # We don't run a server during test. If one is required,
 # you can enable the server option below.

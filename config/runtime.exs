@@ -1,5 +1,6 @@
-## Runtime configuration
-use Mix.Config
+import Config
+
+# TODO: move any other runtime secrets here
 
 # Phoenix config
 if System.get_env("SERVE_ENDPOINTS") != "false" do
@@ -25,3 +26,7 @@ if twitter_recent_path = System.get_env("TWITTER_RECENT_PATH") do
   config :interloper_web, InterloperWeb.TwitterController,
     recent_path: twitter_recent_path
 end
+
+config :kernel,
+  inet_dist_listen_min: String.to_integer(System.get_env("DIST_PORT_MIN", "40000")),
+  inet_dist_listen_max: String.to_integer(System.get_env("DIST_PORT_MAX", "40040"))

@@ -2,7 +2,7 @@
 # should only configure the :interloper_web application itself
 # and only for organization purposes. All other config goes to
 # the umbrella root.
-use Mix.Config
+import Config
 
 # For production, don't forget to configure the url host
 # to something meaningful, Phoenix uses this information

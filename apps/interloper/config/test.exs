@@ -2,4 +2,4 @@
 # should only configure the :interloper application itself
 # and only for organization purposes. All other config goes to
 # the umbrella root.
-use Mix.Config
+import Config

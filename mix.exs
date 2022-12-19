@@ -5,6 +5,7 @@ defmodule Interloper.Umbrella.MixProject do
     [
       apps_path: "apps",
       start_permanent: Mix.env() == :prod,
+      releases: releases(),
       deps: deps()
     ]
   end
@@ -23,7 +24,21 @@ defmodule Interloper.Umbrella.MixProject do
   # and cannot be accessed from applications inside the apps folder
   defp deps do
     [
-      {:distillery, "~> 2.1"},
+      # {:distillery, "~> 2.1"},
+    ]
+  end
+
+  # Elixir releases config
+  defp releases() do
+    [
+      interloper_ex: [
+        version: "0.2.8",
+        applications: [
+          interloper: :permanent,
+          interloper_web: :permanent
+        ],
+        include_executables_for: [:unix]
+      ]
     ]
   end
 end
