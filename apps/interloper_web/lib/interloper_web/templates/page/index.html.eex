@@ -26,7 +26,7 @@
       <span class="bold underline">Places</span>
     </p>
     <p>
-      &gt;&nbsp;<a class="blue selector u-url" href="https://twitter.com/delta_vee" rel="nofollow me" target="_blank">Twitter</a>
+      &gt;&nbsp;<a class="blue selector u-url" href="https://mstdn.ca/@delta_vee" rel="nofollow me" target="_blank">Mastodon</a>
     </p>
     <p>
       &gt;&nbsp;<a class="blue selector u-url" href="https://github.com/rneilson" rel="nofollow me" target="_blank">Github</a>
@@ -39,13 +39,13 @@
       <span class="bold underline">Things</span>
     </p>
     <p>
-      &gt;&nbsp;<a class="blue selector" href="<%= Routes.twitter_path(@conn, :recent) %>">Recent tweets</a>
-    </p>
-    <p>
       &gt;&nbsp;<a class="blue selector" href="<%= Routes.github_path(@conn, :repo_list) %>">Code repositories</a>
     </p>
     <p>
       &gt;&nbsp;<a class="blue selector" href="<%= Routes.page_path(@conn, :games) %>">Game projects</a>
+    </p>
+    <p>
+      &gt;&nbsp;Twitter archive (upcoming)
     </p>
   </section>
 </div>
