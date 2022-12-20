@@ -29,18 +29,20 @@ RUN apk update && \
 # Create user (to avoid perm issues later)
 RUN addgroup -g 1000 user && \
     adduser -D -u 1000 -G user user && \
-    mkdir -p /opt/build && \
-    chown 1000:1000 /opt/build && \
     mkdir -p /opt/app/deps && \
     chown -R 1000:1000 /opt/app
 USER 1000:1000
+WORKDIR /opt/app
 
+# Install local copies of hex and rebar
 RUN mix local.rebar --force && \
     mix local.hex --force
 
 # Set build dir, copy source
-WORKDIR /opt/app
-COPY --chown=1000:1000 . .
+COPY --chown=1000:1000 apps apps
+COPY --chown=1000:1000 config config
+COPY --chown=1000:1000 rel rel
+COPY --chown=1000:1000 mix.exs mix.lock ./
 
 # Fetch and compile dependencies and source
 RUN mkdir -p deps && \
@@ -55,48 +57,11 @@ RUN cd apps/interloper_web/assets && \
     mix phx.digest
 
 # Build release
-RUN mkdir -p /opt/build && \
-    mix distillery.release --verbose && \
-    RELEASES_DIR="$(pwd)/_build/${MIX_ENV}/rel/interloper_ex/releases" && \
-    REL_VSN="$(cut -d' ' -f2 "${RELEASES_DIR}"/start_erl.data)" && \
-    cp "${RELEASES_DIR}/${REL_VSN}/interloper_ex.tar.gz" /opt/build/ && \
-    cd /opt/build && \
-    tar -xzf "interloper_ex.tar.gz" && \
-    rm "interloper_ex.tar.gz"
+RUN mix release
 
 
 ## Release image
 FROM alpine:${ALPINE_VERSION}
-
-# Install runtime deps
-RUN apk update && \
-    apk add --no-cache \
-        bash \
-        openssl-dev \
-        libcap \
-        ca-certificates
-
-# Create user (to avoid perm issues later)
-RUN addgroup -g 1000 user && \
-    adduser -D -u 1000 -G user user
-
-# Set build dir, copy source
-WORKDIR /opt/app
-COPY --from=builder --chown=1000:1000 /opt/build .
-
-# Use the release's script as the entrypoint
-ENTRYPOINT ["/opt/app/bin/interloper_ex"]
-CMD ["foreground"]
-
-# Allow binding to restricted ports
-# Also sneak in creating the writable dir
-RUN ERTS_VSN="$(cut -d' ' -f1 releases/start_erl.data)" && \
-    setcap CAP_NET_BIND_SERVICE=+eip "erts-${ERTS_VSN}/bin/beam.smp" && \
-    mkdir -p var && \
-    chown 1000:1000 var
-
-# *Now* set user
-USER 1000:1000
 
 # Some vars previously defined
 ARG MIX_ENV=prod
@@ -106,13 +71,44 @@ ARG SITE_TLS_CRT=/opt/app/tls/${SITE_NAME}.pem
 ARG SITE_TLS_KEY=/opt/app/tls/${SITE_NAME}.key
 # ARG SITE_TLS_CA=/opt/app/tls/${SITE_NAME}_chain.pem
 
-# Copy TLS cert(s)
-COPY --chown=1000:1000 tls/ tls/
-
-# Set env
+# Set env from args (again)
 ENV MIX_ENV=${MIX_ENV} \
     SITE_NAME=${SITE_NAME} \
     SITE_SCHEME=${SITE_SCHEME} \
     SITE_TLS_CRT=${SITE_TLS_CRT} \
     SITE_TLS_KEY=${SITE_TLS_KEY}
     # SITE_TLS_CA=${SITE_TLS_CA}
+
+# Install runtime deps
+RUN apk update && \
+    apk add --no-cache \
+        bash \
+        openssl \
+        libstdc++ \
+        libcap \
+        ca-certificates
+
+# Create user (to avoid perm issues later)
+RUN addgroup -g 1000 user && \
+    adduser -D -u 1000 -G user user
+
+# Set build dir, copy source
+WORKDIR /opt/app
+COPY --from=builder --chown=1000:1000 /opt/app/_build/${MIX_ENV}/rel/interloper_ex ./
+
+# Don't use the release's script as the entrypoint
+CMD ["/opt/app/bin/interloper_ex", "start"]
+
+# Allow binding to restricted ports
+# Also sneak in creating the writable dir
+# Have to extract the Erlang runtime version to setcap the BEAM executable
+RUN ERTS_VSN="$(cut -d' ' -f1 releases/start_erl.data)" && \
+    setcap CAP_NET_BIND_SERVICE=+eip "erts-${ERTS_VSN}/bin/beam.smp" && \
+    mkdir -p var && \
+    chown 1000:1000 var
+
+# *Now* set user
+USER 1000:1000
+
+# Copy TLS cert(s)
+COPY --chown=1000:1000 tls/ tls/
